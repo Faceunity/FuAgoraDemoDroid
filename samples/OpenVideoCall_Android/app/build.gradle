@@ -1,0 +1,64 @@
+apply plugin: 'com.android.application'
+
+repositories {
+    jcenter()
+}
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.1"
+
+    defaultConfig {
+        applicationId "io.agora.openvcall"
+        minSdkVersion 14 // ICE_CREAM_SANDWICH
+        targetSdkVersion 25
+        versionCode 18
+        versionName "1.7.x"
+
+        jackOptions {
+            enabled true
+        }
+
+        externalNativeBuild {
+            ndkBuild {
+                arguments "NDK_APPLICATION_MK:=src/main/cpp/Application.mk"
+            }
+        }
+
+        ndk {
+            abiFilters "armeabi-v7a", "x86" // DO NOT MODIFY THIS LINE, IT'S UPDATED BY BUILD MACHINE AUTOMATICALLY.
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/cpp/Android.mk'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: '../../../libs')
+    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile 'com.android.support:support-v4:25.0.1'
+    compile 'com.android.support:design:25.0.1'
+    compile 'org.slf4j:slf4j-api:1.7.21'
+    compile 'com.github.tony19:logback-android-core:1.1.1-5'
+    compile('com.github.tony19:logback-android-classic:1.1.1-5') {
+        // workaround issue #73
+        exclude group: 'com.google.android', module: 'android'
+    }
+    compile project(':faceunity')
+}

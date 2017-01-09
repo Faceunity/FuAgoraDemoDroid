@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<resources>
+    <!-- PLEASE KEEP THIS App ID IN SAFE PLACE -->
+    <!-- Get your own app id at https://dashboard.agora.io/ -->
+    <string name="private_app_id"><#YOUR APP ID#></string>
+</resources>
