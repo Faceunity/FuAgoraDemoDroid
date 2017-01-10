@@ -3,5 +3,5 @@
 <resources>
     <!-- PLEASE KEEP THIS App ID IN SAFE PLACE -->
     <!-- Get your own app id at https://dashboard.agora.io/ -->
-    <string name="private_app_id"><#YOUR APP ID#></string>
+    <string name="private_app_id">a65012a07b1445c08e5b716db9de5f76</string>
 </resources>

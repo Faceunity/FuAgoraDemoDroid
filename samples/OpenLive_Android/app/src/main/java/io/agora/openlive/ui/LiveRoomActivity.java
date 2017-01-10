@@ -12,6 +12,9 @@ import android.view.*;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.faceunity.Render;
+
 import io.agora.openlive.R;
 import io.agora.openlive.model.AGEventHandler;
 import io.agora.openlive.model.ConstantApp;
@@ -39,6 +42,15 @@ public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_live_room);
+
+        Render.fuSetUp(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Render.fuDestroy();
     }
 
     @Override

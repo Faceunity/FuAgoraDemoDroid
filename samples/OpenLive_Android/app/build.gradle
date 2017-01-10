@@ -19,6 +19,12 @@ android {
             enabled true
         }
 
+        externalNativeBuild {
+            ndkBuild {
+                arguments "NDK_APPLICATION_MK:=src/main/cpp/Application.mk"
+            }
+        }
+
         ndk {
             abiFilters "armeabi-v7a", "x86" // DO NOT MODIFY THIS LINE, IT'S UPDATED BY BUILD MACHINE AUTOMATICALLY.
         }
@@ -41,13 +47,17 @@ android {
             jniLibs.srcDirs = ['../../../libs']
         }
     }
+
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/cpp/Android.mk'
+        }
+    }
 }
 
 dependencies {
-    compile fileTree(dir: '../../../libs', include: ['*.jar'])
-
+    compile fileTree(include: ['*.jar'], dir: '../../../libs')
     compile project(':libvideoprp')
-
     compile 'com.android.support:appcompat-v7:25.0.1'
     compile 'com.android.support:support-v4:25.0.1'
     compile 'com.android.support:design:25.0.1'
@@ -57,4 +67,5 @@ dependencies {
         // workaround issue #73
         exclude group: 'com.google.android', module: 'android'
     }
+    compile project(':faceunity')
 }

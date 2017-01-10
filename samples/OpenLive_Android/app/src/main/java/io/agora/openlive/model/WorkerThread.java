@@ -12,6 +12,7 @@ import android.view.SurfaceView;
 import android.text.TextUtils;
 import io.agora.common.Constant;
 import io.agora.openlive.R;
+import io.agora.propeller.preprocessing.VideoPreProcessing;
 import io.agora.rtc.Constants;
 import io.agora.rtc.RtcEngine;
 import io.agora.rtc.video.VideoCanvas;
@@ -169,7 +170,8 @@ public class WorkerThread extends Thread {
 
         mEngineConfig.mChannel = channel;
 
-        enablePreProcessor();
+//        enablePreProcessor();
+        new VideoPreProcessing().enablePreProcessing(true);
         log.debug("joinChannel " + channel + " " + uid);
     }
 

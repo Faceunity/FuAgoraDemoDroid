@@ -1,10 +1,10 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             xmlns:app="http://schemas.android.com/apk/res-auto"
-             tools:context=".ui.LiveRoomActivity"
-             android:keepScreenOn="true">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true"
+    tools:context=".ui.LiveRoomActivity">
 
     <io.agora.openlive.ui.GridVideoViewContainer
         android:id="@+id/grid_video_view_container"
@@ -13,10 +13,10 @@
 
     <ViewStub
         android:id="@id/small_video_view_dock"
-        android:inflatedId="@id/small_video_view_dock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
+        android:inflatedId="@id/small_video_view_dock"
         android:layout="@layout/small_video_view_dock" />
 
     <RelativeLayout
@@ -27,30 +27,30 @@
             android:id="@+id/top_area"
             android:layout_width="wrap_content"
             android:layout_height="54dp"
-            android:gravity="center_vertical"
-            android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/rounded_bg"
                 android:layout_marginLeft="6dp"
                 android:layout_marginStart="6dp"
+                android:background="@drawable/rounded_bg"
+                android:orientation="vertical"
                 android:paddingLeft="12dp"
-                android:paddingStart="12dp"
                 android:paddingRight="12dp"
+                android:paddingStart="12dp"
                 app:paddingEnd="12dp">
 
                 <TextView
                     android:id="@+id/room_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <View
@@ -61,9 +61,9 @@
             <ImageView
                 android:layout_width="54dp"
                 android:layout_height="match_parent"
+                android:onClick="onClickClose"
                 android:scaleType="center"
-                android:src="@drawable/btn_close"
-                android:onClick="onClickClose" />
+                android:src="@drawable/btn_close" />
 
         </io.agora.ui.AGLinearLayout>
 
@@ -71,10 +71,10 @@
             android:id="@+id/bottom_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true">
+            android:layout_alignParentStart="true"
+            android:orientation="vertical">
 
             <io.agora.ui.AGLinearLayout
                 android:id="@+id/bottom_action_container"
@@ -86,9 +86,9 @@
                 <ImageView
                     android:layout_width="54dp"
                     android:layout_height="match_parent"
+                    android:onClick="onShowHideClicked"
                     android:scaleType="center"
-                    android:src="@drawable/btn_hide"
-                    android:onClick="onShowHideClicked" />
+                    android:src="@drawable/btn_hide" />
 
                 <ImageView
                     android:id="@+id/btn_1"
@@ -112,6 +112,9 @@
                     android:src="@drawable/btn_mute" />
             </io.agora.ui.AGLinearLayout>
 
+            <com.faceunity.EffectView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
     </RelativeLayout>
