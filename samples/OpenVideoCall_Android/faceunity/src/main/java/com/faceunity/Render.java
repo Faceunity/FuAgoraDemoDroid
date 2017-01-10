@@ -37,8 +37,10 @@ public class Render {
     private volatile static int m_cur_item_id = 1;
     private volatile static int m_cur_filter_id = 0;
 
-    private static float m_faceunity_blur_level = 8.0f;
+    private static float m_faceunity_blur_level = 5.0f;
     private static float m_faceunity_color_level = 1.0f;
+    private static float m_faceunity_cheek_thinning = 1.0f;
+    private static float m_faceunity_eye_enlarging = 1.0f;
 
     public static void fuSetUp(Context c) {
         context = c;
@@ -125,8 +127,10 @@ public class Render {
         }
 
         faceunity.fuItemSetParam(mFacebeautyItem, "filter_name", m_filters[m_cur_filter_id]);
-        faceunity.fuItemSetParam(mFacebeautyItem, "blur_radius", m_faceunity_blur_level);
+        faceunity.fuItemSetParam(mFacebeautyItem, "blur_level", m_faceunity_blur_level);
         faceunity.fuItemSetParam(mFacebeautyItem, "color_level", m_faceunity_color_level);
+        faceunity.fuItemSetParam(mFacebeautyItem, "cheek_thinning", m_faceunity_cheek_thinning);
+        faceunity.fuItemSetParam(mFacebeautyItem, "eye_enlarging", m_faceunity_eye_enlarging);
 
         faceunity.fuRenderToNV21Image(img, w, h, mFrameId++, new int[] { mEffectItem, mFacebeautyItem });
     }
@@ -142,27 +146,19 @@ public class Render {
     }
 
     public static void setFaceunityBlurLevel(int level) {
-        switch (level) {
-            case 0:
-                m_faceunity_blur_level = 0.0f;
-                break;
-            case 1:
-                m_faceunity_blur_level = 4.0f;
-                break;
-            case 2:
-                m_faceunity_blur_level = 8.0f;
-                break;
-            case 3:
-                m_faceunity_blur_level = 12.0f;
-                break;
-            case 4:
-                m_faceunity_blur_level = 16.0f;
-                break;
-        }
+       m_faceunity_blur_level = level;
     }
 
     public static void setFaceunityColorLevel(int progress, int max) {
-        m_faceunity_color_level = 1.0f * progress / max * 2;
+        m_faceunity_color_level = 1.0f * progress / max * 1;
+    }
+
+    public static void setFaceunityCheekThinning(int progress, int max) {
+        m_faceunity_cheek_thinning = 1.0f * progress / max * 1;
+    }
+
+    public static void setFaceunityEyeEnlarging(int progress, int max) {
+        m_faceunity_eye_enlarging = 1.0f * progress / max * 1;
     }
 
 }

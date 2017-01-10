@@ -18,7 +18,8 @@ import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
  */
 
 public class EffectView extends LinearLayout
-    implements RadioGroup.OnCheckedChangeListener {
+    implements RadioGroup.OnCheckedChangeListener,
+        DiscreteSeekBar.OnProgressChangeListener {
 
     private RecyclerView mEffectRecycleView;
     private EffectAndFilterRecycleViewAdapter mEffectRecycleViewAdapter;
@@ -93,22 +94,9 @@ public class EffectView extends LinearLayout
         ((RadioGroup) findViewById(R.id.blur_level_select)).setOnCheckedChangeListener(this);
         ((RadioGroup) findViewById(R.id.select_group)).setOnCheckedChangeListener(this);
 
-        ((DiscreteSeekBar) findViewById(R.id.color_level_seekbar)).setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
-            @Override
-            public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
-                Render.setFaceunityColorLevel(value, 100);
-            }
-
-            @Override
-            public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
-
-            }
-        });
+        ((DiscreteSeekBar) findViewById(R.id.color_level_seekbar)).setOnProgressChangeListener(this);
+        ((DiscreteSeekBar) findViewById(R.id.cheek_thinning_seekbar)).setOnProgressChangeListener(this);
+        ((DiscreteSeekBar) findViewById(R.id.eye_enlarging_seekbar)).setOnProgressChangeListener(this);
     }
 
     @Override
@@ -124,5 +112,27 @@ public class EffectView extends LinearLayout
                 break;
             }
         }
+    }
+
+    @Override
+    public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+        int i = seekBar.getId();
+        if (i == R.id.color_level_seekbar) {
+            Render.setFaceunityColorLevel(value, seekBar.getMax());
+        } else if (i == R.id.cheek_thinning_seekbar) {
+            Render.setFaceunityCheekThinning(value, seekBar.getMax());
+        } else if (i == R.id.eye_enlarging_seekbar) {
+            Render.setFaceunityEyeEnlarging(value, seekBar.getMax());
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
+
     }
 }

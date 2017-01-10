@@ -29,7 +29,8 @@
             android:id="@+id/blur_level_select"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:checkedButton="@+id/blur_level_select_2"
+            android:layout_gravity="center_vertical"
+            android:checkedButton="@+id/blur_level_select_5"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
 
@@ -37,7 +38,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
-                android:layout_margin="@dimen/normal_space"
+                android:layout_margin="4dp"
                 android:background="@drawable/zero_color_level_item_selector"
                 android:button="@null"
                 android:gravity="center"
@@ -47,7 +48,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
-                android:layout_margin="@dimen/normal_space"
+                android:layout_margin="4dp"
                 android:background="@drawable/color_level_item_selector"
                 android:button="@null"
                 android:gravity="center"
@@ -56,11 +57,10 @@
                 android:textSize="22sp" />
 
             <RadioButton
-                android:id="@id/blur_level_select_2"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
-                android:layout_margin="@dimen/normal_space"
+                android:layout_margin="4dp"
                 android:background="@drawable/color_level_item_selector"
                 android:button="@null"
                 android:gravity="center"
@@ -72,7 +72,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
-                android:layout_margin="@dimen/normal_space"
+                android:layout_margin="4dp"
                 android:background="@drawable/color_level_item_selector"
                 android:button="@null"
                 android:gravity="center"
@@ -84,22 +84,33 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
-                android:layout_margin="@dimen/normal_space"
+                android:layout_margin="4dp"
                 android:background="@drawable/color_level_item_selector"
                 android:button="@null"
                 android:gravity="center"
                 android:text="4"
                 android:textColor="@color/colorWhite"
                 android:textSize="22sp" />
+
+            <RadioButton
+                android:id="@id/blur_level_select_5"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_margin="4dp"
+                android:background="@drawable/color_level_item_selector"
+                android:button="@null"
+                android:gravity="center"
+                android:text="5"
+                android:textColor="@color/colorWhite"
+                android:textSize="22sp" />
         </RadioGroup>
 
         <LinearLayout
-            android:id="@+id/color_level_select_block"
             android:layout_width="match_parent"
             android:layout_height="58dp"
             android:gravity="center"
-            android:padding="@dimen/normal_space"
-            android:visibility="gone">
+            android:padding="@dimen/normal_space">
 
             <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
                 android:id="@+id/color_level_seekbar"
@@ -111,7 +122,45 @@
                 app:dsb_progressColor="@color/egg_yellow"
                 app:dsb_scrubberHeight="2dp"
                 app:dsb_thumbSize="16dp"
-                app:dsb_value="50" />
+                app:dsb_value="100" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:gravity="center"
+            android:padding="@dimen/normal_space">
+
+            <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+                android:id="@+id/cheek_thinning_seekbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsb_indicatorColor="@color/egg_yellow"
+                app:dsb_max="100"
+                app:dsb_min="0"
+                app:dsb_progressColor="@color/egg_yellow"
+                app:dsb_scrubberHeight="2dp"
+                app:dsb_thumbSize="16dp"
+                app:dsb_value="100" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:gravity="center"
+            android:padding="@dimen/normal_space">
+
+            <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+                android:id="@+id/eye_enlarging_seekbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsb_indicatorColor="@color/egg_yellow"
+                app:dsb_max="100"
+                app:dsb_min="0"
+                app:dsb_progressColor="@color/egg_yellow"
+                app:dsb_scrubberHeight="2dp"
+                app:dsb_thumbSize="16dp"
+                app:dsb_value="100" />
         </LinearLayout>
     </ViewAnimator>
 
@@ -121,8 +170,7 @@
         android:layout_height="wrap_content"
         android:background="@color/percent60translucentBlack"
         android:checkedButton="@+id/select_group_0"
-        android:orientation="horizontal"
-        android:padding="@dimen/min_space">
+        android:orientation="horizontal">
 
         <RadioButton
             android:id="@id/select_group_0"
@@ -132,6 +180,7 @@
             android:background="@color/colorTranslucent"
             android:button="@null"
             android:gravity="center"
+            android:padding="@dimen/min_space"
             android:text="道具"
             android:textColor="@color/select_group_text_selector"
             android:textSize="16sp"
@@ -144,6 +193,7 @@
             android:background="@color/colorTranslucent"
             android:button="@null"
             android:gravity="center"
+            android:padding="@dimen/min_space"
             android:text="滤镜"
             android:textColor="@color/select_group_text_selector"
             android:textSize="16sp"
@@ -156,6 +206,7 @@
             android:background="@color/colorTranslucent"
             android:button="@null"
             android:gravity="center"
+            android:padding="@dimen/min_space"
             android:text="磨皮"
             android:textColor="@color/select_group_text_selector"
             android:textSize="16sp"
@@ -168,7 +219,34 @@
             android:background="@color/colorTranslucent"
             android:button="@null"
             android:gravity="center"
+            android:padding="@dimen/min_space"
             android:text="美白"
+            android:textColor="@color/select_group_text_selector"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <RadioButton
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorTranslucent"
+            android:button="@null"
+            android:gravity="center"
+            android:padding="@dimen/min_space"
+            android:text="瘦脸"
+            android:textColor="@color/select_group_text_selector"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <RadioButton
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorTranslucent"
+            android:button="@null"
+            android:gravity="center"
+            android:padding="@dimen/min_space"
+            android:text="大眼"
             android:textColor="@color/select_group_text_selector"
             android:textSize="16sp"
             android:textStyle="bold" />
