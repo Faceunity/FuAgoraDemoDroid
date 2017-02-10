@@ -1,7 +1,6 @@
 package com.faceunity;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.faceunity.wrapper.faceunity;
 
@@ -34,28 +33,54 @@ public class Render {
 
     private static Context context;
 
-    private volatile static int m_cur_item_id = 1;
-    private volatile static int m_cur_filter_id = 0;
+    private volatile static int m_cur_item_id;
+    private volatile static int m_cur_filter_id;
 
-    private static float m_faceunity_blur_level = 5.0f;
-    private static float m_faceunity_color_level = 1.0f;
-    private static float m_faceunity_cheek_thinning = 1.0f;
-    private static float m_faceunity_eye_enlarging = 1.0f;
+    private static float m_faceunity_blur_level;
+    private static float m_faceunity_color_level;
+    private static float m_faceunity_cheek_thinning;
+    private static float m_faceunity_eye_enlarging;
+
+    private static byte[] authdata;
 
     public static void fuSetUp(Context c) {
+        if (authdata == null) {
+            authdata = authpack.A();
+        }
+
+        mFrameId = 0;
+
+        m_cur_item_id = 1;
+        m_cur_filter_id = 0;
+
+        m_faceunity_blur_level = 5.0f;
+        m_faceunity_color_level = 1.0f;
+        m_faceunity_cheek_thinning = 1.0f;
+        m_faceunity_eye_enlarging = 1.0f;
+
         context = c;
         isWork = true;
     }
 
     public static void fuDestroy() {
-        isWork = false;
+        synchronized (Render.class) {
+            isWork = false;
+        }
 
         if (isInit) {
             isInit = false;
 
-            faceunity.fuDestroyItem(mEffectItem);
+            destroyEffectItem();
             faceunity.fuDestroyItem(mFacebeautyItem);
             faceunity.fuOnDeviceLost();
+            faceunity.fuReleaseEGLContext();
+        }
+    }
+
+    private static void destroyEffectItem() {
+        if (mEffectItem != 0) {
+            faceunity.fuDestroyItem(mEffectItem);
+            mEffectItem = 0;
         }
     }
 
@@ -79,7 +104,7 @@ public class Render {
             byte[] v3data = new byte[is.available()];
             is.read(v3data);
             is.close();
-            faceunity.fuSetup(v3data, null, authpack.A());
+            faceunity.fuSetup(v3data, null, authdata);
             faceunity.fuSetMaxFaces(1);
 
             is = context.getAssets().open("face_beautification.mp3");
@@ -95,21 +120,18 @@ public class Render {
     }
 
     public static void fuRenderToNV21Image(byte[] img, int w, int h) {
-        if (!isWork) {
-            return;
-        }
-
-        if (!isInit) {
-            fuInit();
-            isInit = true;
-        }
-
         synchronized (Render.class) {
+            if (!isWork) {
+                return;
+            }
+
+            if (!isInit) {
+                fuInit();
+                isInit = true;
+            }
+
             if (m_cur_item_id >= 0) {
-                if (mEffectItem != 0) {
-                    faceunity.fuDestroyItem(mEffectItem);
-                    mEffectItem = 0;
-                }
+                destroyEffectItem();
 
                 if (m_cur_item_id > 0) {
                     try {
@@ -124,15 +146,20 @@ public class Render {
                     }
                 }
             }
+
+            faceunity.fuItemSetParam(mFacebeautyItem, "filter_name", m_filters[m_cur_filter_id]);
+            faceunity.fuItemSetParam(mFacebeautyItem, "blur_level", m_faceunity_blur_level);
+            faceunity.fuItemSetParam(mFacebeautyItem, "color_level", m_faceunity_color_level);
+            faceunity.fuItemSetParam(mFacebeautyItem, "cheek_thinning", m_faceunity_cheek_thinning);
+            faceunity.fuItemSetParam(mFacebeautyItem, "eye_enlarging", m_faceunity_eye_enlarging);
+
+            if (mFrameId == 0) {
+                mFrameId++;
+                return;
+            }
+
+            faceunity.fuRenderToNV21Image(img, w, h, mFrameId++, new int[]{mEffectItem, mFacebeautyItem});
         }
-
-        faceunity.fuItemSetParam(mFacebeautyItem, "filter_name", m_filters[m_cur_filter_id]);
-        faceunity.fuItemSetParam(mFacebeautyItem, "blur_level", m_faceunity_blur_level);
-        faceunity.fuItemSetParam(mFacebeautyItem, "color_level", m_faceunity_color_level);
-        faceunity.fuItemSetParam(mFacebeautyItem, "cheek_thinning", m_faceunity_cheek_thinning);
-        faceunity.fuItemSetParam(mFacebeautyItem, "eye_enlarging", m_faceunity_eye_enlarging);
-
-        faceunity.fuRenderToNV21Image(img, w, h, mFrameId++, new int[] { mEffectItem, mFacebeautyItem });
     }
 
     public static void setCurrentItemByPosition(int itemPosition) {
