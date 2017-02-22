@@ -48,7 +48,7 @@ public class Render {
             authdata = authpack.A();
         }
 
-        mFrameId = 0;
+        mFrameId = -1;
 
         m_cur_item_id = 1;
         m_cur_filter_id = 0;
@@ -153,7 +153,7 @@ public class Render {
             faceunity.fuItemSetParam(mFacebeautyItem, "cheek_thinning", m_faceunity_cheek_thinning);
             faceunity.fuItemSetParam(mFacebeautyItem, "eye_enlarging", m_faceunity_eye_enlarging);
 
-            if (mFrameId == 0) {
+            if (mFrameId == -1) {
                 mFrameId++;
                 return;
             }
