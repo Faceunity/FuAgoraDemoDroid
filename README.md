@@ -1,8 +1,14 @@
 # FuAgoraDemoDroid
 
 FuAgoraDemoDroid 是 Faceunity 的面部跟踪和虚拟道具功能在 Agora_Native_SDK_for_Android_FULL 中的集成，作为一款推流SDK集成示例，原版文档可以参考[这里](http://docs.agora.io/cn/)。
+
+## v3.2 爱心手势识别
+在v3.2中加入了爱心手势识别，用户比出爱心手势，可以触发特定的道具动效。目前线上提供了一个简单的演示用手势道具，自定义手势道具的流程和2D道具制作一致，具体打包的细节可以联系我司技术支持。
+
+手势识别的技术细节参见[这里](https://github.com/Faceunity/FuAgoraDemoDroid#手势识别)。
+
 ## v3.1 美颜更新
-在v3.1中，全面更新了美颜的功能和效果。改进了磨皮算法，使得在细腻皮肤的同时充分保持皮肤的细节，减少涂抹感。增加智能美型功能，可以自然地实现瘦脸和大眼效果，并可根据需要进行调节。
+在v3.1中，全面更新了美颜的功能和效果。改进了磨皮算法，使得在细腻皮肤的同时充分保持皮肤的细节，减少涂抹感。增加智能美型功能，可以自然地实现瘦脸和大眼效果，并可根据需要进行调节。具体细节可以参见[这里](https://github.com/Faceunity/FuAgoraDemoDroid#视频美颜)。
 
 ## v3.0 重要更新
 在v3.0中，全面升级了底层人脸数据库，数据库大小从原来的 10M 缩小到 3M ，同时取消了之前的 ar.mp3 数据。新的数据库可以支持稳定的全头模型，从而支持更好的道具定位、面部纹理；同时新的数据库强化了跟踪模块，从而提升虚拟化身道具的表情响应度和精度。
@@ -68,11 +74,11 @@ import com.faceunity.wrapper.faceunity
 
 #### 道具绘制
 
-Android平台上不同的绘制接口有很大的性能差异，目前性能最优的接口是 fuDualInputToTexture ，其中要求输入的图像分别以内存数组 byte[] 以及 openGL 纹理的方式输入，所需要的数据传输代价最小。这2个参数的获取根据Android Camera的SDK，分别得到对应的texture和byte[]数组，具体实现可以参考Google的Grafika项目。
+Android平台上不同的绘制接口有很大的性能差异，目前性能最优的接口是 fuDualInputToTexture ，其中要求输入的图像分别以内存数组 byte[] 以及 OpenGL 纹理的方式输入，所需要的数据传输代价最小。这2个参数的获取根据Android SDK Camera的API，分别得到对应的texture和byte[]数组。
 
-fuDualInputTexture参数里的flags为0是代表`TEXTURE_2D`,为1时代表`TEXTURE_EXTERNAL_OES`。Android Camera默认的类型是`TEXTURE_EXTERNAL_OES`。
+fuDualInputTexture参数里的flags为0是代表`TEXTURE_2D`,为1时代表`TEXTURE_EXTERNAL_OES`。需要注意，Android Camera默认的类型是`TEXTURE_EXTERNAL_OES`。
 
-在GLSurfaceView的Renderer的回调函数onDrawFrame中，使用fuDualInputToTexture后会得到新的texture，返回的texture类型为TEXTURE_2D。将生成的新的texture进行绘制显示即可实现虚拟道具工具的集成预览，绘制的texture的具体实现可参考Google的Grafika项目，建议额外注意texture的类型。此外，在onDrawFrame中，可以调用fuIsTracking来判断实时人脸跟踪识别状态。
+以GLSurfaceView对接为例，的Renderer的回调函数onDrawFrame中，使用fuDualInputToTexture后会得到新的texture，返回的texture类型为TEXTURE_2D。将生成的新的texture进行绘制显示即可实现虚拟道具工具的集成预览，建议额外注意texture的类型。同时，在onDrawFrame中，可以调用fuIsTracking来判断实时人脸跟踪识别状态。
 
 fuDualInputTexture调用例程如
 ```Java
@@ -113,7 +119,7 @@ faceunity.fuItemSetParam(m_items[1], "color_level", 1.0);
 
 #### 磨皮
 
-新版美颜中磨皮的参数改为了一个复合参数 blur_level ，其取值范围为0-5，对应6个不同的磨皮程度。
+新版美颜中磨皮的参数改为了一个复合参数 blur_level ，其取值范围为0-6，对应7个不同的磨皮程度。
 
 设置参数的例子代码如下：
 
@@ -122,7 +128,7 @@ faceunity.fuItemSetParam(m_items[1], "color_level", 1.0);
 faceunity.fuItemSetParam(m_items[1], "blur_level", 5.0);
 ```
 
-如果对默认的6个磨皮等级不满意，想进一步自定义磨皮效果，可以联系我司获取内部参数调节的方式。
+如果对默认的7个磨皮等级不满意，想进一步自定义磨皮效果，可以联系我司获取内部参数调节的方式。
 
 #### 美型
 
@@ -135,12 +141,19 @@ faceunity.fuItemSetParam(m_items[1], "cheek_thinning", 1.0);
 faceunity.fuItemSetParam(m_items[1], "eye_enlarging", 1.0);
 ```
 
+## 手势识别
+目前我们的手势识别功能也是以道具的形式进行加载的。一个手势识别的道具中包含了要识别的手势、识别到该手势时触发的动效、及控制脚本。加载该道具的过程和加载普通道具、美颜道具的方法一致。
+
+线上例子中 heart.mp3 为爱心手势演示道具。将其作为道具加载进行绘制即可启用手势识别功能。手势识别道具可以和普通道具及美颜共存，类似美颜将 m_items 扩展为三个并在最后加载手势道具即可。
+
+自定义手势道具的流程和2D道具制作一致，具体打包的细节可以联系我司技术支持。
+
 
 ## 注意
 
-注意所有Faceunity的函数都需要在有OpenGL context的同一线程中运行。
+所有Faceunity的函数都需要在有OpenGL context的同一线程中运行。
 
-Activity的onPause生命周期时，进行资源的回收及对应GLSurfaceView的pause并主动调用faceunity的onDeviceLost函数。
+建议在GL context lost相关的事件里释放掉所有道具，到了绘制的时候再通过判断重新创建出来。如Activity的onPause生命周期时，进行资源的回收及并主动调用fuOnDeviceLost。
 
 ## 鉴权
 
@@ -196,7 +209,7 @@ public class authpack {
 
 ## FAQ
 ### 为什么过了一段时间人脸识别失效了？
-检查证书。
+检查证书。如证书是否正确使用，是否过期。
 
 
 
@@ -233,6 +246,10 @@ void fuDestroyItem(int item);
 \create a OpenGL ES 2.0 context
 */
 void fuCreateEGLContext();
+
+/**
+void fuReleaseEGLContext();
+*/
 
 /**
 \brief Render a list of items on top of an NV21 image.
