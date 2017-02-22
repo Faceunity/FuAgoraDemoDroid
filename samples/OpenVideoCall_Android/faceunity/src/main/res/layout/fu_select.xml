@@ -35,20 +35,20 @@
             android:orientation="horizontal">
 
             <RadioButton
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:layout_margin="4dp"
+                android:layout_margin="5dp"
                 android:background="@drawable/zero_color_level_item_selector"
                 android:button="@null"
                 android:gravity="center"
                 android:textSize="22sp" />
 
             <RadioButton
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:layout_margin="4dp"
+                android:layout_margin="5dp"
                 android:background="@drawable/color_level_item_selector"
                 android:button="@null"
                 android:gravity="center"
@@ -57,10 +57,10 @@
                 android:textSize="22sp" />
 
             <RadioButton
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:layout_margin="4dp"
+                android:layout_margin="5dp"
                 android:background="@drawable/color_level_item_selector"
                 android:button="@null"
                 android:gravity="center"
@@ -69,10 +69,10 @@
                 android:textSize="22sp" />
 
             <RadioButton
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:layout_margin="4dp"
+                android:layout_margin="5dp"
                 android:background="@drawable/color_level_item_selector"
                 android:button="@null"
                 android:gravity="center"
@@ -81,10 +81,10 @@
                 android:textSize="22sp" />
 
             <RadioButton
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:layout_margin="4dp"
+                android:layout_margin="5dp"
                 android:background="@drawable/color_level_item_selector"
                 android:button="@null"
                 android:gravity="center"
@@ -94,14 +94,26 @@
 
             <RadioButton
                 android:id="@id/blur_level_select_5"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:layout_margin="4dp"
+                android:layout_margin="5dp"
                 android:background="@drawable/color_level_item_selector"
                 android:button="@null"
                 android:gravity="center"
                 android:text="5"
+                android:textColor="@color/colorWhite"
+                android:textSize="22sp" />
+
+            <RadioButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:background="@drawable/color_level_item_selector"
+                android:button="@null"
+                android:gravity="center"
+                android:text="6"
                 android:textColor="@color/colorWhite"
                 android:textSize="22sp" />
         </RadioGroup>
