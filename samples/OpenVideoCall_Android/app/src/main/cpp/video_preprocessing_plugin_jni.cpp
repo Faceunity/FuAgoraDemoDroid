@@ -22,10 +22,10 @@ public:
 
         fuRenderToNV21ImageMethod = env->GetStaticMethodID(renderClass, "fuRenderToNV21Image", "([BII)V");
 
-        jsize len = videoFrame.width * videoFrame.height * 3 / 2;
+        jsize len = videoFrame.yStride * videoFrame.height * 3 / 2;
         jbyteArray array = env->NewByteArray(len);
-        jbyte buf[len];
-        int yLength = videoFrame.width * videoFrame.height;
+        jbyte* buf = new jbyte[len];
+        int yLength = videoFrame.yStride * videoFrame.height;
         int i = 0;
         for (; i < yLength; i++) {
             buf[i] = ((jbyte *) videoFrame.yBuffer)[i];
@@ -37,7 +37,7 @@ public:
         }
         env->SetByteArrayRegion(array, 0, len, buf);
 
-        env->CallStaticVoidMethod(renderClass, fuRenderToNV21ImageMethod, array, videoFrame.width, videoFrame.height);
+        env->CallStaticVoidMethod(renderClass, fuRenderToNV21ImageMethod, array, videoFrame.yStride, videoFrame.height);
 
         env->GetByteArrayRegion(array, 0, len, buf);
         for (i = 0; i < yLength; i++) {
@@ -47,6 +47,8 @@ public:
             ((jbyte *) videoFrame.vBuffer)[j] = buf[i];
             ((jbyte *) videoFrame.uBuffer)[j] = buf[i + 1];
         }
+
+        delete []buf;
 
         env->DeleteLocalRef(array);
 
