@@ -7,10 +7,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.SurfaceView;
-import io.agora.openlive.model.VideoStatusData;
 
-import java.lang.ref.SoftReference;
 import java.util.HashMap;
+
+import io.agora.openlive.model.VideoStatusData;
 
 public class GridVideoViewContainer extends RecyclerView {
     public GridVideoViewContainer(Context context) {
@@ -33,7 +33,7 @@ public class GridVideoViewContainer extends RecyclerView {
         this.mEventListener = listener;
     }
 
-    private boolean initAdapter(int localUid, HashMap<Integer, SoftReference<SurfaceView>> uids) {
+    private boolean initAdapter(int localUid, HashMap<Integer, SurfaceView> uids) {
         if (mGridVideoViewContainerAdapter == null) {
             mGridVideoViewContainerAdapter = new GridVideoViewContainerAdapter(getContext(), localUid, uids, mEventListener);
             mGridVideoViewContainerAdapter.setHasStableIds(true);
@@ -42,7 +42,7 @@ public class GridVideoViewContainer extends RecyclerView {
         return false;
     }
 
-    public void initViewContainer(Context context, int localUid, HashMap<Integer, SoftReference<SurfaceView>> uids) {
+    public void initViewContainer(Context context, int localUid, HashMap<Integer, SurfaceView> uids) {
         boolean newCreated = initAdapter(localUid, uids);
 
         if (!newCreated) {
@@ -63,7 +63,7 @@ public class GridVideoViewContainer extends RecyclerView {
     }
 
     public SurfaceView getSurfaceView(int index) {
-        return mGridVideoViewContainerAdapter.getItem(index).mView.get();
+        return mGridVideoViewContainerAdapter.getItem(index).mView;
     }
 
     public VideoStatusData getItem(int position) {

@@ -4,18 +4,25 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
-import io.agora.openlive.R;
-import io.agora.openlive.model.ConstantApp;
-import io.agora.openlive.model.VideoStatusData;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import io.agora.openlive.R;
+import io.agora.openlive.model.ConstantApp;
+import io.agora.openlive.model.VideoStatusData;
 
 public class GridVideoViewContainerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final static Logger log = LoggerFactory.getLogger(GridVideoViewContainerAdapter.class);
@@ -27,7 +34,7 @@ public class GridVideoViewContainerAdapter extends RecyclerView.Adapter<Recycler
 
     private ArrayList<VideoStatusData> mUsers;
 
-    public GridVideoViewContainerAdapter(Context context, int localUid, HashMap<Integer, SoftReference<SurfaceView>> uids, VideoViewEventListener listener) {
+    public GridVideoViewContainerAdapter(Context context, int localUid, HashMap<Integer, SurfaceView> uids, VideoViewEventListener listener) {
         mContext = context;
         mInflater = ((Activity) context).getLayoutInflater();
 
@@ -51,8 +58,8 @@ public class GridVideoViewContainerAdapter extends RecyclerView.Adapter<Recycler
         return mLocalUid;
     }
 
-    public void init(HashMap<Integer, SoftReference<SurfaceView>> uids, int localUid, boolean force) {
-        for (HashMap.Entry<Integer, SoftReference<SurfaceView>> entry : uids.entrySet()) {
+    public void init(HashMap<Integer, SurfaceView> uids, int localUid, boolean force) {
+        for (HashMap.Entry<Integer, SurfaceView> entry : uids.entrySet()) {
             if (entry.getKey() == 0 || entry.getKey() == mLocalUid) {
                 boolean found = false;
                 for (VideoStatusData status : mUsers) {
@@ -148,7 +155,7 @@ public class GridVideoViewContainerAdapter extends RecyclerView.Adapter<Recycler
         });
 
         if (holderView.getChildCount() == 0) {
-            SurfaceView target = user.mView.get();
+            SurfaceView target = user.mView;
             stripSurfaceView(target);
             holderView.addView(target, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         }
@@ -171,7 +178,7 @@ public class GridVideoViewContainerAdapter extends RecyclerView.Adapter<Recycler
     public long getItemId(int position) {
         VideoStatusData user = mUsers.get(position);
 
-        SurfaceView view = user.mView.get();
+        SurfaceView view = user.mView;
         if (view == null) {
             throw new NullPointerException("SurfaceView destroyed for user " + user.mUid + " " + user.mStatus + " " + user.mVolume);
         }

@@ -2,8 +2,6 @@ package io.agora.openlive.model;
 
 import android.view.SurfaceView;
 
-import java.lang.ref.SoftReference;
-
 public class VideoStatusData {
     public static final int DEFAULT_STATUS = 0;
     public static final int VIDEO_MUTED = 1;
@@ -11,7 +9,7 @@ public class VideoStatusData {
 
     public static final int DEFAULT_VOLUME = 0;
 
-    public VideoStatusData(int uid, SoftReference<SurfaceView> view, int status, int volume) {
+    public VideoStatusData(int uid, SurfaceView view, int status, int volume) {
         this.mUid = uid;
         this.mView = view;
         this.mStatus = status;
@@ -20,7 +18,7 @@ public class VideoStatusData {
 
     public int mUid;
 
-    public SoftReference<SurfaceView> mView;
+    public SurfaceView mView;
 
     public int mStatus;
 

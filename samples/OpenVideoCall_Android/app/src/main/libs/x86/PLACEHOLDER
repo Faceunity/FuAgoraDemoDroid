@@ -1,2 +1,3 @@
 libagora-rtc-sdk-jni.so
 libHDACEngine.so
+libagora-crypto.so(OPTIONAL)

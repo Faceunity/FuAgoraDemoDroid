@@ -6,24 +6,25 @@ import android.util.DisplayMetrics;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import io.agora.propeller.UserStatusData;
-import io.agora.openvcall.model.ConstantApp;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.ref.SoftReference;
 import java.util.HashMap;
+
+import io.agora.openvcall.model.ConstantApp;
+import io.agora.propeller.UserStatusData;
 
 public class GridVideoViewContainerAdapter extends VideoViewAdapter {
     private final static Logger log = LoggerFactory.getLogger(GridVideoViewContainerAdapter.class);
 
-    public GridVideoViewContainerAdapter(Context context, int localUid, HashMap<Integer, SoftReference<SurfaceView>> uids, VideoViewEventListener listener) {
+    public GridVideoViewContainerAdapter(Context context, int localUid, HashMap<Integer, SurfaceView> uids, VideoViewEventListener listener) {
         super(context, localUid, uids, listener);
         log.debug("GridVideoViewContainerAdapter " + (mLocalUid & 0xFFFFFFFFL));
     }
 
     @Override
-    protected void customizedInit(HashMap<Integer, SoftReference<SurfaceView>> uids, boolean force) {
+    protected void customizedInit(HashMap<Integer, SurfaceView> uids, boolean force) {
         VideoViewAdapterUtil.composeDataItem1(mUsers, uids, mLocalUid); // local uid
 
         if (force || mItemWidth == 0 || mItemHeight == 0) {
@@ -47,7 +48,7 @@ public class GridVideoViewContainerAdapter extends VideoViewAdapter {
     }
 
     @Override
-    public void notifyUiChanged(HashMap<Integer, SoftReference<SurfaceView>> uids, int localUid, HashMap<Integer, Integer> status, HashMap<Integer, Integer> volume) {
+    public void notifyUiChanged(HashMap<Integer, SurfaceView> uids, int localUid, HashMap<Integer, Integer> status, HashMap<Integer, Integer> volume) {
         setLocalUid(localUid);
 
         VideoViewAdapterUtil.composeDataItem(mUsers, uids, localUid, status, volume, mVideoInfo);
@@ -83,9 +84,9 @@ public class GridVideoViewContainerAdapter extends VideoViewAdapter {
     public long getItemId(int position) {
         UserStatusData user = mUsers.get(position);
 
-        SurfaceView view = user.mView.get();
+        SurfaceView view = user.mView;
         if (view == null) {
-            throw new NullPointerException("SurfaceView destroyed for user " + user.mUid + " " + user.mStatus + " " + user.mVolume);
+            throw new NullPointerException("SurfaceView destroyed for user " + (user.mUid & 0xFFFFFFFFL) + " " + user.mStatus + " " + user.mVolume);
         }
 
         return (String.valueOf(user.mUid) + System.identityHashCode(view)).hashCode();

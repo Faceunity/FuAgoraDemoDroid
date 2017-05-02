@@ -2,8 +2,6 @@ package io.agora.propeller;
 
 import android.view.SurfaceView;
 
-import java.lang.ref.SoftReference;
-
 public class UserStatusData {
     public static final int DEFAULT_STATUS = 0;
     public static final int VIDEO_MUTED = 1;
@@ -11,11 +9,11 @@ public class UserStatusData {
 
     public static final int DEFAULT_VOLUME = 0;
 
-    public UserStatusData(int uid, SoftReference<SurfaceView> view, Integer status, int volume) {
+    public UserStatusData(int uid, SurfaceView view, Integer status, int volume) {
         this(uid, view, status, volume, null);
     }
 
-    public UserStatusData(int uid, SoftReference<SurfaceView> view, Integer status, int volume, VideoInfoData i) {
+    public UserStatusData(int uid, SurfaceView view, Integer status, int volume, VideoInfoData i) {
         this.mUid = uid;
         this.mView = view;
         this.mStatus = status;
@@ -25,7 +23,7 @@ public class UserStatusData {
 
     public int mUid;
 
-    public SoftReference<SurfaceView> mView;
+    public SurfaceView mView;
 
     public Integer mStatus; // if status is null, do nothing
 

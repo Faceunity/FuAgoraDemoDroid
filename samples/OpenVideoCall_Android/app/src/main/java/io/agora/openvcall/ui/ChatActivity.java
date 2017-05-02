@@ -1,11 +1,6 @@
 package io.agora.openvcall.ui;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothHeadset;
-import android.bluetooth.BluetoothProfile;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.media.AudioManager;
@@ -14,41 +9,46 @@ import android.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.*;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewParent;
+import android.view.ViewStub;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.widget.*;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
-import com.faceunity.Render;
+import com.faceunity.MRender;
 
-import io.agora.propeller.preprocessing.VideoPreProcessing;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import io.agora.openvcall.R;
 import io.agora.openvcall.model.AGEventHandler;
 import io.agora.openvcall.model.ConstantApp;
-
 import io.agora.openvcall.model.Message;
 import io.agora.openvcall.model.User;
 import io.agora.propeller.Constant;
 import io.agora.propeller.UserStatusData;
 import io.agora.propeller.VideoInfoData;
-import io.agora.propeller.headset.HeadsetBroadcastReceiver;
-import io.agora.propeller.headset.HeadsetPlugManager;
-import io.agora.propeller.headset.IHeadsetPlugListener;
-import io.agora.propeller.headset.bluetooth.BluetoothHeadsetBroadcastReceiver;
+import io.agora.propeller.preprocessing.VideoPreProcessing;
 import io.agora.propeller.ui.RtlLinearLayoutManager;
 import io.agora.rtc.IRtcEngineEventHandler;
 import io.agora.rtc.RtcEngine;
 import io.agora.rtc.video.VideoCanvas;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.ref.SoftReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-public class ChatActivity extends BaseActivity implements AGEventHandler, IHeadsetPlugListener {
+public class ChatActivity extends BaseActivity implements AGEventHandler {
 
     private final static Logger log = LoggerFactory.getLogger(ChatActivity.class);
 
@@ -57,72 +57,27 @@ public class ChatActivity extends BaseActivity implements AGEventHandler, IHeads
     private RelativeLayout mSmallVideoViewDock;
 
     // should only be modified under UI thread
-    private final HashMap<Integer, SoftReference<SurfaceView>> mUidsList = new HashMap<>(); // uid = 0 || uid == EngineConfig.mUid
+    private final HashMap<Integer, SurfaceView> mUidsList = new HashMap<>(); // uid = 0 || uid == EngineConfig.mUid
 
     private volatile boolean mVideoMuted = false;
 
     private volatile boolean mAudioMuted = false;
 
-    private volatile boolean mEarpiece = false;
-
-    private volatile boolean mWithHeadset = false;
-
-    private HeadsetBroadcastReceiver mHeadsetListener;
-    private BluetoothAdapter mBtAdapter;
-    private BluetoothProfile mBluetoothProfile;
-    private BluetoothHeadsetBroadcastReceiver mBluetoothHeadsetBroadcastListener;
-    private BluetoothProfile.ServiceListener mBluetoothHeadsetListener = new BluetoothProfile.ServiceListener() {
-
-        @Override
-        public void onServiceConnected(int profile, BluetoothProfile headset) {
-            if (profile == BluetoothProfile.HEADSET) {
-                log.debug("onServiceConnected " + profile + " " + headset);
-                mBluetoothProfile = headset;
-
-                List<BluetoothDevice> devices = headset.getConnectedDevices();
-                headsetPlugged(devices != null && devices.size() > 0);
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(int profile) {
-            log.debug("onServiceDisconnected " + profile);
-            mBluetoothProfile = null;
-        }
-    };
-
-    private void headsetPlugged(final boolean plugged) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000L);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                if (isFinishing()) {
-                    return;
-                }
-
-                RtcEngine rtcEngine = rtcEngine();
-                rtcEngine.setEnableSpeakerphone(!plugged);
-            }
-        }).start();
-    }
+    private volatile int mAudioRouting = -1; // Default
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        Render.fuSetUp(this);
+        MRender.create(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        Render.fuDestroy();
+        MRender.destroy();
     }
 
     @Override
@@ -175,7 +130,7 @@ public class ChatActivity extends BaseActivity implements AGEventHandler, IHeads
         surfaceV.setZOrderOnTop(false);
         surfaceV.setZOrderMediaOverlay(false);
 
-        mUidsList.put(0, new SoftReference<>(surfaceV)); // get first surface view
+        mUidsList.put(0, surfaceV); // get first surface view
 
         mGridVideoViewContainer.initViewContainer(getApplicationContext(), 0, mUidsList); // first is now full view
         worker().preview(true, surfaceV, 0);
@@ -263,22 +218,6 @@ public class ChatActivity extends BaseActivity implements AGEventHandler, IHeads
     }
 
     private void optional() {
-        HeadsetPlugManager.getInstance().registerHeadsetPlugListener(this);
-        mHeadsetListener = new HeadsetBroadcastReceiver();
-        registerReceiver(mHeadsetListener, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
-
-        mBluetoothHeadsetBroadcastListener = new BluetoothHeadsetBroadcastReceiver();
-        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBtAdapter != null && BluetoothProfile.STATE_CONNECTED == mBtAdapter.getProfileConnectionState(BluetoothProfile.HEADSET)) { // on some devices, BT is not supported
-            boolean bt = mBtAdapter.getProfileProxy(getBaseContext(), mBluetoothHeadsetListener, BluetoothProfile.HEADSET);
-            int connection = mBtAdapter.getProfileConnectionState(BluetoothProfile.HEADSET);
-        }
-
-        IntentFilter i = new IntentFilter(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
-        i.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED);
-        i.addAction(android.media.AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
-        registerReceiver(mBluetoothHeadsetBroadcastListener, i);
-
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
@@ -286,22 +225,6 @@ public class ChatActivity extends BaseActivity implements AGEventHandler, IHeads
     }
 
     private void optionalDestroy() {
-        if (mBtAdapter != null) {
-            mBtAdapter.closeProfileProxy(BluetoothProfile.HEADSET, mBluetoothProfile);
-            mBluetoothProfile = null;
-            mBtAdapter = null;
-        }
-
-        if (mBluetoothHeadsetBroadcastListener != null) {
-            unregisterReceiver(mBluetoothHeadsetBroadcastListener);
-            mBluetoothHeadsetBroadcastListener = null;
-        }
-
-        if (mHeadsetListener != null) {
-            unregisterReceiver(mHeadsetListener);
-            mHeadsetListener = null;
-        }
-        HeadsetPlugManager.getInstance().unregisterHeadsetPlugListener(this);
     }
 
     private int getVideoProfileIndex() {
@@ -363,7 +286,7 @@ public class ChatActivity extends BaseActivity implements AGEventHandler, IHeads
     }
 
     public void onCustomizedFunctionClicked(View view) {
-        log.info("onCustomizedFunctionClicked " + view + " " + mVideoMuted + " " + mAudioMuted);
+        log.info("onCustomizedFunctionClicked " + view + " " + mVideoMuted + " " + mAudioMuted + " " + mAudioRouting);
         if (mVideoMuted) {
             onSwitchSpeakerClicked();
         } else {
@@ -378,14 +301,7 @@ public class ChatActivity extends BaseActivity implements AGEventHandler, IHeads
 
     private void onSwitchSpeakerClicked() {
         RtcEngine rtcEngine = rtcEngine();
-        rtcEngine.setEnableSpeakerphone(!(mEarpiece = !mEarpiece));
-
-        ImageView iv = (ImageView) findViewById(R.id.customized_function_id);
-        if (mEarpiece) {
-            iv.clearColorFilter();
-        } else {
-            iv.setColorFilter(getResources().getColor(R.color.agora_blue), PorterDuff.Mode.MULTIPLY);
-        }
+        rtcEngine.setEnableSpeakerphone(mAudioRouting != 3);
     }
 
     @Override
@@ -405,22 +321,6 @@ public class ChatActivity extends BaseActivity implements AGEventHandler, IHeads
 
     public void onEndCallClicked(View view) {
         log.info("onEndCallClicked " + view);
-
-        quitCall();
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-        log.info("onBackPressed");
-
-        quitCall();
-    }
-
-    private void quitCall() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
 
         finish();
     }
@@ -459,7 +359,13 @@ public class ChatActivity extends BaseActivity implements AGEventHandler, IHeads
         }
 
         RtcEngine rtcEngine = rtcEngine();
-        rtcEngine.muteLocalVideoStream(mVideoMuted = !mVideoMuted);
+        mVideoMuted = !mVideoMuted;
+
+        if (mVideoMuted) {
+            rtcEngine.disableVideo();
+        } else {
+            rtcEngine.enableVideo();
+        }
 
         ImageView iv = (ImageView) view;
 
@@ -468,16 +374,16 @@ public class ChatActivity extends BaseActivity implements AGEventHandler, IHeads
         hideLocalView(mVideoMuted);
 
         if (mVideoMuted) {
-            resetEarpiece();
+            resetToVideoDisabledUI();
         } else {
-            resetCamera();
+            resetToVideoEnabledUI();
         }
     }
 
     private SurfaceView getLocalView() {
-        for (HashMap.Entry<Integer, SoftReference<SurfaceView>> entry : mUidsList.entrySet()) {
+        for (HashMap.Entry<Integer, SurfaceView> entry : mUidsList.entrySet()) {
             if (entry.getKey() == 0 || entry.getKey() == config().mUid) {
-                return entry.getValue().get();
+                return entry.getValue();
             }
         }
 
@@ -499,41 +405,26 @@ public class ChatActivity extends BaseActivity implements AGEventHandler, IHeads
             if (bigBgUser.mUid == targetUid) { // big background is target view
                 mGridVideoViewContainer.notifyUiChanged(mUidsList, targetUid, status, null);
             } else { // find target view in small video view list
-                log.warn("SmallVideoViewAdapter call notifyUiChanged " + mUidsList + " " + (bigBgUser.mUid & 0xFFFFFFFFL) + " taget: " + (targetUid & 0xFFFFFFFFL) + "==" + targetUid + " " + status);
+                log.warn("SmallVideoViewAdapter call notifyUiChanged " + mUidsList + " " + (bigBgUser.mUid & 0xFFFFFFFFL) + " target: " + (targetUid & 0xFFFFFFFFL) + "==" + targetUid + " " + status);
                 mSmallVideoViewAdapter.notifyUiChanged(mUidsList, bigBgUser.mUid, status, null);
             }
         }
     }
 
-    private void resetCamera() {
-        RtcEngine rtcEngine = rtcEngine();
-        rtcEngine.setEnableSpeakerphone(!mWithHeadset);
-
-        if (!mWithHeadset) {
-            mEarpiece = false;
-        } else {
-            mEarpiece = true;
-        }
+    private void resetToVideoEnabledUI() {
         ImageView iv = (ImageView) findViewById(R.id.customized_function_id);
-        iv.clearColorFilter();
         iv.setImageResource(R.drawable.btn_switch_camera);
+        iv.clearColorFilter();
+
+        notifyHeadsetPlugged(mAudioRouting);
     }
 
-    private void resetEarpiece() {
-        RtcEngine rtcEngine = rtcEngine();
-        rtcEngine.setEnableSpeakerphone(!mWithHeadset);
-
+    private void resetToVideoDisabledUI() {
         ImageView iv = (ImageView) findViewById(R.id.customized_function_id);
         iv.setImageResource(R.drawable.btn_speaker);
-        if (mWithHeadset) {
-            mEarpiece = true;
-            iv.clearColorFilter();
-            iv.setClickable(false);
-            iv.setEnabled(false);
-        } else {
-            mEarpiece = false;
-            iv.setColorFilter(getResources().getColor(R.color.agora_blue), PorterDuff.Mode.MULTIPLY);
-        }
+        iv.clearColorFilter();
+
+        notifyHeadsetPlugged(mAudioRouting);
     }
 
     public void onVoiceMuteClicked(View view) {
@@ -572,7 +463,7 @@ public class ChatActivity extends BaseActivity implements AGEventHandler, IHeads
                 }
 
                 SurfaceView surfaceV = RtcEngine.CreateRendererView(getApplicationContext());
-                mUidsList.put(uid, new SoftReference<>(surfaceV));
+                mUidsList.put(uid, surfaceV);
 
                 boolean useDefaultLayout = mLayoutType == LAYOUT_TYPE_DEFAULT && mUidsList.size() != 2;
 
@@ -604,17 +495,13 @@ public class ChatActivity extends BaseActivity implements AGEventHandler, IHeads
                     return;
                 }
 
-                SoftReference<SurfaceView> local = mUidsList.remove(0);
+                SurfaceView local = mUidsList.remove(0);
 
                 if (local == null) {
                     return;
                 }
 
                 mUidsList.put(uid, local);
-
-                rtcEngine().muteLocalAudioStream(mAudioMuted);
-
-                worker().getRtcEngine().setEnableSpeakerphone(true);
             }
         });
     }
@@ -736,8 +623,15 @@ public class ChatActivity extends BaseActivity implements AGEventHandler, IHeads
                 String description = (String) data[1];
 
                 notifyMessageChanged(new Message(new User(0, null), error + " " + description));
+
                 break;
             }
+
+            case AGEventHandler.EVENT_TYPE_ON_AUDIO_ROUTE_CHANGED:
+                 notifyHeadsetPlugged((int) data[0]);
+
+                 break;
+
         }
     }
 
@@ -786,7 +680,7 @@ public class ChatActivity extends BaseActivity implements AGEventHandler, IHeads
     }
 
     private void switchToSmallVideoView(int bigBgUid) {
-        HashMap<Integer, SoftReference<SurfaceView>> slice = new HashMap<>(1);
+        HashMap<Integer, SurfaceView> slice = new HashMap<>(1);
         slice.put(bigBgUid, mUidsList.get(bigBgUid));
         mGridVideoViewContainer.initViewContainer(getApplicationContext(), bigBgUid, slice);
 
@@ -848,25 +742,20 @@ public class ChatActivity extends BaseActivity implements AGEventHandler, IHeads
         mSmallVideoViewDock.setVisibility(View.VISIBLE);
     }
 
-    @Override
-    public void notifyHeadsetPlugged(final boolean plugged, Object... extraData) {
-        log.info("notifyHeadsetPlugged " + plugged + " " + extraData);
-        boolean bluetooth = false;
-        if (extraData != null && extraData.length > 0 && (Integer) extraData[0] == HeadsetPlugManager.BLUETOOTH) { // this is only for bluetooth
-            bluetooth = true;
+    public void notifyHeadsetPlugged(final int routing) {
+        log.info("notifyHeadsetPlugged " + routing + " " + mVideoMuted);
+
+        mAudioRouting = routing;
+
+        if (!mVideoMuted) {
+            return;
         }
 
-        headsetPlugged(plugged);
-        mWithHeadset = plugged;
-
         ImageView iv = (ImageView) findViewById(R.id.customized_function_id);
-        if (mVideoMuted && plugged) {
-            // disable switching speaker button
-            iv.setClickable(false);
-            iv.setEnabled(false);
-        } else if (!plugged) {
-            iv.setClickable(true);
-            iv.setEnabled(true);
+        if (mAudioRouting == 3) { // Speakerphone
+            iv.setColorFilter(getResources().getColor(R.color.agora_blue), PorterDuff.Mode.MULTIPLY);
+        } else {
+            iv.clearColorFilter();
         }
     }
 }

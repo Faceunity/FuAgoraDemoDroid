@@ -24,6 +24,9 @@
 #elif defined(__APPLE__)
 #define AGORA_API __attribute__((visibility("default"))) extern "C"
 #define AGORA_CALL
+#elif defined(__ANDROID__) || defined(__linux__) || defined(__linux)
+#define AGORA_API extern "C" __attribute__((visibility("default")))
+#define AGORA_CALL
 #else
 #define AGORA_API extern "C"
 #define AGORA_CALL
@@ -199,13 +202,13 @@ enum ERROR_CODE_TYPE
 
 enum LOG_FILTER_TYPE
 {
-	LOG_FILTER_CONSOLE = 0x8000,
-    LOG_FILTER_DEBUG = 0x0800,
-    LOG_FILTER_INFO = 0x0001,
-    LOG_FILTER_WARN = 0x0002,
-    LOG_FILTER_ERROR = 0x0004,
+	LOG_FILTER_OFF = 0,
+    LOG_FILTER_DEBUG = 0x080f,
+    LOG_FILTER_INFO = 0x000f,
+    LOG_FILTER_WARN = 0x000e,
+    LOG_FILTER_ERROR = 0x000c,
     LOG_FILTER_CRITICAL = 0x0008,
-	LOG_FILTER_MASK = 0x880f,
+	LOG_FILTER_MASK = 0x80f,
 };
 
 enum MAX_DEVICE_ID_LENGTH_TYPE
@@ -226,11 +229,13 @@ enum MEDIA_ENGINE_EVENT_CODE_TYPE
     MEDIA_ENGINE_RECORDING_WARNING = 2,
     MEDIA_ENGINE_PLAYOUT_WARNING = 3,
     MEDIA_ENGINE_AUDIO_FILE_MIX_FINISH = 10,
+    MEDIA_ENGINE_AUDIO_SAMPLE_RATE_RECONFIG_FINISH = 11,
     // media engine role changed
     MEDIA_ENGINE_ROLE_BROADCASTER_SOLO = 20,
     MEDIA_ENGINE_ROLE_BROADCASTER_INTERACTIVE = 21,
     MEDIA_ENGINE_ROLE_AUDIENCE = 22,
-    MEDIA_ENGINE_ROLE_COMM_PEER = 23
+    MEDIA_ENGINE_ROLE_COMM_PEER = 23,
+    MEDIA_ENGINE_ROLE_GAME_PEER = 24
 };
 
 enum MEDIA_DEVICE_STATE_TYPE
@@ -293,6 +298,7 @@ enum VIDEO_PROFILE_TYPE
     VIDEO_PROFILE_480P_6 = 45,      // 480x480   30   600
     VIDEO_PROFILE_480P_8 = 47,		// 848x480   15   610
     VIDEO_PROFILE_480P_9 = 48,		// 848x480   30   930
+    VIDEO_PROFILE_480P_10 = 49,		// 640x480   10   400
     VIDEO_PROFILE_720P = 50,        // 1280x720  15   1130
     VIDEO_PROFILE_720P_3 = 52,      // 1280x720  30   1710
     VIDEO_PROFILE_720P_5 = 54,      // 960x720   15   910
@@ -381,6 +387,51 @@ struct RemoteVideoStats
 	int receivedBitrate;
 	int receivedFrameRate;
     REMOTE_VIDEO_STREAM_TYPE rxStreamType;
+};
+
+struct VideoCompositingLayout
+{
+    struct Region {
+        uid_t uid;
+        double x;//[0,1]
+        double y;//[0,1]
+        double width;//[0,1]
+        double height;//[0,1]
+        int zOrder; //optional, [0, 100] //0 (default): bottom most, 100: top most
+
+        //  Optional
+        //  [0, 1.0] where 0 denotes throughly transparent, 1.0 opaque
+        double alpha;
+
+        RENDER_MODE_TYPE renderMode;//RENDER_MODE_HIDDEN: Crop, RENDER_MODE_FIT: Zoom to fit
+        Region()
+            :uid(0)
+            , x(0)
+            , y(0)
+            , width(0)
+            , height(0)
+            , zOrder(0)
+            , alpha(1.0)
+            , renderMode(RENDER_MODE_HIDDEN)
+        {}
+
+    };
+    int canvasWidth;
+    int canvasHeight;
+    const char* backgroundColor;//e.g. "#C0C0C0" in RGB
+    const Region* regions;
+    int regionCount;
+    const char* appData;
+    int appDataLength;
+    VideoCompositingLayout()
+        :canvasWidth(0)
+        ,canvasHeight(0)
+        ,backgroundColor(NULL)
+        ,regions(NULL)
+        , regionCount(0)
+        , appData(NULL)
+        , appDataLength(0)
+    {}
 };
 
 #if !defined(__ANDROID__)
@@ -656,6 +707,24 @@ public:
         (void)width;
         (void)height;
         (void)elapsed;
+    }
+
+    /**
+     * when video size changed or rotation changed, the function will be called
+     * @param [in] uid
+     *        the UID of the remote user or local user (0)
+     * @param [in] width
+     *        the new width of the video
+     * @param [in] height
+     *        the new height of the video
+     * @param [in] rotation
+     *        the rotation of the video
+     */
+    virtual void onVideoSizeChanged(uid_t uid, int width, int height, int rotation) {
+        (void)uid;
+        (void)width;
+        (void)height;
+        (void)rotation;
     }
 
     /**
@@ -1267,6 +1336,9 @@ public:
 
     virtual int createDataStream(int* streamId, bool reliable, bool ordered) = 0;
     virtual int sendStreamMessage(int streamId, const char* data, size_t length) = 0;
+
+    virtual int setVideoCompositingLayout(const VideoCompositingLayout& sei) = 0;
+    virtual int clearVideoCompositingLayout() = 0;
 };
 
 

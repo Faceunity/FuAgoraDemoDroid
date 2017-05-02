@@ -14,13 +14,11 @@ import io.agora.propeller.Constant;
 import io.agora.openvcall.R;
 import io.agora.rtc.Constants;
 import io.agora.rtc.RtcEngine;
-import io.agora.rtc.RtcEngineEx;
 import io.agora.rtc.video.VideoCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Locale;
 
 public class WorkerThread extends Thread {
     private final static Logger log = LoggerFactory.getLogger(WorkerThread.class);
@@ -155,6 +153,7 @@ public class WorkerThread extends Thread {
 
         if (mRtcEngine != null) {
             mRtcEngine.leaveChannel();
+            mRtcEngine.enableVideo();
         }
 
         disablePreProcessor();
@@ -226,12 +225,12 @@ public class WorkerThread extends Thread {
             if (TextUtils.isEmpty(appId)) {
                 throw new RuntimeException("NEED TO use your App ID, get your own ID at https://dashboard.agora.io/");
             }
-            mRtcEngine = RtcEngineEx.create(mContext, appId, mEngineEventHandler.mRtcEventHandler);
+            mRtcEngine = RtcEngine.create(mContext, appId, mEngineEventHandler.mRtcEventHandler);
             mRtcEngine.setChannelProfile(Constants.CHANNEL_PROFILE_COMMUNICATION);
             mRtcEngine.enableVideo();
             mRtcEngine.enableAudioVolumeIndication(200, 3); // 200 ms
-            mRtcEngine.setParameters(String.format(Locale.US, "{\"rtc.log_file\":\"%s\"}", Environment.getExternalStorageDirectory()
-                    + File.separator + mContext.getPackageName() + "/log/agora-rtc.log"));
+            mRtcEngine.setLogFile(Environment.getExternalStorageDirectory()
+                    + File.separator + mContext.getPackageName() + "/log/agora-rtc.log");
         }
         return mRtcEngine;
     }

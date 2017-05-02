@@ -11,7 +11,7 @@ JavaVM* javaVM;
 JNIEnv* env;
 
 jclass renderClass;
-jmethodID fuRenderToNV21ImageMethod;
+jmethodID renderToI420ImageMethod;
 
 class AgoraVideoFrameObserver : public agora::media::IVideoFrameObserver
 {
@@ -20,33 +20,24 @@ public:
     {
         javaVM->AttachCurrentThread(&env, NULL);
 
-        fuRenderToNV21ImageMethod = env->GetStaticMethodID(renderClass, "fuRenderToNV21Image", "([BII)V");
+        renderToI420ImageMethod = env->GetStaticMethodID(renderClass, "renderToI420Image", "([BII)V");
 
         jsize len = videoFrame.yStride * videoFrame.height * 3 / 2;
         jbyteArray array = env->NewByteArray(len);
         jbyte* buf = new jbyte[len];
         int yLength = videoFrame.yStride * videoFrame.height;
-        int i = 0;
-        for (; i < yLength; i++) {
-            buf[i] = ((jbyte *) videoFrame.yBuffer)[i];
-        }
+        memcpy(buf, videoFrame.yBuffer, yLength);
         int uLength = yLength / 4;
-        for (int j = 0; j < uLength; i += 2, j++) {
-            buf[i] = ((jbyte *) videoFrame.vBuffer)[j];
-            buf[i + 1] = ((jbyte *) videoFrame.uBuffer)[j];
-        }
+        memcpy(buf + yLength, videoFrame.uBuffer, uLength);
+        memcpy(buf + yLength + uLength, videoFrame.vBuffer, uLength);
         env->SetByteArrayRegion(array, 0, len, buf);
 
-        env->CallStaticVoidMethod(renderClass, fuRenderToNV21ImageMethod, array, videoFrame.yStride, videoFrame.height);
+        env->CallStaticVoidMethod(renderClass, renderToI420ImageMethod, array, videoFrame.yStride, videoFrame.height);
 
         env->GetByteArrayRegion(array, 0, len, buf);
-        for (i = 0; i < yLength; i++) {
-            ((jbyte *) videoFrame.yBuffer)[i] = buf[i];
-        }
-        for (int j = 0; j < uLength; i += 2, j++) {
-            ((jbyte *) videoFrame.vBuffer)[j] = buf[i];
-            ((jbyte *) videoFrame.uBuffer)[j] = buf[i + 1];
-        }
+        memcpy(videoFrame.yBuffer, buf, yLength);
+        memcpy(videoFrame.uBuffer, buf + yLength, uLength);
+        memcpy(videoFrame.vBuffer, buf + yLength + uLength, uLength);
 
         delete []buf;
 
@@ -100,7 +91,7 @@ JNIEXPORT void JNICALL Java_io_agora_propeller_preprocessing_VideoPreProcessing_
 
     env->GetJavaVM(&javaVM);
 
-    renderClass = env->FindClass("com/faceunity/Render");
+    renderClass = env->FindClass("com/faceunity/MRender");
     renderClass = (jclass) env->NewGlobalRef(renderClass);
 }
 

@@ -46,7 +46,7 @@ public class MyEngineEventHandler {
 
         @Override
         public void onFirstLocalVideoFrame(int width, int height, int elapsed) {
-            log.debug("onFirstLocalVideoFrame " + " " + width + " " + height + " " + elapsed);
+            log.debug("onFirstLocalVideoFrame " + width + " " + height + " " + elapsed);
         }
 
         @Override
@@ -185,6 +185,17 @@ public class MyEngineEventHandler {
 
         public void onRejoinChannelSuccess(String channel, int uid, int elapsed) {
             log.debug("onRejoinChannelSuccess " + channel + " " + uid + " " + elapsed);
+        }
+
+        @Override
+        public void onAudioRouteChanged(int routing) {
+            log.debug("onAudioRouteChanged " + routing);
+
+            Iterator<AGEventHandler> it = mEventHandlerList.keySet().iterator();
+            while (it.hasNext()) {
+                AGEventHandler handler = it.next();
+                handler.onExtraCallback(AGEventHandler.EVENT_TYPE_ON_AUDIO_ROUTE_CHANGED, routing);
+            }
         }
 
         public void onWarning(int warn) {

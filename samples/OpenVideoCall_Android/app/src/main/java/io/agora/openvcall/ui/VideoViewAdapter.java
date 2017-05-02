@@ -3,17 +3,22 @@ package io.agora.openvcall.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import io.agora.propeller.UserStatusData;
-import io.agora.propeller.VideoInfoData;
-import io.agora.openvcall.R;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import io.agora.openvcall.R;
+import io.agora.propeller.UserStatusData;
+import io.agora.propeller.VideoInfoData;
 
 public abstract class VideoViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -28,7 +33,7 @@ public abstract class VideoViewAdapter extends RecyclerView.Adapter<RecyclerView
 
     protected int mLocalUid;
 
-    public VideoViewAdapter(Context context, int localUid, HashMap<Integer, SoftReference<SurfaceView>> uids, VideoViewEventListener listener) {
+    public VideoViewAdapter(Context context, int localUid, HashMap<Integer, SurfaceView> uids, VideoViewEventListener listener) {
         mContext = context;
         mInflater = ((Activity) context).getLayoutInflater();
 
@@ -46,15 +51,15 @@ public abstract class VideoViewAdapter extends RecyclerView.Adapter<RecyclerView
 
     private int mDefaultChildItem = 0;
 
-    private void init(HashMap<Integer, SoftReference<SurfaceView>> uids) {
+    private void init(HashMap<Integer, SurfaceView> uids) {
         mUsers.clear();
 
         customizedInit(uids, true);
     }
 
-    protected abstract void customizedInit(HashMap<Integer, SoftReference<SurfaceView>> uids, boolean force);
+    protected abstract void customizedInit(HashMap<Integer, SurfaceView> uids, boolean force);
 
-    public abstract void notifyUiChanged(HashMap<Integer, SoftReference<SurfaceView>> uids, int uidExtra, HashMap<Integer, Integer> status, HashMap<Integer, Integer> volume);
+    public abstract void notifyUiChanged(HashMap<Integer, SurfaceView> uids, int uidExtra, HashMap<Integer, Integer> status, HashMap<Integer, Integer> volume);
 
     protected HashMap<Integer, VideoInfoData> mVideoInfo; // left user should removed from this HashMap
 
@@ -106,7 +111,7 @@ public abstract class VideoViewAdapter extends RecyclerView.Adapter<RecyclerView
         });
 
         if (holderView.getChildCount() == mDefaultChildItem) {
-            SurfaceView target = user.mView.get();
+            SurfaceView target = user.mView;
             VideoViewAdapterUtil.stripView(target);
             holderView.addView(target, 0, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         }
@@ -124,7 +129,7 @@ public abstract class VideoViewAdapter extends RecyclerView.Adapter<RecyclerView
     public long getItemId(int position) {
         UserStatusData user = mUsers.get(position);
 
-        SurfaceView view = user.mView.get();
+        SurfaceView view = user.mView;
         if (view == null) {
             throw new NullPointerException("SurfaceView destroyed for user " + user.mUid + " " + user.mStatus + " " + user.mVolume);
         }

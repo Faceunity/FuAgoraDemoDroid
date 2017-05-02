@@ -6,18 +6,19 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
-import io.agora.propeller.Constant;
-import io.agora.propeller.UserStatusData;
-import io.agora.propeller.VideoInfoData;
-import io.agora.openvcall.R;
-import io.agora.propeller.ui.ViewUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import io.agora.openvcall.R;
+import io.agora.propeller.Constant;
+import io.agora.propeller.UserStatusData;
+import io.agora.propeller.VideoInfoData;
+import io.agora.propeller.ui.ViewUtil;
 
 public class VideoViewAdapterUtil {
 
@@ -25,12 +26,12 @@ public class VideoViewAdapterUtil {
 
     private static final boolean DEBUG = false;
 
-    public static void composeDataItem1(final ArrayList<UserStatusData> users, HashMap<Integer, SoftReference<SurfaceView>> uids, int localUid) {
-        for (HashMap.Entry<Integer, SoftReference<SurfaceView>> entry : uids.entrySet()) {
+    public static void composeDataItem1(final ArrayList<UserStatusData> users, HashMap<Integer, SurfaceView> uids, int localUid) {
+        for (HashMap.Entry<Integer, SurfaceView> entry : uids.entrySet()) {
             if (DEBUG) {
                 log.debug("composeDataItem1 " + (entry.getKey() & 0xFFFFFFFFL) + " " + (localUid & 0xFFFFFFFFL) + " " + users.size() + " " + entry.getValue());
             }
-            SurfaceView surfaceV = entry.getValue().get();
+            SurfaceView surfaceV = entry.getValue();
             surfaceV.setZOrderOnTop(false);
             surfaceV.setZOrderMediaOverlay(false);
             searchUidsAndAppend(users, entry, localUid, UserStatusData.DEFAULT_STATUS, UserStatusData.DEFAULT_VOLUME, null);
@@ -39,7 +40,7 @@ public class VideoViewAdapterUtil {
         removeNotExisted(users, uids, localUid);
     }
 
-    private static void removeNotExisted(ArrayList<UserStatusData> users, HashMap<Integer, SoftReference<SurfaceView>> uids, int localUid) {
+    private static void removeNotExisted(ArrayList<UserStatusData> users, HashMap<Integer, SurfaceView> uids, int localUid) {
         if (DEBUG) {
             log.debug("removeNotExisted all " + uids + " " + users.size());
         }
@@ -55,7 +56,7 @@ public class VideoViewAdapterUtil {
         }
     }
 
-    private static void searchUidsAndAppend(ArrayList<UserStatusData> users, HashMap.Entry<Integer, SoftReference<SurfaceView>> entry,
+    private static void searchUidsAndAppend(ArrayList<UserStatusData> users, HashMap.Entry<Integer, SurfaceView> entry,
                                             int localUid, Integer status, int volume, VideoInfoData i) {
         if (entry.getKey() == 0 || entry.getKey() == localUid) {
             boolean found = false;
@@ -93,7 +94,7 @@ public class VideoViewAdapterUtil {
         }
     }
 
-    public static void composeDataItem(final ArrayList<UserStatusData> users, HashMap<Integer, SoftReference<SurfaceView>> uids,
+    public static void composeDataItem(final ArrayList<UserStatusData> users, HashMap<Integer, SurfaceView> uids,
                                        int localUid,
                                        HashMap<Integer, Integer> status,
                                        HashMap<Integer, Integer> volume,
@@ -101,12 +102,12 @@ public class VideoViewAdapterUtil {
         composeDataItem(users, uids, localUid, status, volume, video, 0);
     }
 
-    public static void composeDataItem(final ArrayList<UserStatusData> users, HashMap<Integer, SoftReference<SurfaceView>> uids,
+    public static void composeDataItem(final ArrayList<UserStatusData> users, HashMap<Integer, SurfaceView> uids,
                                        int localUid,
                                        HashMap<Integer, Integer> status,
                                        HashMap<Integer, Integer> volume,
                                        HashMap<Integer, VideoInfoData> video, int uidExcepted) {
-        for (HashMap.Entry<Integer, SoftReference<SurfaceView>> entry : uids.entrySet()) {
+        for (HashMap.Entry<Integer, SurfaceView> entry : uids.entrySet()) {
             int uid = entry.getKey();
 
             if (uid == uidExcepted && uidExcepted != 0) {

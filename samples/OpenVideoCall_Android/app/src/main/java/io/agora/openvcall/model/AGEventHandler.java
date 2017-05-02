@@ -22,4 +22,6 @@ public interface AGEventHandler {
     int EVENT_TYPE_ON_USER_VIDEO_STATS = 10;
 
     int EVENT_TYPE_ON_APP_ERROR = 13;
+
+    int EVENT_TYPE_ON_AUDIO_ROUTE_CHANGED = 18;
 }

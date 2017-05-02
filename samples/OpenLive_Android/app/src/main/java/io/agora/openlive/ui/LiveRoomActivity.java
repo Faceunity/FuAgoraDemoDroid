@@ -8,12 +8,21 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.*;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewStub;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.faceunity.Render;
+import com.faceunity.MRender;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
 
 import io.agora.openlive.R;
 import io.agora.openlive.model.AGEventHandler;
@@ -22,11 +31,6 @@ import io.agora.openlive.model.VideoStatusData;
 import io.agora.rtc.Constants;
 import io.agora.rtc.RtcEngine;
 import io.agora.rtc.video.VideoCanvas;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.lang.ref.SoftReference;
-import java.util.HashMap;
 
 public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
 
@@ -36,21 +40,21 @@ public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
 
     private RelativeLayout mSmallVideoViewDock;
 
-    private final HashMap<Integer, SoftReference<SurfaceView>> mUidsList = new HashMap<>(); // uid = 0 || uid == EngineConfig.mUid
+    private final HashMap<Integer, SurfaceView> mUidsList = new HashMap<>(); // uid = 0 || uid == EngineConfig.mUid
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_live_room);
 
-        Render.fuSetUp(this);
+        MRender.create(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        Render.fuDestroy();
+        MRender.destroy();
     }
 
     @Override
@@ -113,7 +117,7 @@ public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
             surfaceV.setZOrderOnTop(true);
             surfaceV.setZOrderMediaOverlay(true);
 
-            mUidsList.put(0, new SoftReference<>(surfaceV)); // get first surface view
+            mUidsList.put(0, surfaceV); // get first surface view
 
             mGridVideoViewContainer.initViewContainer(getApplicationContext(), 0, mUidsList); // first is now full view
             worker().preview(true, surfaceV, 0);
@@ -274,9 +278,6 @@ public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
                     doShowButtons(false);
                 }
             }, 1000); // wait for reconfig engine
-
-            rtcEngine().muteLocalVideoStream(false);
-            rtcEngine().muteLocalAudioStream(false);
         } else {
             stopInteraction(currentHostCount, uid);
         }
@@ -298,8 +299,6 @@ public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
                 doShowButtons(false);
             }
         }, 1000); // wait for reconfig engine
-
-        rtcEngine().muteLocalAudioStream(true);
     }
 
     private void doRenderRemoteUi(final int uid) {
@@ -313,7 +312,7 @@ public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
                 SurfaceView surfaceV = RtcEngine.CreateRendererView(getApplicationContext());
                 surfaceV.setZOrderOnTop(true);
                 surfaceV.setZOrderMediaOverlay(true);
-                mUidsList.put(uid, new SoftReference<>(surfaceV));
+                mUidsList.put(uid, surfaceV);
                 if (config().mUid == uid) {
                     rtcEngine().setupLocalVideo(new VideoCanvas(surfaceV, VideoCanvas.RENDER_MODE_HIDDEN, uid));
                 } else {
@@ -351,18 +350,10 @@ public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
 
                 worker().getEngineConfig().mUid = uid;
 
-                SoftReference<SurfaceView> surfaceV = mUidsList.remove(0);
+                SurfaceView surfaceV = mUidsList.remove(0);
                 if (surfaceV != null) {
                     mUidsList.put(uid, surfaceV);
                 }
-
-                if (isBroadcaster) {
-                    rtcEngine().muteLocalAudioStream(false);
-                } else {
-                    rtcEngine().muteLocalAudioStream(true);
-                }
-
-                worker().getRtcEngine().setEnableSpeakerphone(true);
             }
         });
     }
@@ -378,23 +369,23 @@ public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                HashMap.Entry<Integer, SoftReference<SurfaceView>> highest = null;
-                for (HashMap.Entry<Integer, SoftReference<SurfaceView>> pair : mUidsList.entrySet()) {
-                    log.debug("requestRemoteStreamType " + currentHostCount + " local " + (config().mUid & 0xFFFFFFFFL) + " " + (pair.getKey() & 0xFFFFFFFFL) + " " + pair.getValue().get().getHeight() + " " + pair.getValue().get().getWidth());
-                    if (pair.getKey() != config().mUid && (highest == null || highest.getValue().get().getHeight() < pair.getValue().get().getHeight())) {
+                HashMap.Entry<Integer, SurfaceView> highest = null;
+                for (HashMap.Entry<Integer, SurfaceView> pair : mUidsList.entrySet()) {
+                    log.debug("requestRemoteStreamType " + currentHostCount + " local " + (config().mUid & 0xFFFFFFFFL) + " " + (pair.getKey() & 0xFFFFFFFFL) + " " + pair.getValue().getHeight() + " " + pair.getValue().getWidth());
+                    if (pair.getKey() != config().mUid && (highest == null || highest.getValue().getHeight() < pair.getValue().getHeight())) {
                         if (highest != null) {
                             rtcEngine().setRemoteVideoStreamType(highest.getKey(), Constants.VIDEO_STREAM_LOW);
-                            log.debug("setRemoteVideoStreamType switch highest VIDEO_STREAM_LOW " + currentHostCount + " " + (highest.getKey() & 0xFFFFFFFFL) + " " + highest.getValue().get().getWidth() + " " + highest.getValue().get().getHeight());
+                            log.debug("setRemoteVideoStreamType switch highest VIDEO_STREAM_LOW " + currentHostCount + " " + (highest.getKey() & 0xFFFFFFFFL) + " " + highest.getValue().getWidth() + " " + highest.getValue().getHeight());
                         }
                         highest = pair;
-                    } else if (pair.getKey() != config().mUid && (highest != null && highest.getValue().get().getHeight() >= pair.getValue().get().getHeight())) {
+                    } else if (pair.getKey() != config().mUid && (highest != null && highest.getValue().getHeight() >= pair.getValue().getHeight())) {
                         rtcEngine().setRemoteVideoStreamType(pair.getKey(), Constants.VIDEO_STREAM_LOW);
-                        log.debug("setRemoteVideoStreamType VIDEO_STREAM_LOW " + currentHostCount + " " + (pair.getKey() & 0xFFFFFFFFL) + " " + pair.getValue().get().getWidth() + " " + pair.getValue().get().getHeight());
+                        log.debug("setRemoteVideoStreamType VIDEO_STREAM_LOW " + currentHostCount + " " + (pair.getKey() & 0xFFFFFFFFL) + " " + pair.getValue().getWidth() + " " + pair.getValue().getHeight());
                     }
                 }
                 if (highest != null && highest.getKey() != 0) {
                     rtcEngine().setRemoteVideoStreamType(highest.getKey(), Constants.VIDEO_STREAM_HIGH);
-                    log.debug("setRemoteVideoStreamType VIDEO_STREAM_HIGH " + currentHostCount + " " + (highest.getKey() & 0xFFFFFFFFL) + " " + highest.getValue().get().getWidth() + " " + highest.getValue().get().getHeight());
+                    log.debug("setRemoteVideoStreamType VIDEO_STREAM_HIGH " + currentHostCount + " " + (highest.getKey() & 0xFFFFFFFFL) + " " + highest.getValue().getWidth() + " " + highest.getValue().getHeight());
                 }
             }
         }, 500);
@@ -449,7 +440,7 @@ public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
     }
 
     private void switchToSmallVideoView(int uid) {
-        HashMap<Integer, SoftReference<SurfaceView>> slice = new HashMap<>(1);
+        HashMap<Integer, SurfaceView> slice = new HashMap<>(1);
         slice.put(uid, mUidsList.get(uid));
         mGridVideoViewContainer.initViewContainer(getApplicationContext(), uid, slice);
 

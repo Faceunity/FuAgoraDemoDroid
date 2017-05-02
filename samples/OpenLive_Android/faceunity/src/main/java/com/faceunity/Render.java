@@ -158,7 +158,9 @@ public class Render {
                 return;
             }
 
+            System.out.println("fuRenderToNV21Image before " + w + " " + h);
             faceunity.fuRenderToNV21Image(img, w, h, mFrameId++, new int[]{mEffectItem, mFacebeautyItem});
+            System.out.println("fuRenderToNV21Image after");
         }
     }
 
