@@ -6,12 +6,6 @@ LOCAL_SRC_FILES := ../../../../../../libs/$(TARGET_ARCH_ABI)/libHDACEngine.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
-# This is for encryption module in video/voice call
-LOCAL_MODULE := agora-crypto
-LOCAL_SRC_FILES := ../../../../../../libs/$(TARGET_ARCH_ABI)/libagora-crypto.so
-include $(PREBUILT_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
 # Agora RTC SDK
 LOCAL_MODULE := agora-rtc
 LOCAL_SRC_FILES := ../../../../../../libs/$(TARGET_ARCH_ABI)/libagora-rtc-sdk-jni.so
@@ -23,5 +17,5 @@ LOCAL_SRC_FILES := \
 
 LOCAL_LDLIBS := -ldl -llog
 LOCAL_MODULE := apm-plugin-video-preprocessing
-LOCAL_SHARED_LIBRARIES := agora-av agora-crypto agora-rtc
+LOCAL_SHARED_LIBRARIES := agora-av agora-rtc
 include $(BUILD_SHARED_LIBRARY)

@@ -16,7 +16,7 @@ import java.io.InputStream;
 public class MRender {
 
     private final static String[] ITEM_NAMES = {
-            "none", "tiara.mp3", "item0208.mp3", "einstein.mp3",
+            "none", "tiara.mp3", "item0208.mp3",
             "YellowEar.mp3", "PrincessCrown.mp3",
             "Mood.mp3", "Deer.mp3", "BeagleDog.mp3", "item0501.mp3", "ColorCrown.mp3",
             "item0210.mp3",  "HappyRabbi.mp3", "item0204.mp3",
@@ -29,7 +29,7 @@ public class MRender {
 
     private static Handler handler;
 
-    private static int effectItem;
+    private static volatile int effectItem;
     private static int facebeautyItem;
 
     private static int frameId;
@@ -130,7 +130,8 @@ public class MRender {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                destroyEffectItem();
+                destroyEffectItem(effectItem);
+                effectItem = 0;
                 faceunity.fuDestroyItem(facebeautyItem);
                 faceunity.fuOnDeviceLost();
                 faceunity.fuReleaseEGLContext();
@@ -153,21 +154,26 @@ public class MRender {
         }
     }
 
-    private static void destroyEffectItem() {
+    private static void destroyEffectItem(int effectItem) {
         if (effectItem != 0) {
             faceunity.fuDestroyItem(effectItem);
-            effectItem = 0;
         }
     }
 
     public static void setCurrentItemByPosition(final int itemPosition) {
-        handler.post(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                destroyEffectItem();
-                createEffectItem(itemPosition);
+                int effectItem = MRender.effectItem;
+                if (itemPosition > 0) {
+                    createEffectItem(itemPosition);
+                    destroyEffectItem(effectItem);
+                } else {
+                    MRender.effectItem = 0;
+                    destroyEffectItem(effectItem);
+                }
             }
-        });
+        }).start();
     }
 
     public static void setCurrentFilterByPosition(final int filterPosition) {
