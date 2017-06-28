@@ -66,27 +66,29 @@ public class EffectAndFilterRecycleViewAdapter extends RecyclerView.Adapter<Effe
             holder.mItemView.mItemText.setVisibility(View.VISIBLE);
             holder.mItemView.mItemIcon.setImageResource(FILTER_ITEM_RES_ARRAY[
                     position % FILTER_ITEM_RES_ARRAY.length]);
-            holder.mItemView.mItemText.setText(Render.m_filters[
+            holder.mItemView.mItemText.setText(MRender.FILTERS[
                     position % FILTER_ITEM_RES_ARRAY.length].toUpperCase());
         }
 
         holder.mItemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mOnItemSelectedListener != null) {
-                    mOnItemSelectedListener.onItemSelected(position, mRecycleViewType);
-                }
-                if (mLastClickPosition != position) {
-                    ItemViewHolder lastClickItemViewHolder = (ItemViewHolder) mRecycleView
-                                    .findViewHolderForAdapterPosition(mLastClickPosition);
-                    //restore the image background of last click position
-                    if (lastClickItemViewHolder != null) {
-                        lastClickItemViewHolder.mItemView.setBackgroundUnSelected();
+                if (!MRender.creatingItem) {
+                    if (mOnItemSelectedListener != null) {
+                        mOnItemSelectedListener.onItemSelected(position, mRecycleViewType);
                     }
-                    mItemClickStateList.set(mLastClickPosition, false);
+                    if (mLastClickPosition != position) {
+                        ItemViewHolder lastClickItemViewHolder = (ItemViewHolder) mRecycleView
+                                .findViewHolderForAdapterPosition(mLastClickPosition);
+                        //restore the image background of last click position
+                        if (lastClickItemViewHolder != null) {
+                            lastClickItemViewHolder.mItemView.setBackgroundUnSelected();
+                        }
+                        mItemClickStateList.set(mLastClickPosition, false);
+                    }
+                    holder.mItemView.setBackgroundSelected();
+                    setClickPosition(position);
                 }
-                holder.mItemView.setBackgroundSelected();
-                setClickPosition(position);
             }
         });
     }

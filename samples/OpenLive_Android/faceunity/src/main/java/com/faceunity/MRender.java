@@ -37,6 +37,8 @@ public class MRender {
     private static int w;
     private static int h;
 
+    static volatile boolean creatingItem;
+
     public static void create(final Context context) {
         MRender.context = context;
 
@@ -45,6 +47,8 @@ public class MRender {
         HandlerThread handlerThread = new HandlerThread("MRender");
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
+
+        final byte[] authdata = authpack.A();
 
         handler.post(new Runnable() {
             @Override
@@ -56,7 +60,7 @@ public class MRender {
                     byte[] v3data = new byte[is.available()];
                     is.read(v3data);
                     is.close();
-                    faceunity.fuSetup(v3data, null, authpack.A());
+                    faceunity.fuSetup(v3data, null, authdata);
                     faceunity.fuSetMaxFaces(1);
 
                     createEffectItem(1);
@@ -110,6 +114,7 @@ public class MRender {
                             MRender.w = w;
                             MRender.h = h;
 
+                            faceunity.fuItemSetParam(effectItem, "isAndroid", 1);
                             faceunity.fuRenderToI420Image(img, w, h, frameId++, new int[]{effectItem, facebeautyItem});
 
                             MRender.class.notifyAll();
@@ -161,6 +166,7 @@ public class MRender {
     }
 
     public static void setCurrentItemByPosition(final int itemPosition) {
+        creatingItem = true;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -172,6 +178,7 @@ public class MRender {
                     MRender.effectItem = 0;
                     destroyEffectItem(effectItem);
                 }
+                creatingItem = false;
             }
         }).start();
     }

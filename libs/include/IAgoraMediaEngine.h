@@ -30,6 +30,7 @@ public:
 public:
   virtual bool onRecordAudioFrame(AudioFrame& audioFrame) = 0;
   virtual bool onPlaybackAudioFrame(AudioFrame& audioFrame) = 0;
+  virtual bool onMixedAudioFrame(AudioFrame& audioFrame) = 0;
   virtual bool onPlaybackAudioFrameBeforeMixing(unsigned int uid, AudioFrame& audioFrame) = 0;
 };
 

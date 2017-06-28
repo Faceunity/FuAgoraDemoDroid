@@ -16,7 +16,7 @@ android {
         versionName "x.y.z"
 
         jackOptions {
-            enabled true
+            enabled false
         }
 
         externalNativeBuild {
@@ -31,8 +31,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 
     buildTypes {
@@ -58,12 +58,12 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: '../../../libs')
     compile project(':libvideoprp')
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:support-v4:25.1.0'
-    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:appcompat-v7:25.3.0'
+    compile 'com.android.support:support-v4:25.3.0'
+    compile 'com.android.support:design:25.3.0'
     compile 'org.slf4j:slf4j-api:1.7.21'
-    compile 'com.github.tony19:logback-android-core:1.1.1-5'
-    compile('com.github.tony19:logback-android-classic:1.1.1-5') {
+    compile 'com.github.tony19:logback-android-core:1.1.1-4'
+    compile('com.github.tony19:logback-android-classic:1.1.1-4') {
         // workaround issue #73
         exclude group: 'com.google.android', module: 'android'
     }
