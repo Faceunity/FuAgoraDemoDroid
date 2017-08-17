@@ -114,7 +114,6 @@ public class MRender {
                             MRender.w = w;
                             MRender.h = h;
 
-                            faceunity.fuItemSetParam(effectItem, "isAndroid", 1);
                             faceunity.fuRenderToI420Image(img, w, h, frameId++, new int[]{effectItem, facebeautyItem});
 
                             MRender.class.notifyAll();
@@ -153,6 +152,7 @@ public class MRender {
                 is.read(itemData);
                 is.close();
                 effectItem = faceunity.fuCreateItemFromPackage(itemData);
+                faceunity.fuItemSetParam(effectItem, "isAndroid", 1);
             }
         } catch (IOException e) {
             e.printStackTrace();
