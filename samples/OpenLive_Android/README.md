@@ -1,113 +1,49 @@
-## NOTICE
+# OpenLive for Android
 
-Agora OpenLive is a demo of [Agora](http://www.agora.io) Interactive Broadcasting - Android
+*Read this in other languages: [English](README.en.md)*
 
-* Up to 7 hosts / presenters
-* Any audience can call in to join live conversations
-* Super low latency, less than 1 second
-* Switch stream type / screen UI freely
-* Unique anti-packet-loss algorithm
-* Globally distributed data centers to ensure international usage
+这个开源示例项目演示了如何快速集成 Agora 视频 SDK，实现多人视频连麦直播。
 
-Agora OpenLive 是 [声网Agora.io](http://cn.agora.io) 多人主播和视频连麦直播demo - Android
+在这个示例项目中包含了以下功能：
 
-* 最多7人同时主播
-* 观众主播视频连麦
-* 毫秒级超低延迟，秒杀CDN
-* 大小流切换，多主播视窗随意切换
-* 超强抗丢包，网络不好直播仍然流畅
-* 跨洲跨国数据中心，保障直播全球扩展
+- 加入通话和离开通话；
+- 主播和观众模式切换；
+- 静音和解除静音；
+- 切换前置摄像头和后置摄像头；
+- 选择分辨率、码率和帧率；
 
-##Agora OpenLive Overview
+你也可以在这里查看入门版的示例项目：[Agora-Android-Tutorial-1to1](https://github.com/AgoraIO/Agora-Android-Tutorial-1to1)
 
-This demo is featuring live interactive broadcasting with the following unique features:
+Agora 视频 SDK 支持 iOS / Android / Windows / macOS 等多个平台，你可以查看对应各平台的示例项目：
 
-1. Support 4 hosts by default(can be extended to 7). UI design can be self defined.
-2. Audiences can call in with audio / video.
-3. Switch video stream free with different screen UI.
-4. Globally broadcasting.
+- [OpenLive-iOS](https://github.com/AgoraIO/OpenLive-iOS)
+- [OpenLive-Windows](https://github.com/AgoraIO/OpenLive-Windows)
+- [OpenLive-macOS](https://github.com/AgoraIO/OpenLive-macOS)
 
-This demo shall be working only with [Agora](http://www.agora.io) interactive broadcasting SDK. Please contact  <mailto:sales@agora.io>. Developers from China can call 400 632 6626.
+## 运行示例程序
+首先在 [Agora.io 注册](https://dashboard.agora.io/cn/signup/) 注册账号，并创建自己的测试项目，获取到 AppID。将 AppID 填写进 "app/src/main/res/values/strings_config.xml"
 
-这个Demo模拟的是一个有多人主播同时对话，并且对观众直播的App。主要有4个独特之处：
+```
+<string name="private_app_id"><#YOUR APP ID#></string>
+```
 
-1. 主播人数目前最多可以同时支持4人（SDK支持7人），也可以是4人以下任何人数。可根据场景来自由定义和设计视窗UI；
-2. 支持观众和主播语音／视频连麦；
-3. 支持大小流切换，观众在多视窗观看时，可选择任意主播放大主屏观看；
-4. 支持全球范围的直播，跨国跨洲直播
+然后在 [Agora.io SDK](https://www.agora.io/cn/download/) 下载 **视频通话 + 直播 SDK**，解压后将其中的 **libs** 文件夹下的 ***.jar** 复制到本项目的 **app/libs** 下，其中的 **libs** 文件夹下的 **arm64-v8a**/**x86**/**armeabi-v7a** 复制到本项目的 **app/src/main/libs** 下。
 
-该Demo需要基于 [声网Agora.io](http://cn.agora.io) 的实时互动直播技术才能运行。如有需求，请联系 <mailto:sales@agora.io>。中国用户可直接拨打400 632 6626。
+最后用 Android Studio 打开该项目，连上设备，编译并运行。
 
-##Agora.io Interactive Broadcasting
+也可以使用 `Gradle` 直接编译运行。
 
-[Agora](http://www.agora.io) Interactive Broadcasting is based on UDP featuring super low latency/delay, less than 1 second. This ensures “real time presence” experience when multiple hosts talking lively and when audiences call in.
+## 运行环境
+- Android Studio 2.0 +
+- 真实 Android 设备 (Nexus 5X 或者其它设备)
+- 部分模拟器会存在功能缺失或者性能问题，所以推荐使用真机
 
-[Agora](http://www.agora.io) has 100 data centers distributed globally. With the virtual network, the broadcasting experience are stable and smooth.
+## 联系我们
+- 完整的 API 文档见 [文档中心](https://docs.agora.io/cn/)
+- 如果在集成中遇到问题, 你可以到 [开发者社区](https://dev.agora.io/cn/) 提问
+- 如果有售前咨询问题, 可以拨打 400 632 6626，或加入官方Q群 12742516 提问
+- 如果需要售后技术支持, 你可以在 [Agora Dashboard](https://dashboard.agora.io) 提交工单
+- 如果发现了示例代码的 bug, 欢迎提交 [issue](https://github.com/AgoraIO/OpenLive-Android/issues)
 
-[Agora](http://www.agora.io) Interactive Broadcasting SDK is available for iOS, Android, macOS and Windows, supporting RTMP and HLS. It enables bit rate auto adjustment to adapt to broadcasting under different bandwidth.
-
-This demo does not include broadcasting business server. Developers can build your own business server and interact with [Agora](http://www.agora.io) SDK.
-
-[声网Agora.io](http://cn.agora.io) 的实时互动直播技术，区别于所有CDN方案。它是全球第一个以UDP为基础的直播方案。与传统CDN方案相比，最大的特点是超低延时，基本都在毫秒级的延迟。这能保证在多个主播及观众连麦时，有“实时对话”的体验。
-
-[声网Agora.io](http://cn.agora.io) 在全球部署了将近100个数据中心，加上lastmile算法，有超强抗丢包特点，可以保障全球范围稳定靠谱的直播体验。
-
-[声网Agora.io](http://cn.agora.io) 的客户端SDK，支持iOS、Android、macOS和Windows，支持RTMP、HLS协议。另外客户端SDK还支持码率自适应，以适应不同网络环境直播需求。支持美颜。
-
-此Demo不涉及到直播业务服务器部分，此部分一般由开发者自行开发，然后和 [声网Agora.io](http://cn.agora.io) 直播服务交互。
-
-
-## Bug reports
-
-* https://github.com/AgoraLab/OpenLive_Android/issues
-
-
-## Build Instructions
-
-Java 7 SDK/AndroidAndroid SDK/NDK tools need to be ready on you host machine, if you does not have them ready, follow instructions here:
-
-* http://www.oracle.com/technetwork/java/javase/overview/index.html
-* https://developer.android.com/studio/index.html
-* https://developer.android.com/ndk/index.html
-
-`Jack and Jill` is deprecated by Google, so we do not enable it by default in current project
-
-* https://android-developers.googleblog.com/2017/03/future-of-java-8-language-feature.html
-
-We use `Gradle` to build, if you want know more about `Gradle`, follow instructions here:
-
-* https://developer.android.com/studio/build/index.html
-* http://gradle.org/getting-started-android-build/
-
-
-
-NOTICE: before building, you need to
-
-
-1. update your App ID at app/src/main/res/values/strings_config.xml
-
-	private_app_id
-
-	you can get your own ID at https://dashboard.agora.io/
-
-
-2. If you get source code directly from GitHub, you need to copy library and header files from Agora SDK package to your project, follow below instructions.
-
-	update libraries at app/libs(*.jar) and app/src/main/libs(*.so), check PLACEHOLDER for details
-
-	update face beautify module(aar) at libvideoprp, check PLACEHOLDER for details
-
-	If you get source code from Agora SDK package, we have already configured it well, just build and run it.
-
-
-Gradle build instructions
-
-	./gradlew assembleDebug
-This will generate the APK, you need to install and run this APK on Android devices.
-
-Or just use the one step command to build and install 
-
-	./gradlew installDebug
-
-
-Enjoy video broadcasting
+## 代码许可
+The MIT License (MIT).

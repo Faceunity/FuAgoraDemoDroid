@@ -1,2 +1,0 @@
-include ':app', ':faceunity'
-project(':faceunity').projectDir = new File('../OpenLive_Android/faceunity')

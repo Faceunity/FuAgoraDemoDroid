@@ -81,7 +81,7 @@ JNIEXPORT void JNICALL Java_io_agora_propeller_preprocessing_VideoPreProcessing_
     if (!rtcEngine)
         return;
     agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
-    mediaEngine.queryInterface(*rtcEngine, agora::rtc::AGORA_IID_MEDIA_ENGINE);
+    mediaEngine.queryInterface(rtcEngine, agora::rtc::AGORA_IID_MEDIA_ENGINE);
     if (mediaEngine) {
         if (enable) {
             mediaEngine->registerVideoFrameObserver(&s_videoFrameObserver);

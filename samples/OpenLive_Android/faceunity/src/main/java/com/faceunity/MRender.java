@@ -16,11 +16,7 @@ import java.io.InputStream;
 public class MRender {
 
     private final static String[] ITEM_NAMES = {
-            "none", "tiara.mp3", "item0208.mp3",
-            "YellowEar.mp3", "PrincessCrown.mp3",
-            "Mood.mp3", "Deer.mp3", "BeagleDog.mp3", "item0501.mp3", "ColorCrown.mp3",
-            "item0210.mp3",  "HappyRabbi.mp3", "item0204.mp3",
-            "hartshorn.mp3"
+            "none", "yuguan.bundle", "lixiaolong.bundle", "mask_matianyu.bundle", "yazui.bundle", "Mood.bundle", "item0204.bundle"
     };
 
     public final static String[] FILTERS = {"nature", "delta", "electric", "slowlived", "tokyo", "warm"};
@@ -56,7 +52,7 @@ public class MRender {
                 try {
                     faceunity.fuCreateEGLContext();
 
-                    InputStream is = context.getAssets().open("v3.mp3");
+                    InputStream is = context.getAssets().open("v3.bundle");
                     byte[] v3data = new byte[is.available()];
                     is.read(v3data);
                     is.close();
@@ -65,13 +61,11 @@ public class MRender {
 
                     createEffectItem(1);
 
-                    is = context.getAssets().open("face_beautification.mp3");
+                    is = context.getAssets().open("face_beautification.bundle");
                     byte[] itemData = new byte[is.available()];
                     is.read(itemData);
                     is.close();
                     facebeautyItem = faceunity.fuCreateItemFromPackage(itemData);
-
-                    faceunity.fuItemSetParam(facebeautyItem, "use_old_blur", 1);
 
                     faceunity.fuItemSetParam(facebeautyItem, "blur_level", 6);
                     faceunity.fuItemSetParam(facebeautyItem, "color_level", 0.2);

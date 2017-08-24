@@ -16,12 +16,7 @@ import java.util.Arrays;
 public class EffectAndFilterRecycleViewAdapter extends RecyclerView.Adapter<EffectAndFilterRecycleViewAdapter.ItemViewHolder>{
 
     private static final int[] EFFECT_ITEM_RES_ARRAY = {
-            R.drawable.ic_delete_all, R.drawable.tiara,  R.drawable.item0208,
-                     R.drawable.yellowear,
-            R.drawable.princesscrown, R.drawable.mood, R.drawable.deer,
-            R.drawable.beagledog, R.drawable.item0501, R.drawable.colorcrown,
-            R.drawable.item0210, R.drawable.happyrabbi,
-            R.drawable.item0204, R.drawable.hartshorn
+            R.drawable.ic_delete_all, R.drawable.yuguan, R.drawable.lixiaolong, R.drawable.matianyu, R.drawable.yazui, R.drawable.mood, R.drawable.item0204
     };
 
     private static final int[] FILTER_ITEM_RES_ARRAY = {R.drawable.nature, R.drawable.delta,
