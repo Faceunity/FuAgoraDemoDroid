@@ -12,39 +12,28 @@ JavaVM* javaVM;
 JNIEnv* env;
 
 jclass renderClass;
-jmethodID renderToI420ImageMethod;
+jmethodID renderItemsToYUVFrameMethod;
+
+//Faceunity Start 使用FUManager将道具渲染到原始数据上
+void renderItemsToYUVFrame(void* yBuffer, void* uBuffer, void* vBuffer, int yStride, int uStride, int vStride, int width, int height, int rotation) {
+    javaVM->AttachCurrentThread(&env, NULL);
+
+    renderItemsToYUVFrameMethod = env->GetStaticMethodID(renderClass, "renderItemsToYUVFrame", "(JJJIIIIII)V");
+
+    env->CallStaticVoidMethod(renderClass, renderItemsToYUVFrameMethod, (jlong) yBuffer, (jlong) uBuffer, (jlong) vBuffer, yStride, uStride, vStride, width, height, rotation);
+
+    javaVM->DetachCurrentThread();
+}
+//Faceunity End
 
 class AgoraVideoFrameObserver : public agora::media::IVideoFrameObserver
 {
 public:
     virtual bool onCaptureVideoFrame(VideoFrame& videoFrame) override
     {
-        javaVM->AttachCurrentThread(&env, NULL);
-
-        renderToI420ImageMethod = env->GetStaticMethodID(renderClass, "renderToI420Image", "([BII)V");
-
-        jsize len = videoFrame.yStride * videoFrame.height * 3 / 2;
-        jbyteArray array = env->NewByteArray(len);
-        jbyte* buf = new jbyte[len];
-        int yLength = videoFrame.yStride * videoFrame.height;
-        memcpy(buf, videoFrame.yBuffer, yLength);
-        int uLength = yLength / 4;
-        memcpy(buf + yLength, videoFrame.uBuffer, uLength);
-        memcpy(buf + yLength + uLength, videoFrame.vBuffer, uLength);
-        env->SetByteArrayRegion(array, 0, len, buf);
-
-        env->CallStaticVoidMethod(renderClass, renderToI420ImageMethod, array, videoFrame.yStride, videoFrame.height);
-
-        env->GetByteArrayRegion(array, 0, len, buf);
-        memcpy(videoFrame.yBuffer, buf, yLength);
-        memcpy(videoFrame.uBuffer, buf + yLength, uLength);
-        memcpy(videoFrame.vBuffer, buf + yLength + uLength, uLength);
-
-        delete []buf;
-
-        env->DeleteLocalRef(array);
-
-        javaVM->DetachCurrentThread();
+        //Faceunity Start 调用方法
+        renderItemsToYUVFrame(videoFrame.yBuffer, videoFrame.uBuffer, videoFrame.vBuffer, videoFrame.yStride, videoFrame.uStride, videoFrame.vStride, videoFrame.width, videoFrame.height, videoFrame.rotation);
+        //Faceunity End
 
         return true;
 	}
@@ -90,10 +79,12 @@ JNIEXPORT void JNICALL Java_io_agora_propeller_preprocessing_VideoPreProcessing_
         }
     }
 
+    //Faceunity Start 获取JavaVM和Java类FUManager
     env->GetJavaVM(&javaVM);
 
-    renderClass = env->FindClass("com/faceunity/MRender");
+    renderClass = env->FindClass("com/faceunity/FUManager");
     renderClass = (jclass) env->NewGlobalRef(renderClass);
+    //Faceunity End
 }
 
 #ifdef __cplusplus

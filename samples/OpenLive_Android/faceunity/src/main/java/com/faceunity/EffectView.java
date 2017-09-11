@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -67,7 +66,7 @@ public class EffectView extends LinearLayout
             @Override
             public void onItemSelected(int itemPosition, int recycleViewType) {
                 if (recycleViewType == EffectAndFilterRecycleViewAdapter.RECYCLEVIEW_TYPE_EFFECT) {
-                    MRender.setCurrentItemByPosition(itemPosition);
+                    FUManager.setCurrentItemByPosition(itemPosition);
                 }
             }
         });
@@ -84,7 +83,7 @@ public class EffectView extends LinearLayout
             @Override
             public void onItemSelected(int itemPosition, int recycleViewType) {
                 if (recycleViewType == EffectAndFilterRecycleViewAdapter.RECYCLEVIEW_TYPE_FILTER) {
-                    MRender.setCurrentFilterByPosition(itemPosition);
+                    FUManager.setCurrentFilterByPosition(itemPosition);
                 }
             }
         });
@@ -111,9 +110,9 @@ public class EffectView extends LinearLayout
                 if (groupId == R.id.select_group) {
                     viewAnimator.setDisplayedChild(i);
                 } else if (groupId == R.id.blur_level_select) {
-                    MRender.setBlurLevel(i);
+                    FUManager.setBlurLevel(i);
                 } else if (groupId == R.id.face_shape) {
-                    MRender.setFaceShape((i + 3) % 4);
+                    FUManager.setFaceShape((i + 3) % 4);
                 }
                 break;
             }
@@ -124,15 +123,15 @@ public class EffectView extends LinearLayout
     public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
         int i = seekBar.getId();
         if (i == R.id.color_level_seekbar) {
-            MRender.setColorLevel(value, seekBar.getMax());
+            FUManager.setColorLevel(value, seekBar.getMax());
         } else if (i == R.id.red_level_seekbar) {
-            MRender.setRedLevel(value, seekBar.getMax());
+            FUManager.setRedLevel(value, seekBar.getMax());
         } else if (i == R.id.face_shape_level_seekbar) {
-            MRender.setFaceShapeLevel(value, seekBar.getMax());
+            FUManager.setFaceShapeLevel(value, seekBar.getMax());
         } else if (i == R.id.cheek_thinning_seekbar) {
-            MRender.setCheekThinning(value, seekBar.getMax());
+            FUManager.setCheekThinning(value, seekBar.getMax());
         } else if (i == R.id.eye_enlarging_seekbar) {
-            MRender.setEyeEnlarging(value, seekBar.getMax());
+            FUManager.setEyeEnlarging(value, seekBar.getMax());
         }
     }
 

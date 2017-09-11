@@ -11,6 +11,9 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.text.TextUtils;
+
+import com.faceunity.FUManager;
+
 import io.agora.common.Constant;
 import io.agora.openlive.R;
 import io.agora.propeller.preprocessing.VideoPreProcessing;
@@ -116,16 +119,18 @@ public class WorkerThread extends Thread {
     private AgoraYuvEnhancer mVideoEnhancer = null;
 
     public final void enablePreProcessor() {
-        if (mEngineConfig.mClientRole == Constants.CLIENT_ROLE_BROADCASTER) {
-            if (Constant.PRP_ENABLED) {
-                if (mVideoEnhancer == null) {
-                    mVideoEnhancer = new AgoraYuvEnhancer(mContext);
-                    mVideoEnhancer.SetLighteningFactor(Constant.PRP_DEFAULT_LIGHTNESS);
-                    mVideoEnhancer.SetSmoothnessFactor(Constant.PRP_DEFAULT_SMOOTHNESS);
-                    mVideoEnhancer.StartPreProcess();
-                }
-            }
-        }
+//        if (mEngineConfig.mClientRole == Constants.CLIENT_ROLE_BROADCASTER) {
+//            if (Constant.PRP_ENABLED) {
+//                if (mVideoEnhancer == null) {
+//                    mVideoEnhancer = new AgoraYuvEnhancer(mContext);
+//                    mVideoEnhancer.SetLighteningFactor(Constant.PRP_DEFAULT_LIGHTNESS);
+//                    mVideoEnhancer.SetSmoothnessFactor(Constant.PRP_DEFAULT_SMOOTHNESS);
+//                    mVideoEnhancer.StartPreProcess();
+//                }
+//            }
+//        }
+        new VideoPreProcessing().enablePreProcessing(true);
+        FUManager.getInstance(mContext).loadItems();
     }
 
     public final void setPreParameters(float lightness, float smoothness) {
@@ -148,10 +153,11 @@ public class WorkerThread extends Thread {
     }
 
     public final void disablePreProcessor() {
-        if (mVideoEnhancer != null) {
-            mVideoEnhancer.StopPreProcess();
-            mVideoEnhancer = null;
-        }
+//        if (mVideoEnhancer != null) {
+//            mVideoEnhancer.StopPreProcess();
+//            mVideoEnhancer = null;
+//        }
+        FUManager.getInstance(mContext).destroyItems();
     }
 
     public final void joinChannel(final String channel, int uid) {
@@ -170,8 +176,7 @@ public class WorkerThread extends Thread {
 
         mEngineConfig.mChannel = channel;
 
-//        enablePreProcessor();
-        new VideoPreProcessing().enablePreProcessing(true);
+        enablePreProcessor();
         log.debug("joinChannel " + channel + " " + uid);
     }
 

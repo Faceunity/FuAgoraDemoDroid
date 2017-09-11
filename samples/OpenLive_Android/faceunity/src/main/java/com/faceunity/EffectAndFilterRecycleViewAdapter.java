@@ -16,7 +16,7 @@ import java.util.Arrays;
 public class EffectAndFilterRecycleViewAdapter extends RecyclerView.Adapter<EffectAndFilterRecycleViewAdapter.ItemViewHolder>{
 
     private static final int[] EFFECT_ITEM_RES_ARRAY = {
-            R.drawable.ic_delete_all, R.drawable.yuguan, R.drawable.lixiaolong, R.drawable.matianyu, R.drawable.yazui, R.drawable.mood, R.drawable.item0204
+            R.drawable.ic_delete_all, R.drawable.lixiaolong, R.drawable.chibi_reimu, R.drawable.liudehua, R.drawable.yuguan, R.drawable.mood, R.drawable.gradient
     };
 
     private static final int[] FILTER_ITEM_RES_ARRAY = {R.drawable.nature, R.drawable.delta,
@@ -61,14 +61,14 @@ public class EffectAndFilterRecycleViewAdapter extends RecyclerView.Adapter<Effe
             holder.mItemView.mItemText.setVisibility(View.VISIBLE);
             holder.mItemView.mItemIcon.setImageResource(FILTER_ITEM_RES_ARRAY[
                     position % FILTER_ITEM_RES_ARRAY.length]);
-            holder.mItemView.mItemText.setText(MRender.FILTERS[
+            holder.mItemView.mItemText.setText(FUManager.FILTERS[
                     position % FILTER_ITEM_RES_ARRAY.length].toUpperCase());
         }
 
         holder.mItemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!MRender.creatingItem) {
+                if (!FUManager.creatingItem) {
                     if (mOnItemSelectedListener != null) {
                         mOnItemSelectedListener.onItemSelected(position, mRecycleViewType);
                     }
@@ -112,10 +112,7 @@ public class EffectAndFilterRecycleViewAdapter extends RecyclerView.Adapter<Effe
             mItemClickStateList.addAll(Arrays.asList(
                     new Boolean[EFFECT_ITEM_RES_ARRAY.length]));
             //default effect select item is 1
-            setClickPosition(1);
-            if (mOnItemSelectedListener != null) {
-                mOnItemSelectedListener.onItemSelected(1, mRecycleViewType);
-            }
+            setClickPosition(4);
         } else {
             mItemClickStateList.addAll(Arrays.asList(
                     new Boolean[FILTER_ITEM_RES_ARRAY.length]));

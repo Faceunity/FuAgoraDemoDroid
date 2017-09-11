@@ -3,6 +3,7 @@ package com.faceunity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.text.TextUtils;
 
 import com.faceunity.wrapper.faceunity;
 
@@ -13,10 +14,10 @@ import java.io.InputStream;
  * Created by Administrator on 2017/4/5.
  */
 
-public class MRender {
+public class FUManager {
 
     private final static String[] ITEM_NAMES = {
-            "none", "yuguan.bundle", "lixiaolong.bundle", "mask_matianyu.bundle", "yazui.bundle", "Mood.bundle", "item0204.bundle"
+            "", "lixiaolong.bundle", "chibi_reimu.bundle", "mask_liudehua.bundle", "yuguan.bundle", "Mood.bundle", "gradient.bundle"
     };
 
     public final static String[] FILTERS = {"nature", "delta", "electric", "slowlived", "tokyo", "warm"};
@@ -30,17 +31,22 @@ public class MRender {
 
     private static int frameId;
 
-    private static int w;
-    private static int h;
-
     static volatile boolean creatingItem;
 
-    public static void create(final Context context) {
-        MRender.context = context;
+    private static volatile int rotation;
 
-        frameId = 0;
+    private static FUManager instance;
 
-        HandlerThread handlerThread = new HandlerThread("MRender");
+    public static FUManager getInstance(Context context) {
+        FUManager.context = context;
+        if (instance == null) {
+            instance = new FUManager(context);
+        }
+        return instance;
+    }
+
+    private FUManager(final Context context) {
+        HandlerThread handlerThread = new HandlerThread("FUManager");
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
 
@@ -57,11 +63,24 @@ public class MRender {
                     is.read(v3data);
                     is.close();
                     faceunity.fuSetup(v3data, null, authdata);
-                    faceunity.fuSetMaxFaces(1);
+                    faceunity.fuSetMaxFaces(4);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
-                    createEffectItem(1);
+    public void loadItems() {
+        frameId = 0;
 
-                    is = context.getAssets().open("face_beautification.bundle");
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    loadItem("yuguan.bundle");
+
+                    InputStream is = context.getAssets().open("face_beautification.bundle");
                     byte[] itemData = new byte[is.available()];
                     is.read(itemData);
                     is.close();
@@ -81,48 +100,37 @@ public class MRender {
         });
     }
 
-    static long startTime;
-
-    public static void renderToI420Image(final byte[] img, final int w, final int h) {
+    public static void renderItemsToYUVFrame(final long yBuffer, final long uBuffer, final long vBuffer, final int yStride, final int uStride, final int vStride, final int w, final int h, final int rotation) {
         if (context == null) {
             return;
         }
 
-        if (frameId >= 10) {
-            if (startTime == 0) {
-                startTime = System.currentTimeMillis();
-            } else {
-                System.out.println("aaaa "+ w + " " + h +" drawframes " + (frameId - 10) * 1000 / (System.currentTimeMillis() - startTime));
-            }
-        }
-
-        synchronized (MRender.class) {
+        synchronized (FUManager.class) {
             try {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        synchronized (MRender.class) {
-                            if (MRender.w != 0 && (MRender.w != w || MRender.h != h)) {
-                                faceunity.fuOnDeviceLost();
+                        synchronized (FUManager.class) {
+                            if (FUManager.rotation != rotation) {
+                                faceunity.fuItemSetParam(effectItem, "default_rotation_mode", (rotation == 270) ? 1 : 3);
                             }
-                            MRender.w = w;
-                            MRender.h = h;
+                            FUManager.rotation = rotation;
 
-                            faceunity.fuRenderToI420Image(img, w, h, frameId++, new int[]{effectItem, facebeautyItem});
+                            faceunity.fuRenderToYUVImage(yBuffer, uBuffer, vBuffer, yStride, uStride, vStride, w, h, frameId++, new int[]{effectItem, facebeautyItem});
 
-                            MRender.class.notifyAll();
+                            FUManager.class.notifyAll();
                         }
                     }
                 });
 
-                MRender.class.wait();
+                FUManager.class.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public static void destroy() {
+    public void destroyItems() {
         context = null;
 
         handler.post(new Runnable() {
@@ -132,22 +140,19 @@ public class MRender {
                 effectItem = 0;
                 faceunity.fuDestroyItem(facebeautyItem);
                 faceunity.fuOnDeviceLost();
-                faceunity.fuReleaseEGLContext();
-                handler.getLooper().quit();
             }
         });
     }
 
-    private static void createEffectItem(int itemPosition) {
+    private static void createEffectItem(String name) {
         try {
-            if (itemPosition > 0) {
-                InputStream is = context.getAssets().open(ITEM_NAMES[itemPosition]);
-                byte[] itemData = new byte[is.available()];
-                is.read(itemData);
-                is.close();
-                effectItem = faceunity.fuCreateItemFromPackage(itemData);
-                faceunity.fuItemSetParam(effectItem, "isAndroid", 1);
-            }
+            InputStream is = context.getAssets().open(name);
+            byte[] itemData = new byte[is.available()];
+            is.read(itemData);
+            is.close();
+            effectItem = faceunity.fuCreateItemFromPackage(itemData);
+            faceunity.fuItemSetParam(effectItem, "default_rotation_mode", (rotation == 270) ? 1 : 3);
+            faceunity.fuItemSetParam(effectItem, "isAndroid", 1);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -159,19 +164,24 @@ public class MRender {
         }
     }
 
+    public static void loadItem(final String name) {
+        int effectItem = FUManager.effectItem;
+        if (!TextUtils.isEmpty(name)) {
+            createEffectItem(name);
+            destroyEffectItem(effectItem);
+        } else {
+            FUManager.effectItem = 0;
+            destroyEffectItem(effectItem);
+        }
+        creatingItem = false;
+    }
+
     public static void setCurrentItemByPosition(final int itemPosition) {
         creatingItem = true;
         new Thread(new Runnable() {
             @Override
             public void run() {
-                int effectItem = MRender.effectItem;
-                if (itemPosition > 0) {
-                    createEffectItem(itemPosition);
-                    destroyEffectItem(effectItem);
-                } else {
-                    MRender.effectItem = 0;
-                    destroyEffectItem(effectItem);
-                }
+                loadItem(ITEM_NAMES[itemPosition]);
                 creatingItem = false;
             }
         }).start();

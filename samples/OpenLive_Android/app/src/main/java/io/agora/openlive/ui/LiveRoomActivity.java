@@ -17,8 +17,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.faceunity.MRender;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,15 +44,6 @@ public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_live_room);
-
-        MRender.create(this);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        MRender.destroy();
     }
 
     @Override
