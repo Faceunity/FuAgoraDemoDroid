@@ -62,6 +62,9 @@ renderClass = (jclass) env->NewGlobalRef(renderClass);
 ~~~
 -keep class com.faceunity.FUManager {*;}
 ~~~
+# 更新SDK
+[Nama SDK发布地址](https://github.com/Faceunity/FULiveDemoDroid/releases),可查看Nama的所有版本和发布说明。
+更新方法为下载Faceunity*.zip解压后替换faceunity模块中的相应文件。
 # 定制需求
 ## 定制界面
 修改faceunity中的界面代码

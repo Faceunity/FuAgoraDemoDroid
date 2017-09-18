@@ -14,12 +14,15 @@ import com.faceunity.faceunitylibrary.R;
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
 /**
+ * 特效选择控件
+ * 包括道具选择和美颜选择
  * Created by Administrator on 2017/1/6.
  */
 
 public class EffectView extends LinearLayout
     implements RadioGroup.OnCheckedChangeListener,
-        DiscreteSeekBar.OnProgressChangeListener {
+        DiscreteSeekBar.OnProgressChangeListener,
+        EffectAndFilterRecycleViewAdapter.OnItemSelectedListener {
 
     private RecyclerView mEffectRecycleView;
     private EffectAndFilterRecycleViewAdapter mEffectRecycleViewAdapter;
@@ -46,12 +49,6 @@ public class EffectView extends LinearLayout
         init(context);
     }
 
-    public EffectView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-
-        init(context);
-    }
-
     private void init(Context context) {
         inflate(context, R.layout.fu_select, this);
 
@@ -61,15 +58,7 @@ public class EffectView extends LinearLayout
                 LinearLayoutManager.HORIZONTAL, false));
         mEffectRecycleViewAdapter = new EffectAndFilterRecycleViewAdapter(mEffectRecycleView,
                 EffectAndFilterRecycleViewAdapter.RECYCLEVIEW_TYPE_EFFECT);
-        mEffectRecycleViewAdapter.setOnItemSelectedListener(new EffectAndFilterRecycleViewAdapter
-                .OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(int itemPosition, int recycleViewType) {
-                if (recycleViewType == EffectAndFilterRecycleViewAdapter.RECYCLEVIEW_TYPE_EFFECT) {
-                    FUManager.setCurrentItemByPosition(itemPosition);
-                }
-            }
-        });
+        mEffectRecycleViewAdapter.setOnItemSelectedListener(this);
         mEffectRecycleView.setAdapter(mEffectRecycleViewAdapter);
 
         mFilterRecycleView = (RecyclerView) findViewById(R.id.filter_recycle_view);
@@ -78,15 +67,7 @@ public class EffectView extends LinearLayout
         EffectAndFilterRecycleViewAdapter mFilterRecycleViewAdapter =
                 new EffectAndFilterRecycleViewAdapter(
                         mFilterRecycleView, EffectAndFilterRecycleViewAdapter.RECYCLEVIEW_TYPE_FILTER);
-        mFilterRecycleViewAdapter.setOnItemSelectedListener(new EffectAndFilterRecycleViewAdapter
-                .OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(int itemPosition, int recycleViewType) {
-                if (recycleViewType == EffectAndFilterRecycleViewAdapter.RECYCLEVIEW_TYPE_FILTER) {
-                    FUManager.setCurrentFilterByPosition(itemPosition);
-                }
-            }
-        });
+        mFilterRecycleViewAdapter.setOnItemSelectedListener(this);
         mFilterRecycleView.setAdapter(mFilterRecycleViewAdapter);
 
         viewAnimator = (ViewAnimator) findViewById(R.id.select_animator);
@@ -100,6 +81,15 @@ public class EffectView extends LinearLayout
         ((DiscreteSeekBar) findViewById(R.id.face_shape_level_seekbar)).setOnProgressChangeListener(this);
         ((DiscreteSeekBar) findViewById(R.id.eye_enlarging_seekbar)).setOnProgressChangeListener(this);
         ((DiscreteSeekBar) findViewById(R.id.cheek_thinning_seekbar)).setOnProgressChangeListener(this);
+    }
+
+    @Override
+    public void onItemSelected(int itemPosition, int recycleViewType) {
+        if (recycleViewType == EffectAndFilterRecycleViewAdapter.RECYCLEVIEW_TYPE_FILTER) {
+            FUManager.setCurrentFilterByPosition(itemPosition);
+        } else if (recycleViewType == EffectAndFilterRecycleViewAdapter.RECYCLEVIEW_TYPE_EFFECT) {
+            FUManager.setCurrentItemByPosition(itemPosition);
+        }
     }
 
     @Override
