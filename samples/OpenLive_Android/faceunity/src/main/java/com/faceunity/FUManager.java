@@ -20,7 +20,7 @@ public class FUManager {
 
     //道具资源数组
     private final static String[] ITEM_NAMES = {
-            "", "lixiaolong.bundle", "chibi_reimu.bundle", "mask_liudehua.bundle", "yuguan.bundle", "Mood.bundle", "gradient.bundle"
+            "", "item0204.bundle", "bg_seg.bundle", "fu_zh_duzui.mp3", "yazui.bundle", "mask_matianyu.bundle", "lixiaolong.bundle", "Mood.bundle", "gradient.bundle", "yuguan.bundle"
     };
 
     //滤镜名称数组
@@ -95,7 +95,7 @@ public class FUManager {
             public void run() {
                 try {
                     //加载默认道具yuguan.bundle
-                    loadItem("yuguan.bundle");
+                    loadItem("item0204.bundle");
 
                     InputStream is = context.get().getAssets().open("face_beautification.bundle");
                     byte[] itemData = new byte[is.available()];

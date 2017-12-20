@@ -51,6 +51,11 @@ public class MyEngineEventHandler {
 
         @Override
         public void onUserJoined(int uid, int elapsed) {
+            Iterator<AGEventHandler> it = mEventHandlerList.keySet().iterator();
+            while (it.hasNext()) {
+                AGEventHandler handler = it.next();
+                handler.onUserJoined(uid, elapsed);
+            }
         }
 
         @Override

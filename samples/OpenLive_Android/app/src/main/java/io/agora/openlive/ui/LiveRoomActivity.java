@@ -243,7 +243,6 @@ public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
 
     @Override
     public void onFirstRemoteVideoDecoded(int uid, int width, int height, int elapsed) {
-        doRenderRemoteUi(uid);
     }
 
     private void doSwitchToBroadcaster(boolean broadcaster) {
@@ -351,6 +350,11 @@ public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
     public void onUserOffline(int uid, int reason) {
         log.debug("onUserOffline " + (uid & 0xFFFFFFFFL) + " " + reason);
         doRemoveRemoteUi(uid);
+    }
+
+    @Override
+    public void onUserJoined(int uid, int elapsed) {
+        doRenderRemoteUi(uid);
     }
 
     private void requestRemoteStreamType(final int currentHostCount) {

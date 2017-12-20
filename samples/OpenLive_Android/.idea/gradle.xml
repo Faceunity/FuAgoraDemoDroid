@@ -10,7 +10,6 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/faceunity" />
-            <option value="$PROJECT_DIR$/libvideoprp" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

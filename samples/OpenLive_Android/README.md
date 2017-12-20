@@ -1,49 +1,88 @@
-# OpenLive for Android
+本代码由声网[视频通话 + 直播 SDK](https://www.agora.io/cn/download/)修改。
+# 对接步骤
+## 添加module
+添加faceunity module到工程中，在app dependencies里添加compile project(':faceunity')
+## 修改代码
+### 生成与销毁
+在WorkerThread的
+enablePreProcessor方法中替换原有代码（初始化并加载美颜道具、默认道具）
+~~~
+FUManager.getInstance(mContext).loadItems();
+~~~
+disablePreProcessor方法中替换原有代码（销毁道具）
+~~~
+FUManager.getInstance(mContext).destroyItems();
+~~~
+### 渲染道具到原始数据上
+在video_preprocessing_plugin_jni.cpp里
+#### 增加变量
+~~~
+JavaVM* javaVM;
+JNIEnv* env;
 
-*Read this in other languages: [English](README.en.md)*
+jclass renderClass;
+jmethodID renderItemsToYUVFrameMethod;
+~~~
+#### 添加方法renderItemsToYUVFrame方法
+使用FUManager将道具渲染到原始数据上
+~~~
+void renderItemsToYUVFrame(void* yBuffer, void* uBuffer, void* vBuffer, int yStride, int uStride, int vStride, int width, int height, int rotation) {
+    javaVM->AttachCurrentThread(&env, NULL);
 
-这个开源示例项目演示了如何快速集成 Agora 视频 SDK，实现多人视频连麦直播。
+    renderItemsToYUVFrameMethod = env->GetStaticMethodID(renderClass, "renderItemsToYUVFrame", "(JJJIIIIII)V");
 
-在这个示例项目中包含了以下功能：
+    env->CallStaticVoidMethod(renderClass, renderItemsToYUVFrameMethod, (jlong) yBuffer, (jlong) uBuffer, (jlong) vBuffer, yStride, uStride, vStride, width, height, rotation);
 
-- 加入通话和离开通话；
-- 主播和观众模式切换；
-- 静音和解除静音；
-- 切换前置摄像头和后置摄像头；
-- 选择分辨率、码率和帧率；
+    javaVM->DetachCurrentThread();
+}
+~~~
+#### 修改onCaptureVideoFrame
+~~~
+renderItemsToYUVFrame(videoFrame.yBuffer, videoFrame.uBuffer, videoFrame.vBuffer, videoFrame.yStride, videoFrame.uStride, videoFrame.vStride, videoFrame.width, videoFrame.height, videoFrame.rotation);
+~~~
+#### 修改Java_io_agora_propeller_preprocessing_VideoPreProcessing_enablePreProcessing
+在方法Java_io_agora_propeller_preprocessing_VideoPreProcessing_enablePreProcessing结尾增加（获取JavaVM和Java类FUManager）
+~~~
+env->GetJavaVM(&javaVM);
 
-你也可以在这里查看入门版的示例项目：[Agora-Android-Tutorial-1to1](https://github.com/AgoraIO/Agora-Android-Tutorial-1to1)
-
-Agora 视频 SDK 支持 iOS / Android / Windows / macOS 等多个平台，你可以查看对应各平台的示例项目：
-
-- [OpenLive-iOS](https://github.com/AgoraIO/OpenLive-iOS)
-- [OpenLive-Windows](https://github.com/AgoraIO/OpenLive-Windows)
-- [OpenLive-macOS](https://github.com/AgoraIO/OpenLive-macOS)
-
-## 运行示例程序
-首先在 [Agora.io 注册](https://dashboard.agora.io/cn/signup/) 注册账号，并创建自己的测试项目，获取到 AppID。将 AppID 填写进 "app/src/main/res/values/strings_config.xml"
-
-```
-<string name="private_app_id"><#YOUR APP ID#></string>
-```
-
-然后在 [Agora.io SDK](https://www.agora.io/cn/download/) 下载 **视频通话 + 直播 SDK**，解压后将其中的 **libs** 文件夹下的 ***.jar** 复制到本项目的 **app/libs** 下，其中的 **libs** 文件夹下的 **arm64-v8a**/**x86**/**armeabi-v7a** 复制到本项目的 **app/src/main/libs** 下。
-
-最后用 Android Studio 打开该项目，连上设备，编译并运行。
-
-也可以使用 `Gradle` 直接编译运行。
-
-## 运行环境
-- Android Studio 2.0 +
-- 真实 Android 设备 (Nexus 5X 或者其它设备)
-- 部分模拟器会存在功能缺失或者性能问题，所以推荐使用真机
-
-## 联系我们
-- 完整的 API 文档见 [文档中心](https://docs.agora.io/cn/)
-- 如果在集成中遇到问题, 你可以到 [开发者社区](https://dev.agora.io/cn/) 提问
-- 如果有售前咨询问题, 可以拨打 400 632 6626，或加入官方Q群 12742516 提问
-- 如果需要售后技术支持, 你可以在 [Agora Dashboard](https://dashboard.agora.io) 提交工单
-- 如果发现了示例代码的 bug, 欢迎提交 [issue](https://github.com/AgoraIO/OpenLive-Android/issues)
-
-## 代码许可
-The MIT License (MIT).
+renderClass = env->FindClass("com/faceunity/FUManager");
+renderClass = (jclass) env->NewGlobalRef(renderClass);
+~~~
+## 添加界面（可选）
+在activity_live_room(layout文件)的末尾添加（在界面底部显示默认的道具选择控件）
+~~~
+<com.faceunity.EffectView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+~~~
+## 修改proguard
+由于video_preprocessing_plugin_jni.cpp中存在对com.faceunity.FUManager
+的引用，故proguard中需添加
+~~~
+-keep class com.faceunity.FUManager {*;}
+~~~
+# 更新SDK
+[Nama SDK发布地址](https://github.com/Faceunity/FULiveDemoDroid/releases),可查看Nama的所有版本和发布说明。
+更新方法为下载Faceunity*.zip解压后替换faceunity模块中的相应文件。
+# 定制需求
+## 定制界面
+修改faceunity中的界面代码
+EffectView、EffectAndFilterRecycleViewAdapter和EffectAndFilterItemView或者自己编写。
+## 定制道具
+faceunity中FUManager ITEM_NAMES指定的是assets里对应的道具的文件名，故如需增删道具只需要在assets增删相应的道具文件并在ITEM_NAMES增删相应的文件名即可。
+## 修改默认美颜参数
+修改faceunity中FUManager中以下代码
+~~~
+faceunity.fuItemSetParam(facebeautyItem, "blur_level", 6);
+faceunity.fuItemSetParam(facebeautyItem, "color_level", 0.2);
+faceunity.fuItemSetParam(facebeautyItem, "red_level", 0.5);
+faceunity.fuItemSetParam(facebeautyItem, "face_shape", 3);
+faceunity.fuItemSetParam(facebeautyItem, "face_shape_level", 0.5);
+faceunity.fuItemSetParam(facebeautyItem, "cheek_thinning", 1);
+faceunity.fuItemSetParam(facebeautyItem, "eye_enlarging", 0.5);
+~~~
+参数含义与取值范围参考[这里](http://www.faceunity.com/technical/android-beauty.html)，如果使用界面，则需要同时修改界面中的初始值。
+## 其他需求
+nama库的使用参考[这里](http://www.faceunity.com/technical/android-api.html)。
+# 2D 3D道具制作
+除了使用制作好的道具外，还可以自行制作2D和3D道具，参考[这里](http://www.faceunity.com/technical/fueditor-intro.html)。

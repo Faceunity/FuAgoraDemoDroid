@@ -20,7 +20,6 @@ import io.agora.propeller.preprocessing.VideoPreProcessing;
 import io.agora.rtc.Constants;
 import io.agora.rtc.RtcEngine;
 import io.agora.rtc.video.VideoCanvas;
-import io.agora.videoprp.AgoraYuvEnhancer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,50 +115,6 @@ public class WorkerThread extends Thread {
 
     private RtcEngine mRtcEngine;
 
-    private AgoraYuvEnhancer mVideoEnhancer = null;
-
-    public final void enablePreProcessor() {
-//        if (mEngineConfig.mClientRole == Constants.CLIENT_ROLE_BROADCASTER) {
-//            if (Constant.PRP_ENABLED) {
-//                if (mVideoEnhancer == null) {
-//                    mVideoEnhancer = new AgoraYuvEnhancer(mContext);
-//                    mVideoEnhancer.SetLighteningFactor(Constant.PRP_DEFAULT_LIGHTNESS);
-//                    mVideoEnhancer.SetSmoothnessFactor(Constant.PRP_DEFAULT_SMOOTHNESS);
-//                    mVideoEnhancer.StartPreProcess();
-//                }
-//            }
-//        }
-        new VideoPreProcessing().enablePreProcessing(true);
-        FUManager.getInstance(mContext).loadItems();
-    }
-
-    public final void setPreParameters(float lightness, float smoothness) {
-        if (mEngineConfig.mClientRole == Constants.CLIENT_ROLE_BROADCASTER) {
-            if (Constant.PRP_ENABLED) {
-                if (mVideoEnhancer == null) {
-                    mVideoEnhancer = new AgoraYuvEnhancer(mContext);
-                }
-                mVideoEnhancer.StartPreProcess();
-            }
-        }
-
-        Constant.PRP_DEFAULT_LIGHTNESS = lightness;
-        Constant.PRP_DEFAULT_SMOOTHNESS = smoothness;
-
-        if (mVideoEnhancer != null) {
-            mVideoEnhancer.SetLighteningFactor(Constant.PRP_DEFAULT_LIGHTNESS);
-            mVideoEnhancer.SetSmoothnessFactor(Constant.PRP_DEFAULT_SMOOTHNESS);
-        }
-    }
-
-    public final void disablePreProcessor() {
-//        if (mVideoEnhancer != null) {
-//            mVideoEnhancer.StopPreProcess();
-//            mVideoEnhancer = null;
-//        }
-        FUManager.getInstance(mContext).destroyItems();
-    }
-
     public final void joinChannel(final String channel, int uid) {
         if (Thread.currentThread() != this) {
             log.warn("joinChannel() - worker thread asynchronously " + channel + " " + uid);
@@ -176,7 +131,8 @@ public class WorkerThread extends Thread {
 
         mEngineConfig.mChannel = channel;
 
-        enablePreProcessor();
+        new VideoPreProcessing().enablePreProcessing(true);
+        FUManager.getInstance(mContext).loadItems();
         log.debug("joinChannel " + channel + " " + uid);
     }
 
@@ -194,7 +150,7 @@ public class WorkerThread extends Thread {
             mRtcEngine.leaveChannel();
         }
 
-        disablePreProcessor();
+        FUManager.getInstance(mContext).destroyItems();
 
         int clientRole = mEngineConfig.mClientRole;
         mEngineConfig.reset();
@@ -298,8 +254,6 @@ public class WorkerThread extends Thread {
         mReady = false;
 
         // TODO should remove all pending(read) messages
-
-        mVideoEnhancer = null;
 
         log.debug("exit() > start");
 

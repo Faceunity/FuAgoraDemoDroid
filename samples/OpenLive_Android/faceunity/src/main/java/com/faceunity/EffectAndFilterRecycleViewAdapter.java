@@ -18,7 +18,7 @@ import java.util.Arrays;
 class EffectAndFilterRecycleViewAdapter extends RecyclerView.Adapter<EffectAndFilterRecycleViewAdapter.ItemViewHolder>{
 
     private static final int[] EFFECT_ITEM_RES_ARRAY = {
-            R.drawable.ic_delete_all, R.drawable.lixiaolong, R.drawable.chibi_reimu, R.drawable.liudehua, R.drawable.yuguan, R.drawable.mood, R.drawable.gradient
+            R.drawable.ic_delete_all, R.drawable.item0204, R.drawable.bgseg, R.drawable.fu_zh_duzui, R.drawable.yazui, R.drawable.matianyu, R.drawable.lixiaolong, R.drawable.mood, R.drawable.gradient, R.drawable.yuguan
     };
 
     private static final int[] FILTER_ITEM_RES_ARRAY = {R.drawable.nature, R.drawable.delta,
@@ -114,7 +114,7 @@ class EffectAndFilterRecycleViewAdapter extends RecyclerView.Adapter<EffectAndFi
             mItemClickStateList.addAll(Arrays.asList(
                     new Boolean[EFFECT_ITEM_RES_ARRAY.length]));
             //default effect select item is 1
-            setClickPosition(4);
+            setClickPosition(1);
         } else {
             mItemClickStateList.addAll(Arrays.asList(
                     new Boolean[FILTER_ITEM_RES_ARRAY.length]));
