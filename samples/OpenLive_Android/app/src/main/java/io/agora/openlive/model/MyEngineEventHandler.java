@@ -35,7 +35,7 @@ public class MyEngineEventHandler {
 
         @Override
         public void onFirstRemoteVideoDecoded(int uid, int width, int height, int elapsed) {
-            log.debug("onFirstRemoteVideoDecoded " + (uid & 0xFFFFFFFFL) + width + " " + height + " " + elapsed);
+            log.debug("onFirstRemoteVideoDecoded " + (uid & 0xFFFFFFFFL) + " " + width + " " + height + " " + elapsed);
 
             Iterator<AGEventHandler> it = mEventHandlerList.keySet().iterator();
             while (it.hasNext()) {
@@ -51,6 +51,8 @@ public class MyEngineEventHandler {
 
         @Override
         public void onUserJoined(int uid, int elapsed) {
+            log.debug("onUserJoined " + (uid & 0xFFFFFFFFL) + " " + elapsed);
+
             Iterator<AGEventHandler> it = mEventHandlerList.keySet().iterator();
             while (it.hasNext()) {
                 AGEventHandler handler = it.next();

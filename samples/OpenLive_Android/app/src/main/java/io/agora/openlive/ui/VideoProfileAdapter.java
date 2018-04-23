@@ -35,9 +35,6 @@ public class VideoProfileAdapter extends RecyclerView.Adapter {
         String frameRate = context.getResources().getStringArray(R.array.string_array_frame_rate)[position];
         ((ProfileHolder) holder).frameRate.setText(frameRate);
 
-        String bitRate = context.getResources().getStringArray(R.array.string_array_bit_rate)[position];
-        ((ProfileHolder) holder).bitRate.setText(bitRate);
-
         holder.itemView.setBackgroundResource(position == selected ? R.color.lightColorAccent : android.R.color.transparent);
     }
 
@@ -49,14 +46,12 @@ public class VideoProfileAdapter extends RecyclerView.Adapter {
     public class ProfileHolder extends RecyclerView.ViewHolder {
         public TextView resolution;
         public TextView frameRate;
-        public TextView bitRate;
 
         public ProfileHolder(View itemView) {
             super(itemView);
 
             resolution = (TextView) itemView.findViewById(R.id.resolution);
             frameRate = (TextView) itemView.findViewById(R.id.frame_rate);
-            bitRate = (TextView) itemView.findViewById(R.id.bit_rate);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

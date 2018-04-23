@@ -12,8 +12,6 @@ import android.util.Log;
 import android.view.SurfaceView;
 import android.text.TextUtils;
 
-import com.faceunity.FUManager;
-
 import io.agora.common.Constant;
 import io.agora.openlive.R;
 import io.agora.propeller.preprocessing.VideoPreProcessing;
@@ -132,11 +130,12 @@ public class WorkerThread extends Thread {
         mEngineConfig.mChannel = channel;
 
         new VideoPreProcessing().enablePreProcessing(true);
-        FUManager.getInstance(mContext).loadItems();
         log.debug("joinChannel " + channel + " " + uid);
     }
 
     public final void leaveChannel(String channel) {
+        new VideoPreProcessing().enablePreProcessing(false);
+
         if (Thread.currentThread() != this) {
             log.warn("leaveChannel() - worker thread asynchronously " + channel);
             Message envelop = new Message();
@@ -150,7 +149,7 @@ public class WorkerThread extends Thread {
             mRtcEngine.leaveChannel();
         }
 
-        FUManager.getInstance(mContext).destroyItems();
+//        FUManager.getInstance(mContext).destroyItems();
 
         int clientRole = mEngineConfig.mClientRole;
         mEngineConfig.reset();
@@ -181,7 +180,7 @@ public class WorkerThread extends Thread {
 
         mRtcEngine.setVideoProfile(mEngineConfig.mVideoProfile, true);
 
-        mRtcEngine.setClientRole(cRole, "");
+        mRtcEngine.setClientRole(cRole);
 
         log.debug("configEngine " + cRole + " " + mEngineConfig.mVideoProfile);
     }

@@ -112,7 +112,8 @@
                     android:src="@drawable/btn_mute" />
             </io.agora.ui.AGLinearLayout>
 
-            <com.faceunity.EffectView
+            <com.faceunity.beautycontrolview.BeautyControlView
+                android:id="@+id/faceunity_control"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>

@@ -42,6 +42,7 @@ android {
         }
     }
 
+
     sourceSets {
         main {
             jniLibs.srcDirs = ['../../../libs']
@@ -57,7 +58,6 @@ android {
 
 dependencies {
     compile fileTree(dir: '../../../libs', include: ['*.jar'])
-
     compile 'com.android.support:appcompat-v7:25.3.0'
     compile 'com.android.support:support-v4:25.3.0'
     compile 'com.android.support:design:25.3.0'
@@ -69,5 +69,5 @@ dependencies {
     }
 
     androidTestCompile 'com.jayway.android.robotium:robotium-solo:5.6.3'
-    compile project(':faceunity')
+    compile project(':beautycontrolview')
 }

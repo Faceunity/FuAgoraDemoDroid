@@ -2,38 +2,46 @@
 #include <android/log.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dlfcn.h>
 
 #include "../../../../../../libs/include/IAgoraRtcEngine.h"
 #include "../../../../../../libs/include/IAgoraMediaEngine.h"
 
 #include "video_preprocessing_plugin_jni.h"
 
-JavaVM* javaVM;
-JNIEnv* env;
+void (*onSurfaceCreated)();
+void (*onDrawFrame)(void*, void*, void*, int, int, int, int, int, int);
+void (*onSurfaceDestroy)();
 
-jclass renderClass;
-jmethodID renderItemsToYUVFrameMethod;
+const int status_init = 0;
+const int status_running = 1;
+const int status_kill = 2;
+const int status_dead = 3;
 
-//Faceunity Start 使用FUManager将道具渲染到原始数据上
-void renderItemsToYUVFrame(void* yBuffer, void* uBuffer, void* vBuffer, int yStride, int uStride, int vStride, int width, int height, int rotation) {
-    javaVM->AttachCurrentThread(&env, NULL);
-
-    renderItemsToYUVFrameMethod = env->GetStaticMethodID(renderClass, "renderItemsToYUVFrame", "(JJJIIIIII)V");
-
-    env->CallStaticVoidMethod(renderClass, renderItemsToYUVFrameMethod, (jlong) yBuffer, (jlong) uBuffer, (jlong) vBuffer, yStride, uStride, vStride, width, height, rotation);
-
-    javaVM->DetachCurrentThread();
-}
-//Faceunity End
+int status;
 
 class AgoraVideoFrameObserver : public agora::media::IVideoFrameObserver
 {
 public:
     virtual bool onCaptureVideoFrame(VideoFrame& videoFrame) override
     {
-        //Faceunity Start 调用方法
-        renderItemsToYUVFrame(videoFrame.yBuffer, videoFrame.uBuffer, videoFrame.vBuffer, videoFrame.yStride, videoFrame.uStride, videoFrame.vStride, videoFrame.width, videoFrame.height, videoFrame.rotation);
-        //Faceunity End
+        switch (status) {
+            case status_init:
+                onSurfaceCreated();
+
+                status = status_running;
+            case status_running:
+                onDrawFrame(videoFrame.yBuffer, videoFrame.uBuffer, videoFrame.vBuffer,
+                            videoFrame.yStride, videoFrame.uStride, videoFrame.vStride,
+                            videoFrame.width, videoFrame.height, videoFrame.rotation);
+                break;
+            case status_kill:
+                onSurfaceDestroy();
+
+                status = status_dead;
+                break;
+            default:break;
+        }
 
         return true;
 	}
@@ -70,21 +78,21 @@ JNIEXPORT void JNICALL Java_io_agora_propeller_preprocessing_VideoPreProcessing_
     if (!rtcEngine)
         return;
     agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
-    mediaEngine.queryInterface(rtcEngine, agora::rtc::AGORA_IID_MEDIA_ENGINE);
+    mediaEngine.queryInterface(rtcEngine, agora::AGORA_IID_MEDIA_ENGINE);
     if (mediaEngine) {
         if (enable) {
+            status = status_init;
             mediaEngine->registerVideoFrameObserver(&s_videoFrameObserver);
         } else {
-            mediaEngine->registerVideoFrameObserver(NULL);
+            status = status_kill;
+//            mediaEngine->registerVideoFrameObserver(NULL);
         }
     }
 
-    //Faceunity Start 获取JavaVM和Java类FUManager
-    env->GetJavaVM(&javaVM);
-
-    renderClass = env->FindClass("com/faceunity/FUManager");
-    renderClass = (jclass) env->NewGlobalRef(renderClass);
-    //Faceunity End
+    void* handle = dlopen("libfaceunity-native.so", RTLD_LAZY);
+    onSurfaceCreated = (void (*)()) dlsym(handle, "onSurfaceCreate");
+    onDrawFrame = (void (*)(void *, void *, void *, int, int, int, int, int, int)) dlsym(handle, "onDrawFrameYuv");
+    onSurfaceDestroy = (void (*)()) dlsym(handle, "onSurfaceDestroyed");
 }
 
 #ifdef __cplusplus

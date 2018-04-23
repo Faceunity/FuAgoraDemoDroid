@@ -17,6 +17,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.faceunity.beautycontrolview.BeautyControlView;
+import com.faceunity.fulivenativedemo.FURenderer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,10 +43,18 @@ public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
 
     private final HashMap<Integer, SurfaceView> mUidsList = new HashMap<>(); // uid = 0 || uid == EngineConfig.mUid
 
+    private BeautyControlView mFaceunityControlView;
+    private FURenderer mFURenderer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_live_room);
+
+        mFaceunityControlView = (BeautyControlView) findViewById(R.id.faceunity_control);
+
+        mFURenderer = new FURenderer();
+        mFaceunityControlView.setOnFaceUnityControlListener(mFURenderer);
     }
 
     @Override

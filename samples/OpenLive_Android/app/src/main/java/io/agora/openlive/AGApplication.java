@@ -1,6 +1,9 @@
 package io.agora.openlive;
 
 import android.app.Application;
+
+import com.faceunity.fulivenativedemo.FURenderer;
+
 import io.agora.openlive.model.WorkerThread;
 
 public class AGApplication extends Application {
@@ -28,5 +31,12 @@ public class AGApplication extends Application {
             e.printStackTrace();
         }
         mWorkerThread = null;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        FURenderer.initFURenderer(getAssets());
     }
 }

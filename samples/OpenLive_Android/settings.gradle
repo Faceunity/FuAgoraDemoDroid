@@ -1,2 +1,2 @@
 include ':app'
-include ':faceunity'
+include ':beautycontrolview'
