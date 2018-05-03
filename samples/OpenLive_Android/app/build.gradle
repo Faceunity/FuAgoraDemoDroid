@@ -69,5 +69,5 @@ dependencies {
     }
 
     androidTestCompile 'com.jayway.android.robotium:robotium-solo:5.6.3'
-    compile project(':beautycontrolview')
+    compile project(':faceunity')
 }
