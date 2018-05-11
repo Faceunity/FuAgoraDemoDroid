@@ -100,7 +100,7 @@ void onSurfaceCreated(void *beautification, int beautificationSize, void *fxaa, 
     itemsArray[ITEM_ARRAYS_ANIMOJI_3D] = fuAndroidNativeCreateItemFromPackage(fxaa, fxaaSize);
 
     fuSetExpressionCalibration(1);
-    fuAndroidNativeSetDefaultOrientation((360 - mInputImageOrientation) / 90);
+//    fuAndroidNativeSetDefaultOrientation((360 - mInputImageOrientation) / 90);
 }
 
 void onSurfaceChanged(int x, int y, int width, int height) {
@@ -182,8 +182,20 @@ void preDrawFrame() {
     }
 }
 
+int rotationNow = -1;
+
 void onDrawFrameYuv(void* yBuffer, void* uBuffer, void* vBuffer, int yStride, int uStride, int vStride, int width, int height, int rotation) {
     preDrawFrame();
+
+    if (rotationNow == -1) {
+        rotationNow = rotation;
+    }
+
+    if (rotationNow != rotation) {
+        fuAndroidNativeClearReadbackRelated();
+        fuOnCameraChange();
+        rotationNow = rotation;
+    }
 
     fuAndroidNativeRenderToYUVImage(yBuffer, uBuffer, vBuffer, yStride, uStride, vStride, width, height, frame_id++, itemsArray, sizeof(itemsArray) / sizeof(int), 0);
 }
@@ -222,7 +234,7 @@ void switchCamera(int cameraType, int inputImageOrientation) {
     mInputImageOrientation = inputImageOrientation;
     fuOnCameraChange();
     updateEffectItemParams(itemsArray[ITEM_ARRAYS_EFFECT]);
-    fuAndroidNativeSetDefaultOrientation((360 - mInputImageOrientation) / 90);
+//    fuAndroidNativeSetDefaultOrientation((360 - mInputImageOrientation) / 90);
 }
 
 void resetStatus() {
