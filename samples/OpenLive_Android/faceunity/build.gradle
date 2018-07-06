@@ -25,12 +25,6 @@ android {
         }
     }
 
-    externalNativeBuild {
-        ndkBuild {
-            path 'src/main/jni/Android.mk'
-        }
-    }
-
     sourceSets {
         main.assets.srcDirs += ['src/main/assets', 'src/main/effects/bundle']
         main.res.srcDirs += ['src/mian/res', 'src/main/effects/res', 'src/main/filters/res']
@@ -43,5 +37,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.0'
     compile 'com.android.support:recyclerview-v7:25.3.0'
     compile 'de.hdodenhof:circleimageview:2.2.0'
+//    compile 'com.faceunity:nama:5.0.0'
 
 }

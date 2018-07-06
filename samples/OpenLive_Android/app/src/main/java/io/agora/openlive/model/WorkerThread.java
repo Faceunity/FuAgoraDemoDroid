@@ -11,10 +11,8 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.text.TextUtils;
-
 import io.agora.common.Constant;
 import io.agora.openlive.R;
-import io.agora.propeller.preprocessing.VideoPreProcessing;
 import io.agora.rtc.Constants;
 import io.agora.rtc.RtcEngine;
 import io.agora.rtc.video.VideoCanvas;
@@ -129,13 +127,10 @@ public class WorkerThread extends Thread {
 
         mEngineConfig.mChannel = channel;
 
-        new VideoPreProcessing().enablePreProcessing(true);
         log.debug("joinChannel " + channel + " " + uid);
     }
 
     public final void leaveChannel(String channel) {
-        new VideoPreProcessing().enablePreProcessing(false);
-
         if (Thread.currentThread() != this) {
             log.warn("leaveChannel() - worker thread asynchronously " + channel);
             Message envelop = new Message();
@@ -148,8 +143,6 @@ public class WorkerThread extends Thread {
         if (mRtcEngine != null) {
             mRtcEngine.leaveChannel();
         }
-
-//        FUManager.getInstance(mContext).destroyItems();
 
         int clientRole = mEngineConfig.mClientRole;
         mEngineConfig.reset();

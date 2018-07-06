@@ -417,6 +417,18 @@ public class BeautyControlView extends FrameLayout {
                 mFaceBeautyFaceShape = FaceShapeIdList.indexOf(checkedId);
                 if (mOnFaceUnityControlListener != null)
                     mOnFaceUnityControlListener.onFaceShapeSelected(mFaceBeautyFaceShape);
+                float enlargeEye, CheekThin;
+                if (mFaceBeautyFaceShape == 4) {
+                    enlargeEye = mFaceBeautyEnlargeEye;
+                    CheekThin = mFaceBeautyCheekThin;
+                } else {
+                    enlargeEye = mFaceBeautyEnlargeEye_old;
+                    CheekThin = mFaceBeautyCheekThin_old;
+                }
+                onChangeFaceBeautyLevel(R.id.enlarge_eye_level_box, enlargeEye);
+                onChangeFaceBeautyLevel(R.id.cheek_thin_level_box, CheekThin);
+                ((BeautyBox) findViewById(R.id.enlarge_eye_level_box)).setChecked(enlargeEye < FINAL_CHANE);
+                ((BeautyBox) findViewById(R.id.cheek_thin_level_box)).setChecked(CheekThin < FINAL_CHANE);
                 mFaceShapeBox.setChecked(checkedId != R.id.face_shape_3_default);
             }
         });

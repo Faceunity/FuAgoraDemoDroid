@@ -1,8 +1,11 @@
 package io.agora.openlive.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
+import android.hardware.Camera;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -18,11 +21,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.faceunity.beautycontrolview.BeautyControlView;
-import com.faceunity.fulivenativedemo.FURenderer;
+import com.faceunity.beautycontrolview.FURenderer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 import io.agora.openlive.R;
@@ -31,6 +35,11 @@ import io.agora.openlive.model.ConstantApp;
 import io.agora.openlive.model.VideoStatusData;
 import io.agora.rtc.Constants;
 import io.agora.rtc.RtcEngine;
+import io.agora.rtc.mediaio.AgoraBufferedCamera2;
+import io.agora.rtc.mediaio.AgoraTextureCamera;
+import io.agora.rtc.mediaio.CaptureParameters;
+import io.agora.rtc.mediaio.IVideoFrameConsumer;
+import io.agora.rtc.mediaio.MediaIO;
 import io.agora.rtc.video.VideoCanvas;
 
 public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
@@ -43,17 +52,124 @@ public class LiveRoomActivity extends BaseActivity implements AGEventHandler {
 
     private final HashMap<Integer, SurfaceView> mUidsList = new HashMap<>(); // uid = 0 || uid == EngineConfig.mUid
 
+    class VideoFrameConsumer implements IVideoFrameConsumer {
+
+        private IVideoFrameConsumer iVideoFrameConsumer;
+
+        VideoFrameConsumer(IVideoFrameConsumer iVideoFrameConsumer) {
+            this.iVideoFrameConsumer = iVideoFrameConsumer;
+        }
+
+        @Override
+        public void consumeByteBufferFrame(ByteBuffer byteBuffer, int i, int i1, int i2, int i3, long l) {
+
+        }
+
+        @Override
+        public void consumeByteArrayFrame(byte[] data, int format, int width, int height, int rotation, long timestamp) {
+            mFURenderer.drawFrame(data, width, height, rotation, Camera.CameraInfo.CAMERA_FACING_FRONT);
+            this.iVideoFrameConsumer.consumeByteArrayFrame(data, format, width, height, rotation, timestamp);
+        }
+
+        @Override
+        public void consumeTextureFrame(int textureId,
+                                        int format,
+                                        int width,
+                                        int height,
+                                        int rotation,
+                                        long timesstamp,
+                                        float[] matrix) {
+            if (isLoad) {
+                byte[] img = new byte[width * height * 3 / 2];
+                mFURenderer.drawFrame(textureId, width, height, 0, img);
+                this.iVideoFrameConsumer.consumeByteArrayFrame(img, MediaIO.PixelFormat.NV21.intValue(), width, height, rotation, timesstamp);
+            } else {
+                mFURenderer.loadItems();
+                isLoad = true;
+            }
+        }
+    }
+
     private BeautyControlView mFaceunityControlView;
     private FURenderer mFURenderer;
+
+    private boolean isLoad;
+
+    class TextureCamera extends AgoraTextureCamera {
+
+        private IVideoFrameConsumer videoFrameConsumer;
+
+        @Override
+        public int getBufferType() {
+            return MediaIO.BufferType.BYTE_ARRAY.intValue();
+        }
+
+        public TextureCamera(Context context, int width, int height) {
+            super(context, width, height);
+        }
+
+        @Override
+        public boolean onInitialize(IVideoFrameConsumer observer) {
+            videoFrameConsumer = new VideoFrameConsumer(observer);
+            return super.onInitialize(videoFrameConsumer);
+        }
+
+        @Override
+        public boolean onStart() {
+            return super.onStart();
+        }
+
+        @Override
+        public void onStop() {
+            super.onStop();
+            isLoad = false;
+            mFURenderer.destroyItems();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_live_room);
 
+        TextureCamera textureCamera = null;
+        if (Build.VERSION.SDK_INT >= 21) {
+            CaptureParameters mParameters = new CaptureParameters();
+            mParameters.width = 640;
+            mParameters.height = 480;
+            mParameters.fps = 15;
+            mParameters.pixelFormat = MediaIO.PixelFormat.I420.intValue();
+            mParameters.bufferType = MediaIO.BufferType.BYTE_ARRAY.intValue();
+
+            AgoraBufferedCamera2 agoraBufferedCamera2 = new AgoraBufferedCamera2(this, mParameters) {
+
+                @Override
+                public boolean onStart() {
+                    mFURenderer.loadItems();
+                    return super.onStart();
+                }
+
+                @Override
+                public void onStop() {
+                    super.onStop();
+                    mFURenderer.destroyItems();
+                }
+
+                @Override
+                public boolean onInitialize(IVideoFrameConsumer consumer) {
+                    return super.onInitialize(new VideoFrameConsumer(consumer));
+                }
+            };
+            agoraBufferedCamera2.useFrontCamera(true);
+            rtcEngine().setVideoSource(agoraBufferedCamera2);
+        } else {
+            textureCamera = new TextureCamera(this, 640, 480);
+            rtcEngine().setVideoSource(textureCamera);
+        }
+
         mFaceunityControlView = (BeautyControlView) findViewById(R.id.faceunity_control);
 
-        mFURenderer = new FURenderer();
+        mFURenderer = new FURenderer.Builder(this).createEGLContext(textureCamera == null).build();
         mFaceunityControlView.setOnFaceUnityControlListener(mFURenderer);
     }
 
