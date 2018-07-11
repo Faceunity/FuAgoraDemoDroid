@@ -115,4 +115,4 @@ private float mForeheadLevel = 0.3f;//额头
 private float mThinNoseLevel = 0.5f;//瘦鼻
 private float mMouthShape = 0.4f;//嘴形
 ```
-参数含义与取值范围参考[这里](http://www.faceunity.com/technical/android-beauty.html)，如果使用界面，则需要同时修改界面中的初始值。
+参数含义与取值范围参考[这里](https://github.com/Faceunity/FULiveDemoDroid/tree/dev#%E5%8F%82%E6%95%B0%E8%AE%BE%E7%BD%AE)，如果使用界面，则需要同时修改界面中的初始值。
