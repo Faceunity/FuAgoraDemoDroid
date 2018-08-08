@@ -1,118 +1,110 @@
-# FuAgoraDemoDroid
-FuAgoraDemoDroid 是集成了 Faceunity 面部跟踪和虚拟道具功能和声网[视频通话 + 直播 SDK](https://www.agora.io/cn/download/)的 Demo 。
-本文是 FaceUnity SDK 快速对接声网的导读说明，关于 FaceUnity SDK 的更多详细说明，请参看 [FULiveDemo](https://github.com/Faceunity/FULiveDemoDroid/tree/dev)
+# FuAgoraDemoDroid 快速接入文档
+
+FuAgoraDemoDroid 是集成了 Faceunity 面部跟踪和虚拟道具功能 和 声网直播推流  的 Demo。
+
+本文是 FaceUnity SDK 快速对 声网直播推流 的导读说明，关于 `FaceUnity SDK` 的详细说明，请参看 **[FULiveDemoDroid](https://github.com/Faceunity/FULiveDemoDroid/tree/dev)**
+
+
+
 ## 快速集成方法
-### 添加module
-添加 faceunity module 到工程中，在 app dependencies 里添加 `compile project(':faceunity')`
-### 修改代码
-#### 初始化 nama 库
-在 AGApplication 的 onCreate 方法中添加
-```
-FURenderer.initFURenderer(getAssets());
-```
-#### 加载美颜和默认道具
-在LiveRoomActivity的onCreate方法中添加
-```
-mFURenderer = new FURenderer();
-```
-#### 开启与关闭
-在WorkerThread的
-joinChannel方法中添加代码（开启美颜处理）
-```
-new VideoPreProcessing().enablePreProcessing(true);
-```
-leaveChannel方法中添加代码（关闭美颜处理）
-```
-new VideoPreProcessing().enablePreProcessing(false);
-```
-#### 渲染道具到原始数据上
-在 video_preprocessing_plugin_jni.cpp 里
-##### 增加变量
-```
-void (*onSurfaceCreated)();
-void (*onDrawFrame)(void*, void*, void*, int, int, int, int, int, int);
-void (*onSurfaceDestroy)();
 
-const int status_init = 0;
-const int status_running = 1;
-const int status_kill = 2;
-const int status_dead = 3;
+### 一、导入 SDK
 
-int status;
-```
-##### 修改onCaptureVideoFrame
-```
-virtual bool onCaptureVideoFrame(VideoFrame& videoFrame) override
-{
-    switch (status) {
-        case status_init:
-            //初始化并加载默认道具美颜
-            onSurfaceCreated();
+将 FaceUnity 文件夹全部拖入工程中。  
 
-            status = status_running;
-        case status_running:
-            //将道具渲染到原始数据上
-            onDrawFrame(videoFrame.yBuffer, videoFrame.uBuffer, videoFrame.vBuffer,
-                        videoFrame.yStride, videoFrame.uStride, videoFrame.vStride,
-                        videoFrame.width, videoFrame.height, videoFrame.rotation);
-            break;
-        case status_kill:
-            //销毁
-            onSurfaceDestroy();
+- jniLibs 文件夹下 libnama.so 人脸跟踪及道具绘制核心静态库
+- libs 文件夹下 nama.jar java层native接口封装
+- v3.bundle 初始化必须的二进制文件
+- face_beautification.bundle 我司美颜相关的二进制文件
+- effects 文件夹下的 *.bundle 文件是我司制作的特效贴纸文件，自定义特效贴纸制作的文档和工具请联系我司获取。
 
-            status = status_dead;
-            break;
-        default:break;
-    }
+### 二、全局配置
 
-    return true;
-}
+在 FURenderer类 的  `initFURenderer` 静态方法是对 Faceunity SDK 一些全局数据初始化的封装，可以在 Application 中调用，仅需初始化一次即可。
+
 ```
-##### 修改Java_io_agora_propeller_preprocessing_VideoPreProcessing_enablePreProcessing
-初始化函数指针和开关美颜处理
+public static void initFURenderer(Context context)；
 ```
-JNIEXPORT void JNICALL Java_io_agora_propeller_preprocessing_VideoPreProcessing_enablePreProcessing
-  (JNIEnv *env, jobject obj, jboolean enable)
-{
-    if (!rtcEngine)
-        return;
-    agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
-    mediaEngine.queryInterface(rtcEngine, agora::AGORA_IID_MEDIA_ENGINE);
-    if (mediaEngine) {
-        if (enable) {
-            status = status_init;
-            mediaEngine->registerVideoFrameObserver(&s_videoFrameObserver);
-        } else {
-            status = status_kill;
-//            mediaEngine->registerVideoFrameObserver(NULL);
+
+### 三、使用 SDK
+
+#### 初始化
+
+在 FURenderer类 的  `onSurfaceCreated` 方法是对 Faceunity SDK 每次使用前数据初始化的封装。
+
+在本demo中的使用：
+
+```
+        @Override
+        public void consumeTextureFrame(int textureId,
+                                        int format,
+                                        int width,
+                                        int height,
+                                        int rotation,
+                                        long timesstamp,
+                                        float[] matrix) {
+            if (isLoad) {
+               ......
+            } else {
+                mFURenderer.loadItems();
+                isLoad = true;
+            }
         }
-    }
+```
 
-    void* handle = dlopen("libfaceunity-native.so", RTLD_LAZY);
-    onSurfaceCreated = (void (*)()) dlsym(handle, "onSurfaceCreate");
-    onDrawFrame = (void (*)(void *, void *, void *, int, int, int, int, int, int)) dlsym(handle, "onDrawFrameYuv");
-    onSurfaceDestroy = (void (*)()) dlsym(handle, "onSurfaceDestroyed");
-}
-```
-### 修改默认美颜参数
-修改faceunity中faceunity中以下代码
-```
-private float mFaceBeautyALLBlurLevel = 1.0f;//精准磨皮
-private float mFaceBeautyType = 0.0f;//美肤类型
-private float mFaceBeautyBlurLevel = 0.7f;//磨皮
-private float mFaceBeautyColorLevel = 0.5f;//美白
-private float mFaceBeautyRedLevel = 0.5f;//红润
-private float mBrightEyesLevel = 1000.7f;//亮眼
-private float mBeautyTeethLevel = 1000.7f;//美牙
+#### 图像处理
 
-private float mFaceBeautyFaceShape = 4.0f;//脸型
-private float mFaceBeautyEnlargeEye = 0.4f;//大眼
-private float mFaceBeautyCheekThin = 0.4f;//瘦脸
-private float mFaceBeautyEnlargeEye_old = 0.4f;//大眼
-private float mFaceBeautyCheekThin_old = 0.4f;//瘦脸
-private float mChinLevel = 0.3f;//下巴
-private float mForeheadLevel = 0.3f;//额头
-private float mThinNoseLevel = 0.5f;//瘦鼻
-private float mMouthShape = 0.4f;//嘴形
+在 FURenderer类 的  `onDrawFrame` 方法是对 Faceunity SDK 图像处理方法的封装，该方法有许多重载方法适用于不同的数据类型需求。
+
+在本demo中的使用：
+
 ```
-参数含义与取值范围参考[这里](http://www.faceunity.com/technical/android-beauty.html)，如果使用界面，则需要同时修改界面中的初始值。
+        @Override
+        public void consumeByteArrayFrame(byte[] data, int format, int width, int height, int rotation, long timestamp) {
+            mFURenderer.drawFrame(data, width, height, rotation, Camera.CameraInfo.CAMERA_FACING_FRONT);
+            this.iVideoFrameConsumer.consumeByteArrayFrame(data, format, width, height, rotation, timestamp);
+        }
+
+        @Override
+        public void consumeTextureFrame(int textureId,
+                                        int format,
+                                        int width,
+                                        int height,
+                                        int rotation,
+                                        long timesstamp,
+                                        float[] matrix) {
+            if (isLoad) {
+                byte[] img = new byte[width * height * 3 / 2];
+                mFURenderer.drawFrame(textureId, width, height, 0, img);
+                this.iVideoFrameConsumer.consumeByteArrayFrame(img, MediaIO.PixelFormat.NV21.intValue(), width, height, rotation, timesstamp);
+            } else {
+                mFURenderer.loadItems();
+                isLoad = true;
+            }
+        }
+```
+
+#### 销毁
+
+在 FURenderer类 的  `onSurfaceDestroyed` 方法是对 Faceunity SDK 数据销毁的封装。
+
+在本demo中的使用：
+
+```
+        @Override
+        public void onStop() {
+            super.onStop();
+            isLoad = false;
+            mFURenderer.destroyItems();
+        }
+```
+
+### 四、切换道具及调整美颜参数
+
+本例中 FURenderer类 实现了 OnFUControlListener接口，而OnFUControlListener接口是对切换道具及调整美颜参数等一系列操作的封装，demo中使用了BeautyControlView作为切换道具及调整美颜参数的控制view。使用以下代码便可实现view对各种参数的控制。
+
+```
+mBeautyControlView.setOnFUControlListener(mFURenderer);
+```
+
+**快速集成完毕，关于 FaceUnity SDK 的更多详细说明，请参看 [FULiveDemoDroid](https://github.com/Faceunity/FULiveDemoDroid/tree/dev)**
