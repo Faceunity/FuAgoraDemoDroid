@@ -29,17 +29,14 @@ public class CustomizedCameraRenderer extends GLSurfaceView implements
         GLSurfaceView.Renderer,
         SurfaceTexture.OnFrameAvailableListener {
 
-    private static final String TAG = "CustomizedCameraRenderer";
+    private static final String TAG = "CustomizedRenderer";
 
-    private static final boolean DBG = true;
-    private EGLContext mEGLCurrentContext;
     private static final boolean DEBUG = false;
-
-//    public interface OnFrameAvailableListener {
-//        void onFrameAvailable(int texture, EGLContext eglContext, int rotation, float[] matrix);
-//    }
+    private EGLContext mEGLCurrentContext;
+    private final Object mLock = new Object();
 
     private OnRendererStatusListener mOnRendererStatusListener;
+    private float[] mMatrix = new float[16];
 
     public void setOnRendererStatusListener(OnRendererStatusListener onRendererStatusListener) {
         mOnRendererStatusListener = onRendererStatusListener;
@@ -83,10 +80,12 @@ public class CustomizedCameraRenderer extends GLSurfaceView implements
     private final Shader mOffscreenShader = new Shader();
     private int mViewWidth, mViewHeight;
     private volatile boolean mUpdateTexture = false;
+    private volatile boolean mIsChangeingCamera = false;
 
     private float[] mOrientationM = new float[16];
     private float[] mRatio = new float[2];
-
+    private int mCameraPreviewHeight = 720;
+    private int mCameraPreviewWidth = 1280;
     private volatile boolean mPreviewing = false;
 
     public CustomizedCameraRenderer(Context context) {
@@ -124,12 +123,11 @@ public class CustomizedCameraRenderer extends GLSurfaceView implements
 
     @Override
     public synchronized void onFrameAvailable(SurfaceTexture surfaceTexture) {
-        Log.d(TAG, "onFrameAvailable: ");
-        mUpdateTexture = true;
-        requestRender();
+        if (!mIsChangeingCamera) {
+            mUpdateTexture = true;
+            requestRender();
+        }
     }
-
-    private int mCameraPreviewWidth = 1280;
 
     public void initCameraTexture() {
         try {
@@ -148,51 +146,24 @@ public class CustomizedCameraRenderer extends GLSurfaceView implements
         mSrcTexture.init();
     }
 
-    public static int[] choosePreviewSize(Camera.Parameters parms, int width, int height) {
-        // We should make sure that the requested MPEG size is less than the preferred
-        // size, and has the same aspect ratio.
-        Camera.Size ppsfv = parms.getPreferredPreviewSizeForVideo();
-
-        if (DEBUG) {
-            for (Camera.Size size : parms.getSupportedPreviewSizes()) {
-                Log.e(TAG, "supported: " + size.width + "x" + size.height);
-            }
-        }
-
-        for (Camera.Size size : parms.getSupportedPreviewSizes()) {
-            if (size.width == width && size.height == height) {
-                parms.setPreviewSize(width, height);
-                return new int[]{width, height};
-            }
-        }
-
-        Log.e(TAG, "Unable to set preview size to " + width + "x" + height);
-        if (ppsfv != null) {
-            parms.setPreviewSize(ppsfv.width, ppsfv.height);
-            return new int[]{ppsfv.width, ppsfv.height};
-        }
-        // else use whatever the default size is
-        return new int[]{0, 0};
-    }
-
-    private int mCameraPreviewHeight = 720;
-
     @Override
     public synchronized void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        if (DBG) {
+        if (DEBUG) {
             Log.i(TAG, "onSurfaceCreated " + gl);
         }
         initCameraTexture();
         if (mOnRendererStatusListener != null) {
             mOnRendererStatusListener.onSurfaceCreated(gl, config);
         }
+        mCameraToFbo = new TextureRenderer(true);
+        mFboToView = new TextureRenderer(false);
         Log.i(TAG, "onSurfaceCreated " + gl + " end");
     }
 
     @SuppressLint("NewApi")
     @Override
     public synchronized void onSurfaceChanged(GL10 gl, int width, int height) {
-        if (DBG) {
+        if (DEBUG) {
             Log.i(TAG, "onSurfaceChanged " + gl + " " + width + " " + height);
         }
 
@@ -212,12 +183,20 @@ public class CustomizedCameraRenderer extends GLSurfaceView implements
     private TextureRenderer mCameraToFbo;
 
     public void changeCamera() {
+        if (mIsChangeingCamera) {
+            return;
+        }
+        mIsChangeingCamera = true;
+        long begin = System.currentTimeMillis();
         releaseCamera();
-        synchronized (CustomizedCameraRenderer.this) {
+        synchronized (mLock) {
             mCameraType = mCameraType == Camera.CameraInfo.CAMERA_FACING_FRONT ? Camera.CameraInfo.CAMERA_FACING_BACK :
                     Camera.CameraInfo.CAMERA_FACING_FRONT;
         }
         openCamera();
+        mIsChangeingCamera = false;
+        long duration = System.currentTimeMillis() - begin;
+        Log.i(TAG, "changeCamera: duration:" + duration);
     }
 
     public int getDisplayRotation() {
@@ -238,87 +217,88 @@ public class CustomizedCameraRenderer extends GLSurfaceView implements
     }
 
     private void openCamera() {
-        if (mCamera == null) {
-            Camera.CameraInfo info = new Camera.CameraInfo();
-            int numCameras = Camera.getNumberOfCameras();
-            for (int i = 0; i < numCameras; i++) {
-                Camera.getCameraInfo(i, info);
-                if (info.facing == mCameraType) {
-                    mCameraId = i;
-                    mCamera = Camera.open(i);
-                    mCameraType = info.facing;
-                    break;
+        synchronized (mLock) {
+            if (mCamera == null) {
+                Camera.CameraInfo info = new Camera.CameraInfo();
+                int numCameras = Camera.getNumberOfCameras();
+                for (int i = 0; i < numCameras; i++) {
+                    Camera.getCameraInfo(i, info);
+                    if (info.facing == mCameraType) {
+                        mCameraId = i;
+                        mCamera = Camera.open(i);
+                        mCameraType = info.facing;
+                        break;
+                    }
                 }
             }
-        }
 
-        if (mPreviewing) {
-            mCamera.stopPreview();
-        }
-
-        // Set up SurfaceTexture
-        SurfaceTexture oldSurfaceTexture = mSurfaceTexture;
-        mSurfaceTexture = new SurfaceTexture(mSrcTexture.getTextureId());
-        mSurfaceTexture.setOnFrameAvailableListener(this);
-        if (oldSurfaceTexture != null) {
-            oldSurfaceTexture.release();
-        }
-
-        // set camera paras
-        int camera_width = 0;
-        int camera_height = 0;
-
-        try {
-            mCamera.setPreviewTexture(mSurfaceTexture);
-        } catch (IOException ioe) {
-            Log.w(TAG, "setPreviewTexture " + Log.getStackTraceString(ioe));
-        }
-
-        Camera.Parameters param = mCamera.getParameters();
-        List<Size> psize = param.getSupportedPreviewSizes();
-        if (psize.size() > 0) {
-            boolean supports_1280_720 = false;
-            for (int i = 0; i < psize.size(); i++) {
-                if ((psize.get(i).width == 1280) && (psize.get(i).height == 720)) {
-                    supports_1280_720 = true;
-                }
+            if (mPreviewing) {
+                mCamera.stopPreview();
             }
-            if (supports_1280_720) {
-                mCameraPreviewWidth = 1280;
-                mCameraPreviewHeight = 720;
+
+            // Set up SurfaceTexture
+            SurfaceTexture oldSurfaceTexture = mSurfaceTexture;
+            mSurfaceTexture = new SurfaceTexture(mSrcTexture.getTextureId());
+            mSurfaceTexture.setOnFrameAvailableListener(this);
+            if (oldSurfaceTexture != null) {
+                oldSurfaceTexture.release();
+            }
+
+            // set camera paras
+            int camera_width = 0;
+            int camera_height = 0;
+
+            try {
+                mCamera.setPreviewTexture(mSurfaceTexture);
+            } catch (IOException ioe) {
+                Log.w(TAG, "setPreviewTexture " + Log.getStackTraceString(ioe));
+            }
+
+            Camera.Parameters param = mCamera.getParameters();
+            List<Size> psize = param.getSupportedPreviewSizes();
+            if (psize.size() > 0) {
+                boolean supports_1280_720 = false;
+                for (int i = 0; i < psize.size(); i++) {
+                    if ((psize.get(i).width == 1280) && (psize.get(i).height == 720)) {
+                        supports_1280_720 = true;
+                    }
+                }
+                if (supports_1280_720) {
+                    mCameraPreviewWidth = 1280;
+                    mCameraPreviewHeight = 720;
+                } else {
+                    mCameraPreviewWidth = param.getSupportedPreviewSizes().get(0).width;
+                    mCameraPreviewHeight = param.getSupportedPreviewSizes().get(0).height;
+                }
+
+                Log.i(TAG, "setPreviewSize " + mCameraPreviewWidth + " " + mCameraPreviewHeight);
+                param.setPreviewSize(mCameraPreviewWidth, mCameraPreviewHeight);
+            }
+
+            // get the camera orientation and display dimension
+            if (mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                Matrix.setRotateM(mOrientationM, 0, 90.0f, 0f, 0f, 1f);
+                mRatio[1] = camera_width * 1.0f / mViewHeight;
+                mRatio[0] = camera_height * 1.0f / mViewWidth;
             } else {
-                mCameraPreviewWidth = param.getSupportedPreviewSizes().get(0).width;
-                mCameraPreviewHeight = param.getSupportedPreviewSizes().get(0).height;
+                Matrix.setRotateM(mOrientationM, 0, 0.0f, 0f, 0f, 1f);
+                mRatio[1] = camera_height * 1.0f / mViewHeight;
+                mRatio[0] = camera_width * 1.0f / mViewWidth;
             }
 
-            Log.i(TAG, "setPreviewSize " + mCameraPreviewWidth + " " + mCameraPreviewHeight);
-            param.setPreviewSize(mCameraPreviewWidth, mCameraPreviewHeight);
-        }
+            // start camera
+            mCamera.setParameters(param);
 
-        // get the camera orientation and display dimension
-        if (mContext.getResources().getConfiguration().orientation ==
-                Configuration.ORIENTATION_PORTRAIT) {
-            Matrix.setRotateM(mOrientationM, 0, 90.0f, 0f, 0f, 1f);
-            mRatio[1] = camera_width * 1.0f / mViewHeight;
-            mRatio[0] = camera_height * 1.0f / mViewWidth;
-        } else {
-            Matrix.setRotateM(mOrientationM, 0, 0.0f, 0f, 0f, 1f);
-            mRatio[1] = camera_height * 1.0f / mViewHeight;
-            mRatio[0] = camera_width * 1.0f / mViewWidth;
-        }
+            Camera.CameraInfo info = new Camera.CameraInfo();
+            Camera.getCameraInfo(mCameraId, info);
+            mCameraRotation = info.orientation;
+            mCamera.startPreview();
 
-        // start camera
-        mCamera.setParameters(param);
+            mPreviewing = true;
 
-        Camera.CameraInfo info = new Camera.CameraInfo();
-        Camera.getCameraInfo(mCameraId, info);
-        mCameraRotation = info.orientation;
-        mCamera.startPreview();
-
-        mPreviewing = true;
-
-        if (mOnRendererStatusListener != null) {
-            mOnRendererStatusListener.onCameraChange(mCameraType, mCameraRotation);
+            if (mOnRendererStatusListener != null) {
+                mOnRendererStatusListener.onCameraChange(mCameraType, mCameraRotation);
+            }
         }
     }
 
@@ -327,8 +307,11 @@ public class CustomizedCameraRenderer extends GLSurfaceView implements
 
     @Override
     public synchronized void onDrawFrame(GL10 gl) {
-        if (DBG) {
+        if (DEBUG) {
             Log.i(TAG, "onDrawFrame " + mUpdateTexture + " " + mCameraPreviewWidth + " " + mCameraPreviewHeight);
+        }
+        if (!mUpdateTexture) {
+            return;
         }
 
         if (mFbo == 0) {
@@ -340,71 +323,54 @@ public class CustomizedCameraRenderer extends GLSurfaceView implements
             mDstSurfaceTexture = new SurfaceTexture(mDstTexture);
         }
 
-        if (mCameraToFbo == null) {
-            mCameraToFbo = new TextureRenderer(true);
-        }
-
-        if (mFboToView == null) {
-            mFboToView = new TextureRenderer(false);
-        }
-
         // Calculate rotated degrees (camera to view)
         int degrees = getDisplayRotation();
 
         // render the texture to FBO if new frame is available
-        if (mUpdateTexture) {
-            GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-            // Latch surface texture
-            mSurfaceTexture.updateTexImage();
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+        // Latch surface texture
+        mSurfaceTexture.updateTexImage();
 
-            // Render to FBO (TODO: resize/crop to target size)
-            GLES20.glFinish();
-            GLES20.glViewport(0, 0, 1080, 1920);
+        // Render to FBO
+        GLES20.glFinish();
+        GLES20.glViewport(0, 0, 1080, 1920);
 
-            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFbo);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFbo);
+        mCameraToFbo.rotate(mCameraRotation);
+        mCameraToFbo.draw(mSrcTexture.getTextureId());
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
-            mCameraToFbo.rotate(mCameraRotation);
+        // Render to this view
+        int targetWidth = mViewWidth;
+        int targetHeight = (int) ((mCameraPreviewWidth * targetWidth * 100.0f / mCameraPreviewHeight) / 100);
 
-            mCameraToFbo.draw(mSrcTexture.getTextureId());
-            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
-
-            // Render to this view
-            int targetWidth = mViewWidth;
-            int targetHeight = (int) ((mCameraPreviewWidth * targetWidth * 100.0f / mCameraPreviewHeight) / 100);
-
-            // FIXME should calculate the rotation dynamically and apply mirror for correctly video displaying
-            int rotation;
-            if (mCameraType == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                rotation = (-degrees + 180) % 360;
-            } else {
-                rotation = (degrees + 180) % 360;
-            }
-
-            if (DBG) {
-                Log.i(TAG, "glViewport " + targetWidth + " " + targetHeight + " " + mViewWidth + " " + mViewHeight + " " + mCameraPreviewWidth + " " + mCameraPreviewHeight + " " + rotation);
-            }
-            GLES20.glViewport(0, 0, targetWidth, targetHeight);
-
-            mFboToView.rotate(rotation);
-            if (mCameraType == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                mFboToView.flip(true, false);
-            }
-
-            float[] matrix = new float[16];
-            mDstSurfaceTexture.getTransformMatrix(matrix);
-
-            if (mOnRendererStatusListener != null) {
-                int i = mOnRendererStatusListener.onDrawFrame(mDstTexture, mEGLCurrentContext,
-                        targetWidth, targetHeight, matrix);
-                mFboToView.draw(i);
-            }
-
-            mUpdateTexture = false;
+        int rotation;
+        if (mCameraType == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            rotation = (-degrees + 180) % 360;
+        } else {
+            rotation = (degrees + 180) % 360;
         }
 
-        if (DBG) {
-            Log.i(TAG, "onDrawFrame " + gl + " end orientation " + mCameraRotation + " " + degrees);
+        if (DEBUG) {
+            Log.i(TAG, "glViewport " + targetWidth + " " + targetHeight + " " + mViewWidth + " " + mViewHeight + " " + mCameraPreviewWidth + " " + mCameraPreviewHeight + " " + rotation);
+        }
+        GLES20.glViewport(0, 0, targetWidth, targetHeight);
+
+        mFboToView.rotate(rotation);
+        if (mCameraType == Camera.CameraInfo.CAMERA_FACING_BACK) {
+            mFboToView.flip(true, false);
+        }
+
+        mDstSurfaceTexture.getTransformMatrix(mMatrix);
+        if (mOnRendererStatusListener != null) {
+            int i = mOnRendererStatusListener.onDrawFrame(mDstTexture, mEGLCurrentContext,
+                    targetWidth, targetHeight, mMatrix);
+            mFboToView.draw(i);
+        }
+
+        if (DEBUG) {
+            Log.i(TAG, "onDrawFrame end orientation " + mCameraRotation + " " + degrees);
         }
     }
 
@@ -422,17 +388,19 @@ public class CustomizedCameraRenderer extends GLSurfaceView implements
 
     private void releaseCamera() {
         try {
-            if (mSurfaceTexture != null) {
-                mSurfaceTexture.setOnFrameAvailableListener(null);
+            synchronized (mLock) {
+                if (mSurfaceTexture != null) {
+                    mSurfaceTexture.setOnFrameAvailableListener(null);
+                }
+                mUpdateTexture = false;
+                if (mCamera != null) {
+                    mCamera.stopPreview();
+                    mCamera.setPreviewTexture(null);
+                    mCamera.release();
+                    mCamera = null;
+                }
+                mPreviewing = false;
             }
-            mUpdateTexture = false;
-            if (mCamera != null) {
-                mCamera.stopPreview();
-                mCamera.setPreviewTexture(null);
-                mCamera.release();
-                mCamera = null;
-            }
-            mPreviewing = false;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -446,9 +414,7 @@ public class CustomizedCameraRenderer extends GLSurfaceView implements
         }
 
         mSurfaceTexture.release();
-
         mEGLCurrentContext = null;
-
         releaseCamera();
     }
 

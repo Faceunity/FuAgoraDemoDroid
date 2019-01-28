@@ -35,7 +35,6 @@ import static com.faceunity.wrapper.faceunity.FU_ADM_FLAG_FLIP_X;
  * 3.对应的时机调用onSurfaceCreated和onSurfaceDestroyed
  * 4.处理图像时调用onDrawFrame
  * <p>
- * 如果您有更高级的定制需求，Nama API文档请参考http://www.faceunity.com/technical/android-api.html
  */
 public class FURenderer implements OnFUControlListener {
     private static final String TAG = FURenderer.class.getSimpleName();
@@ -132,7 +131,7 @@ public class FURenderer implements OnFUControlListener {
             /**
              * fuSetup faceunity初始化
              * 其中 v3.bundle：人脸识别数据文件，缺少该文件会导致系统初始化失败；
-             *      authpack：用于鉴权证书内存数组。若没有,请咨询support@faceunity.com
+             *      authpack：用于鉴权证书内存数组
              * 首先调用完成后再调用其他FU API
              */
             InputStream v3 = context.getAssets().open(BUNDLE_v3);

@@ -1,6 +1,6 @@
 # FuAgoraDemoDroid 快速接入文档
 
-FuAgoraDemoDroid 是集成了 Faceunity 面部跟踪和虚拟道具功能 和 声网视频直播 的 Demo。
+FuAgoraDemoDroid 是集成了 Faceunity 面部跟踪和虚拟道具功能 和 **[声网视频直播](https://docs.agora.io/cn/Agora%20Platform/downloads?_ga=2.135518513.1451186282.1543802498-496788920.1540963589)** 的 Demo。
 
 **注意：本 demo 支持切换相机**
 
