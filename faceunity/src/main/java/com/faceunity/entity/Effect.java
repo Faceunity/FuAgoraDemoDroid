@@ -1,7 +1,5 @@
 package com.faceunity.entity;
 
-import android.text.TextUtils;
-
 /**
  * 本demo中道具的实体类
  * Created by tujh on 2018/2/7.
@@ -26,9 +24,9 @@ public class Effect {
     private String path;
     private int maxFace;
     private int effectType;
-    private int description;
+    private String description;
 
-    public Effect(String bundleName, int resId, String path, int maxFace, int effectType, int description) {
+    public Effect(String bundleName, int resId, String path, int maxFace, int effectType, String description) {
         this.bundleName = bundleName;
         this.resId = resId;
         this.path = path;
@@ -57,20 +55,7 @@ public class Effect {
         return effectType;
     }
 
-    public int description() {
+    public String description() {
         return description;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Effect effect = (Effect) o;
-        return !TextUtils.isEmpty(path) && path.equals(effect.path());
-    }
-
-    @Override
-    public int hashCode() {
-        return !TextUtils.isEmpty(path) ? path.hashCode() : 0;
     }
 }

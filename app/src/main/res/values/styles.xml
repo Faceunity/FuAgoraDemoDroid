@@ -8,13 +8,11 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="FullScreenVideoTheme" parent="AppTheme">
+    <style name="FullscreenTheme" parent="AppTheme">
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowEnableSplitTouch">false</item>
-        <item name="android:windowBackground">@drawable/loading</item>
-        <item name="android:splitMotionEvents">false</item>
     </style>
+
 </resources>

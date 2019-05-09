@@ -1,7 +1,5 @@
 package com.faceunity.entity;
 
-import android.text.TextUtils;
-
 /**
  * 本demo中滤镜的实体类
  * Created by tujh on 2018/2/7.
@@ -14,14 +12,10 @@ public class Filter {
 
     private String filterName;
     private int resId;
-    private int description;
+    private String description;
     private int filterType;
 
-    public Filter(String filterName) {
-        this.filterName = filterName;
-    }
-
-    public Filter(String filterName, int resId, int description, int filterType) {
+    public Filter(String filterName, int resId, String description, int filterType) {
         this.filterName = filterName;
         this.resId = resId;
         this.description = description;
@@ -36,24 +30,7 @@ public class Filter {
         return resId;
     }
 
-    public int description() {
+    public String description() {
         return description;
-    }
-
-    public int filterType() {
-        return filterType;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Filter filter = (Filter) o;
-        return !TextUtils.isEmpty(filterName) && filterName.equals(filter.filterName());
-    }
-
-    @Override
-    public int hashCode() {
-        return !TextUtils.isEmpty(filterName) ? filterName.hashCode() : 0;
     }
 }
