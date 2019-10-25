@@ -1,4 +1,4 @@
-# FUAgoraOpenLiveDemoDroid 快速接入文档
+# FUAgoraOpenLiveDemoDroid 快速接入文档 (本demo已不再维护， **[最新demo](https://github.com/AgoraIO/FaceUnity)**)
 
 FUAgoraOpenLiveDemoDroid 是集成了 FaceUnity 面部跟踪和虚拟道具功能 和 **[声网视频直播](https://docs.agora.io/cn/Agora%20Platform/downloads)** 的 Demo。
 
