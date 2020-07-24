@@ -1,14 +1,15 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     buildToolsVersion "28.0.3"
 
     defaultConfig {
-        minSdkVersion 18
-        targetSdkVersion 27
-        versionCode 59
-        versionName "5.9.0"
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode 701
+        versionName "7.0.1"
+        // 7_0_1_phy_cc9e747_f92de5b
     }
 
     buildTypes {
@@ -17,21 +18,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    sourceSets {
-        main.assets.srcDirs += ['src/main/assets', 'src/main/effects/bundle']
-        main.res.srcDirs += ['src/mian/res', 'src/main/effects/res', 'src/main/filters/res']
-    }
-
-    lintOptions {
-        abortOnError false
-    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:recyclerview-v7:27.1.1'
-    implementation 'de.hdodenhof:circleimageview:2.2.0'
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 }
