@@ -3,6 +3,8 @@ package com.faceunity.nama.module;
 import com.faceunity.nama.entity.Sticker;
 
 /**
+ * 贴纸模块接口
+ *
  * @author Richie on 2020.07.07
  */
 public interface IStickerModule {

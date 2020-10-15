@@ -2,8 +2,6 @@
 
 buildscript {
     repositories {
-        maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
-        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
         google() // HIGHER PRIORITY
         jcenter()
     }
@@ -17,8 +15,6 @@ buildscript {
 
 allprojects {
     repositories {
-        maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
-        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
         google() // HIGHER PRIORITY
         jcenter()
     }

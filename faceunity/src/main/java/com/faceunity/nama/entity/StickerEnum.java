@@ -3,6 +3,7 @@ package com.faceunity.nama.entity;
 import com.faceunity.nama.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 道具贴纸列表
@@ -14,12 +15,8 @@ public enum StickerEnum {
      * 道具贴纸
      */
     STICKER_none(R.drawable.ic_delete_all, "", "none"),
-    STICKER_sdlu(R.drawable.sdlu, "effect/sdlu.bundle", "sdlu"),
-    STICKER_daisypig(R.drawable.daisypig, "effect/daisypig.bundle", "daisypig"),
-    STICKER_fashi(R.drawable.fashi, "effect/fashi.bundle", "fashi"),
-    STICKER_xueqiu_lm_fu(R.drawable.xueqiu_lm_fu, "effect/xueqiu_lm_fu.bundle", "xueqiu_lm_fu"),
-    STICKER_wobushi(R.drawable.wobushi, "effect/wobushi.bundle", "wobushi"),
-    STICKER_gaoshiqing(R.drawable.gaoshiqing, "effect/gaoshiqing.bundle", "gaoshiqing");
+    STICKER_sdlu(R.drawable.sdlu, "sticker/sdlu.bundle", "sdlu"),
+    STICKER_fashi(R.drawable.fashi, "sticker/fashi.bundle", "fashi");
 
     private int iconId;
     private String filePath;
@@ -35,12 +32,13 @@ public enum StickerEnum {
         return new Sticker(iconId, filePath, description);
     }
 
-    public static ArrayList<Sticker> getEffects() {
-        StickerEnum[] effectEnums = StickerEnum.values();
-        ArrayList<Sticker> effects = new ArrayList<>(effectEnums.length);
-        for (StickerEnum e : effectEnums) {
-            effects.add(e.create());
+    public static List<Sticker> getStickers() {
+        StickerEnum[] stickerEnums = StickerEnum.values();
+        List<Sticker> stickers = new ArrayList<>(stickerEnums.length);
+        for (StickerEnum e : stickerEnums) {
+            stickers.add(e.create());
         }
-        return effects;
+        return stickers;
     }
+
 }

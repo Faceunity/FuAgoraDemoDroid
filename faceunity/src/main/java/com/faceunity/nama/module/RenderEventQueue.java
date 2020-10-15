@@ -11,10 +11,9 @@ import java.util.ArrayList;
 public class RenderEventQueue {
     private static final String TAG = "RenderEventQueue";
     private final ArrayList<Runnable> mEventQueue = new ArrayList<>(16);
-    private final Object mLock = new Object();
 
     public void add(final Runnable runnable) {
-        synchronized (mLock) {
+        synchronized (this) {
             mEventQueue.add(runnable);
         }
     }
@@ -23,11 +22,11 @@ public class RenderEventQueue {
         if (itemHandle <= 0 || key == null || key.length() == 0 || value == null) {
             return;
         }
-        synchronized (mLock) {
+        synchronized (this) {
             mEventQueue.add(new Runnable() {
                 @Override
                 public void run() {
-                    LogUtils.verbose(TAG, "fuItemSetParam. itemHandle: %d, key: %s, value: %s", itemHandle, key, value.toString());
+                    LogUtils.verbose(TAG, "fuItemSetParam. itemHandle: %d, key: %s, value: %s", itemHandle, key, value);
                     if (value instanceof Float) {
                         faceunity.fuItemSetParam(itemHandle, key, (Float) value);
                     } else if (value instanceof Double) {
@@ -45,7 +44,7 @@ public class RenderEventQueue {
     }
 
     public void executeAndClear() {
-        synchronized (mLock) {
+        synchronized (this) {
             while (!mEventQueue.isEmpty()) {
                 mEventQueue.remove(0).run();
             }
@@ -53,7 +52,7 @@ public class RenderEventQueue {
     }
 
     public void clear() {
-        synchronized (mLock) {
+        synchronized (this) {
             mEventQueue.clear();
         }
     }

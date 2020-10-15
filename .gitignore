@@ -46,8 +46,7 @@ captures/
 .idea/gradle.xml
 .idea/dictionaries
 .idea/libraries
-
-/.idea/
+.idea/
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
@@ -116,7 +115,7 @@ obj/
 .idea/dataSources.ids
 .idea/sqlDataSources.xml
 .idea/dynamic.xml
-.idea/
+.idea/uiDesigner.xml
 
 # OS-specific files
 .DS_Store
@@ -148,8 +147,6 @@ hs_err_pid*
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 
-/.idea/caches/
-
 # JIRA plugin
 atlassian-ide-plugin.xml
 
@@ -173,7 +170,7 @@ fabric.properties
 *.tar.gz
 *.rar
 
-#!/gradle/wrapper/gradle-wrapper.jar
+!/gradle/wrapper/gradle-wrapper.jar
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 
@@ -181,9 +178,9 @@ fabric.properties
 # End of https://www.gitignore.io/api/java,android,androidstudio
 
 # .so Files #
-#app/src/main/jniLibs/*/*.so
+app/src/main/jniLibs/*/*.so
 
 # ignore files
-#!faceunity/src/main/jniLibs/*/libnama.so
-#!faceunity/libs/nama.jar
+!faceunity/src/main/jniLibs/*/libnama.so
+!faceunity/libs/nama.jar
 

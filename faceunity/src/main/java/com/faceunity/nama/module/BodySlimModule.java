@@ -55,7 +55,7 @@ public class BodySlimModule extends AbstractEffectModule implements IBodySlimMod
                 setLegThinSlimIntensity(mLegThinSlimStrength);
 
                 if (moduleCallback != null) {
-                    moduleCallback.onCreateFinish(itemBodySlim);
+                    moduleCallback.onBundleCreated(itemBodySlim);
                 }
             }
         });
@@ -84,8 +84,8 @@ public class BodySlimModule extends AbstractEffectModule implements IBodySlimMod
         mRenderEventQueue.add(new Runnable() {
             @Override
             public void run() {
-                LogUtils.debug(TAG, "setMaxHumans %d", maxHumans);
                 faceunity.fuHumanProcessorSetMaxHumans(maxHumans);
+                LogUtils.debug(TAG, "setMaxHumans : %d", maxHumans);
             }
         });
     }
