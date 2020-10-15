@@ -8,7 +8,6 @@ import android.util.Log;
  * @author Richie on 2020.07.07
  */
 public final class LogUtils {
-    private static final String TAG = "LogUtils";
     private static final String GLOBAL_ATG = "[NAMA_LOG] ";
     /**
      * Log level
@@ -22,7 +21,7 @@ public final class LogUtils {
 
     private static int sLogLevel = OFF;
 
-    public LogUtils() {
+    private LogUtils() {
     }
 
     public static void setLogLevel(int level) {
@@ -33,83 +32,64 @@ public final class LogUtils {
         return sLogLevel >= level;
     }
 
-    public static void verbose(String tag, Throwable tr, String... msg) {
-        if (Log.VERBOSE >= sLogLevel) {
-            Log.v(GLOBAL_ATG + tag, formatString(msg), tr);
-        }
-    }
-
-    public static void debug(String tag, Throwable tr, String... msg) {
-        if (Log.DEBUG >= sLogLevel) {
-            Log.d(GLOBAL_ATG + tag, formatString(msg), tr);
-        }
-    }
-
-    public static void info(String tag, Throwable tr, String... msg) {
-        if (Log.INFO >= sLogLevel) {
-            Log.i(GLOBAL_ATG + tag, formatString(msg), tr);
-        }
-    }
-
-    public static void warn(String tag, Throwable tr, String... msg) {
-        if (Log.WARN >= sLogLevel) {
-            Log.w(GLOBAL_ATG + tag, formatString(msg), tr);
-        }
-    }
-
-    public static void error(String tag, Throwable tr, String... msg) {
-        if (Log.ERROR >= sLogLevel) {
-            Log.e(GLOBAL_ATG + tag, formatString(msg), tr);
-        }
-    }
 
     public static void verbose(String tag, String msg, Object... obj) {
-        if (Log.VERBOSE >= sLogLevel) {
+        if (VERBOSE >= sLogLevel) {
             Log.v(GLOBAL_ATG + tag, String.format(msg, obj));
         }
     }
 
     public static void debug(String tag, String msg, Object... obj) {
-        if (Log.DEBUG >= sLogLevel) {
+        if (DEBUG >= sLogLevel) {
             Log.d(GLOBAL_ATG + tag, String.format(msg, obj));
         }
     }
 
     public static void info(String tag, String msg, Object... obj) {
-        if (Log.INFO >= sLogLevel) {
+        if (INFO >= sLogLevel) {
             Log.i(GLOBAL_ATG + tag, String.format(msg, obj));
         }
     }
 
-    public static void warn(String tag, String msg, Object... obj) {
+    public static void warn(String tag, String msg, Throwable tr) {
         if (Log.WARN >= sLogLevel) {
+            Log.w(GLOBAL_ATG + tag, msg, tr);
+        }
+    }
+
+    public static void warn(String tag, String msg, Object... obj) {
+        if (WARN >= sLogLevel) {
             Log.w(GLOBAL_ATG + tag, String.format(msg, obj));
         }
     }
 
     public static void error(String tag, String msg, Object... obj) {
-        if (Log.ERROR >= sLogLevel) {
+        if (ERROR >= sLogLevel) {
             Log.e(GLOBAL_ATG + tag, String.format(msg, obj));
         }
     }
 
-    public static void error(Throwable throwable) {
-        if (Log.ERROR >= sLogLevel) {
-            Log.e(GLOBAL_ATG, throwable.getMessage());
+    public static void warn(String tag, Throwable tr) {
+        if (Log.WARN >= sLogLevel) {
+            Log.w(GLOBAL_ATG + tag, tr);
         }
     }
 
-    private static String formatString(String... strings) {
-        if (strings == null) {
-            return null;
-        } else if (strings.length == 1) {
-            return strings[0];
-        } else {
-            StringBuilder buffer = new StringBuilder();
-            for (String s : strings) {
-                buffer.append(s).append(", ");
-            }
-            return buffer.toString();
+    public static void error(String tag, String msg, Throwable tr) {
+        if (Log.ERROR >= sLogLevel) {
+            Log.e(GLOBAL_ATG + tag, msg, tr);
+        }
+    }
+
+    public static void error(String tag, Throwable tr) {
+        if (Log.ERROR >= sLogLevel) {
+            Log.e(GLOBAL_ATG + tag, "", tr);
+        }
+    }
+
+    public static void error(Throwable throwable) {
+        if (ERROR >= sLogLevel) {
+            Log.e(GLOBAL_ATG, throwable.getMessage());
         }
     }
 

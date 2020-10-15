@@ -15,9 +15,17 @@ public abstract class AbstractEffectModule implements IEffectModule {
     protected RenderEventQueue mRenderEventQueue;
 
     @Override
-    public void setRotationMode(int rotationMode) {
+    public void setRotationMode(final int rotationMode) {
         mRotationMode = rotationMode;
-        faceunity.fuSetDefaultRotationMode(rotationMode);
+        if (mRenderEventQueue != null) {
+            mRenderEventQueue.add(new Runnable() {
+                @Override
+                public void run() {
+                    faceunity.fuSetDefaultRotationMode(rotationMode);
+                    LogUtils.debug(TAG, "%s fuSetDefaultRotationMode : %d", AbstractEffectModule.this.getClass().getSimpleName(), rotationMode);
+                }
+            });
+        }
     }
 
     @Override
@@ -30,8 +38,8 @@ public abstract class AbstractEffectModule implements IEffectModule {
     @Override
     public void destroy() {
         if (mItemHandle > 0) {
-            LogUtils.debug(TAG, "destroy item %d", mItemHandle);
             faceunity.fuDestroyItem(mItemHandle);
+            LogUtils.debug(TAG, "%s destroy item %d", getClass().getSimpleName(), mItemHandle);
             mItemHandle = 0;
         }
     }

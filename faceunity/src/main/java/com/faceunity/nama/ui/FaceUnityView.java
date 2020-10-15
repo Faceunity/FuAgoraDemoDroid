@@ -31,6 +31,7 @@ import java.util.Map;
  * @author Richie on 2020.06.20
  */
 public class FaceUnityView extends FrameLayout {
+    private static final String TAG = "FaceUnityView";
     private IModuleManager mFURenderer;
     private IMakeupModule mMakeupModule;
     private IStickerModule mStickerModule;
@@ -64,8 +65,8 @@ public class FaceUnityView extends FrameLayout {
         rvStickEffect.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         rvStickEffect.setHasFixedSize(true);
         ((SimpleItemAnimator) rvStickEffect.getItemAnimator()).setSupportsChangeAnimations(false);
-        final EffectListAdapter effectListAdapter = new EffectListAdapter(StickerEnum.getEffects());
-        effectListAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener<Sticker>() {
+        final StickerListAdapter stickerListAdapter = new StickerListAdapter(StickerEnum.getStickers());
+        stickerListAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener<Sticker>() {
             @Override
             public void onItemClick(BaseRecyclerAdapter<Sticker> adapter, View view, int position) {
                 if (mStickerModule != null) {
@@ -73,7 +74,7 @@ public class FaceUnityView extends FrameLayout {
                 }
             }
         });
-        rvStickEffect.setAdapter(effectListAdapter);
+        rvStickEffect.setAdapter(stickerListAdapter);
 
         mClMakeup = view.findViewById(R.id.cl_makeup);
         RecyclerView rvMakeup = view.findViewById(R.id.rv_makeup);
@@ -94,6 +95,7 @@ public class FaceUnityView extends FrameLayout {
 
         CheckGroup checkGroup = view.findViewById(R.id.cg_nav_bar);
         checkGroup.setOnCheckedChangeListener(new CheckGroup.OnCheckedChangeListener() {
+
             @Override
             public void onCheckedChanged(CheckGroup group, int checkedId) {
                 if (checkedId == R.id.cb_face_beauty) {
@@ -115,10 +117,6 @@ public class FaceUnityView extends FrameLayout {
                     rvStickEffect.setVisibility(GONE);
                     bodySlimControlView.setVisibility(GONE);
                     mFURenderer.createMakeupModule();
-                    Makeup makeup = makeupListAdapter.getSelectedItems().valueAt(0);
-                    if (mMakeupModule != null) {
-                        mMakeupModule.selectMakeup(makeup);
-                    }
                     mFURenderer.destroyStickerModule();
                     mFURenderer.destroyBodySlimModule();
                 } else if (checkedId == R.id.cb_body_slim) {
@@ -209,21 +207,21 @@ public class FaceUnityView extends FrameLayout {
         }
     }
 
-    public static class EffectListAdapter extends BaseRecyclerAdapter<Sticker> {
+    public static class StickerListAdapter extends BaseRecyclerAdapter<Sticker> {
 
-        public EffectListAdapter(@NonNull List<Sticker> data) {
-            super(data, R.layout.layout_effect_recycler);
+        StickerListAdapter(@NonNull List<Sticker> data) {
+            super(data, R.layout.layout_sticker_recycler);
         }
 
         @Override
         protected void bindViewHolder(BaseViewHolder viewHolder, Sticker item) {
-            viewHolder.setImageResource(R.id.effect_recycler_img, item.getIconId());
+            viewHolder.setImageResource(R.id.iv_sticker_icon, item.getIconId());
         }
 
         @Override
         protected void handleSelectedState(BaseViewHolder viewHolder, Sticker data, boolean selected) {
             super.handleSelectedState(viewHolder, data, selected);
-            viewHolder.setBackground(R.id.effect_recycler_img, selected ? R.drawable.effect_select : android.R.color.transparent);
+            viewHolder.setBackground(R.id.iv_sticker_icon, selected ? R.drawable.shape_sticker_select : android.R.color.transparent);
         }
     }
 

@@ -3,15 +3,13 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 28
     buildToolsVersion "28.0.3"
-
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 19
         targetSdkVersion 28
-        versionCode 701
-        versionName "7.0.1"
-        // 7_0_1_phy_cc9e747_f92de5b
+        versionCode 720
+        versionName "7.2.0"
+        // 7.2.0_phy_cb5302c2_b431017
     }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -24,5 +22,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'com.android.support.constraint:constraint-layout:2.0.1'
+//    implementation 'com.faceunity:nama:7.2.0'
 }

@@ -43,7 +43,7 @@ public class MakeupModule extends AbstractEffectModule implements IMakeupModule 
                     selectMakeup(new Makeup(mMakeup));
                 }
                 if (moduleCallback != null) {
-                    moduleCallback.onCreateFinish(itemMakeup);
+                    moduleCallback.onBundleCreated(itemMakeup);
                 }
             }
         });
@@ -70,8 +70,8 @@ public class MakeupModule extends AbstractEffectModule implements IMakeupModule 
                         }
                         int oldHandle = mMakeupHandle;
                         if (oldHandle > 0) {
-                            LogUtils.debug(TAG, "makeup unbind %d", oldHandle);
                             faceunity.fuUnBindItems(mItemHandle, new int[]{oldHandle});
+                            LogUtils.debug(TAG, "makeup unbind %d", oldHandle);
                         }
                         if (makeupHandle > 0) {
                             setIsMakeupFlipPoints(mIsFlipPoints);
@@ -79,8 +79,8 @@ public class MakeupModule extends AbstractEffectModule implements IMakeupModule 
                             LogUtils.debug(TAG, "makeup bind %d", makeupHandle);
                         }
                         if (oldHandle > 0) {
-                            LogUtils.debug(TAG, "makeup destroy %d", oldHandle);
                             faceunity.fuDestroyItem(oldHandle);
+                            LogUtils.debug(TAG, "makeup destroy %d", oldHandle);
                         }
                         mMakeupHandle = makeupHandle;
                         mMakeup = makeup;
@@ -95,11 +95,11 @@ public class MakeupModule extends AbstractEffectModule implements IMakeupModule 
         if (mMakeup != null) {
             int makeupHandle = mMakeupHandle;
             if (makeupHandle > 0) {
-                LogUtils.debug(TAG, "unbind and destroy makeup %d", makeupHandle);
                 if (mItemHandle > 0) {
                     faceunity.fuUnBindItems(mItemHandle, new int[]{makeupHandle});
                 }
                 faceunity.fuDestroyItem(makeupHandle);
+                LogUtils.debug(TAG, "unbind and destroy makeup %d", makeupHandle);
                 mMakeupHandle = 0;
             }
         }
