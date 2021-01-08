@@ -5,7 +5,7 @@ android {
 
     defaultConfig {
         applicationId "io.agora.rtcwithfu"
-        minSdkVersion 21
+        minSdkVersion 19
         targetSdkVersion 28
         versionCode 11
         versionName "5.4"

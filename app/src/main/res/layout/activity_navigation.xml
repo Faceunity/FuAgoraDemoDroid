@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical">
-
     <EditText
         android:id="@+id/edt_channel"
         android:layout_width="@dimen/main_activity_edit_width"

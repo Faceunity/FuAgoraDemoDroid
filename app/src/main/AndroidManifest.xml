@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="io.agora.rtcwithfu">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -16,6 +17,8 @@
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
+
+    <uses-sdk tools:overrideLibrary="io.agora.capture.framework" />
 
     <application
         android:name=".MyApplication"
