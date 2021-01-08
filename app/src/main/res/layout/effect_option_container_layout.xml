@@ -4,7 +4,6 @@
     android:layout_height="@dimen/effect_type_item_height"
     android:orientation="horizontal"
     android:background="@color/percent60translucentBlack">
-
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/effect_option_item_1"
         android:layout_width="0dp"
