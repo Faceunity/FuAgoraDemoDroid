@@ -5,7 +5,7 @@
     <TextureView
         android:id="@+id/local_video_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
 
     <TextView
         android:visibility="invisible"
@@ -15,7 +15,7 @@
         android:layout_centerInParent="true"
         android:text="@string/fu_base_is_tracking_text"
         android:textColor="@color/colorWhite"
-        android:textSize="17sp" />
+        android:textSize="17sp"/>
 
     <FrameLayout
         android:id="@+id/remote_video_view"
@@ -24,8 +24,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="@dimen/max_space"
-        android:layout_marginEnd="@dimen/max_space" />
-
+        android:layout_marginEnd="@dimen/max_space"/>
     <ImageView
         android:id="@+id/btn_switch_camera"
         android:layout_width="38dp"
@@ -34,13 +33,13 @@
         android:layout_marginStart="@dimen/max_space"
         android:src="@mipmap/camera_normal"
         android:scaleType="fitXY"
-        android:onClick="onClick" />
+        android:onClick="onClick"/>
 
 
     <com.faceunity.nama.ui.FaceUnityView
         android:id="@+id/fu_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

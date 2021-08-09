@@ -14,12 +14,11 @@
         android:hint="@string/room_name_edit_hint"
         android:digits="@string/legal_characters"
         android:lines="1"
-        android:autofillHints="" />
-
+        android:autofillHints=""/>
     <Button
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:onClick="onStartBroadcastClick"
-        android:text="@string/enter_room_btn" />
+        android:text="@string/enter_room_btn"/>
 </LinearLayout>

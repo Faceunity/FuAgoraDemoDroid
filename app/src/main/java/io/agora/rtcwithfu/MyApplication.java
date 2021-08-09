@@ -42,9 +42,8 @@ public class MyApplication extends Application {
     private void initVideoCaptureAsync() {
         new Thread(() -> {
             Context application = getApplicationContext();
-            FURenderer.setup(application);
-            mVideoManager = new CameraVideoManager(application,
-                    new PreprocessorFaceUnity(application));
+            FURenderer.getInstance().setup(application);
+            mVideoManager = new CameraVideoManager(application, new PreprocessorFaceUnity(application));
         }).start();
     }
 

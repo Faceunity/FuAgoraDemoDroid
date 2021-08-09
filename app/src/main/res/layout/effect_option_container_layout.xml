@@ -12,8 +12,8 @@
         android:textAlignment="gravity"
         android:gravity="center"
         android:text="@string/home_function_name_beauty"
-        android:textSize="@dimen/text_size_26"></android.support.v7.widget.AppCompatTextView>
-
+        android:textSize="@dimen/text_size_26">
+    </android.support.v7.widget.AppCompatTextView>
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/effect_option_item_2"
         android:layout_width="0dp"
@@ -22,8 +22,8 @@
         android:textAlignment="gravity"
         android:gravity="center"
         android:text="@string/home_function_name_makeup"
-        android:textSize="@dimen/text_size_26"></android.support.v7.widget.AppCompatTextView>
-
+        android:textSize="@dimen/text_size_26">
+    </android.support.v7.widget.AppCompatTextView>
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/effect_option_item_3"
         android:layout_width="0dp"
@@ -32,8 +32,8 @@
         android:textAlignment="gravity"
         android:gravity="center"
         android:text="@string/home_function_name_sticker"
-        android:textSize="@dimen/text_size_26"></android.support.v7.widget.AppCompatTextView>
-
+        android:textSize="@dimen/text_size_26">
+    </android.support.v7.widget.AppCompatTextView>
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/effect_option_item_4"
         android:layout_width="0dp"
@@ -42,5 +42,6 @@
         android:textAlignment="gravity"
         android:gravity="center"
         android:text="@string/home_function_name_beauty_body"
-        android:textSize="@dimen/text_size_26"></android.support.v7.widget.AppCompatTextView>
+        android:textSize="@dimen/text_size_26">
+    </android.support.v7.widget.AppCompatTextView>
 </LinearLayout>

@@ -8,8 +8,7 @@ public class RtcEngineEventHandlerProxy extends IRtcEngineEventHandler {
     private ArrayList<RtcEngineEventHandler> mEventHandlers = new ArrayList<>();
 
     public void addEventHandler(RtcEngineEventHandler handler) {
-        if (!mEventHandlers.contains(handler))
-            mEventHandlers.add(handler);
+        if (!mEventHandlers.contains(handler)) mEventHandlers.add(handler);
     }
 
     public void removeEventHandler(RtcEngineEventHandler handler) {

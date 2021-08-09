@@ -12,8 +12,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import io.agora.rtcwithfu.R;
 import io.agora.rtcwithfu.utils.Constants;
+import io.agora.rtcwithfu.R;
 
 public class MainActivity extends Activity {
     private static final int REQUEST_CODE_ALL_PERMISSIONS = 999;
@@ -41,9 +41,9 @@ public class MainActivity extends Activity {
 
     private void requestPermissions() {
         ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.CAMERA,
+                new String[] { Manifest.permission.CAMERA,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.RECORD_AUDIO},
+                        Manifest.permission.RECORD_AUDIO },
                 REQUEST_CODE_ALL_PERMISSIONS);
     }
 

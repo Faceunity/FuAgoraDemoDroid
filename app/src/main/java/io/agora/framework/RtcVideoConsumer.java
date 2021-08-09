@@ -115,7 +115,7 @@ public class RtcVideoConsumer implements IVideoConsumer, IVideoSource {
 
     @Override
     public void onDispose() {
-        Log.i(TAG, "onDispose");
+        Log.i(TAG , "onDispose");
         mValidInRtc = false;
         mRtcConsumer = null;
         disconnectChannel(mChannelId);
