@@ -1,8 +1,11 @@
 package com.faceunity.nama.data;
 
+import com.faceunity.FUConfig;
 import com.faceunity.core.enumeration.FUAIProcessorEnum;
+import com.faceunity.core.faceunity.FUAIKit;
 import com.faceunity.core.faceunity.FURenderKit;
 import com.faceunity.nama.FURenderer;
+import com.faceunity.nama.utils.FuDeviceUtils;
 
 /**
  * DESC：
@@ -44,6 +47,10 @@ public class FaceUnityDataFactory {
      * FURenderKit加载当前特效
      */
     public void bindCurrentRenderer() {
+        //高端机开启小脸检测
+        FUAIKit.getInstance().faceProcessorSetFaceLandmarkQuality(FUConfig.DEVICE_LEVEL);
+        if (FUConfig.DEVICE_LEVEL  > FuDeviceUtils.DEVICE_LEVEL_MID)
+            FUAIKit.getInstance().fuFaceProcessorSetDetectSmallFace(true);
         switch (currentFunctionIndex) {
             case 0:
                 mFaceBeautyDataFactory.bindCurrentRenderer();
