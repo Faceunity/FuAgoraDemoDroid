@@ -16,11 +16,14 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.faceunity.FUConfig;
 import com.faceunity.core.enumeration.FUAIProcessorEnum;
+import com.faceunity.core.faceunity.FUAIKit;
 import com.faceunity.nama.FURenderer;
 import com.faceunity.nama.data.FaceUnityDataFactory;
 import com.faceunity.nama.listener.FURendererListener;
 import com.faceunity.nama.ui.FaceUnityView;
+import com.faceunity.nama.utils.FuDeviceUtils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
