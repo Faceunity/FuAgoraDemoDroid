@@ -51,6 +51,8 @@
     <string name="beauty_micro_pouch">Circle</string>
     <string name="beauty_micro_nasolabial">Wrinkles</string>
     <string name="beauty_micro_smile">Smile</string>
+    <string name="beauty_brow_height">Brow height</string>
+    <string name="beauty_brow_space">Brow space</string>
     <string name="beauty_micro_canthus">Canthus</string>
     <string name="beauty_micro_philtrum">Philtrum</string>
     <string name="beauty_micro_long_nose">Length</string>
@@ -79,5 +81,6 @@
     <string name="beautify_head_slim">Head shrink</string>
     <string name="beautify_leg_thin_slim">Thin leg</string>
 
-
+    <string name="brow_height_tips">This function is only supported for high-end computers</string>
+    <string name="brow_space_tips">This function is only supported for high-end computers</string>
 </resources>
