@@ -52,6 +52,8 @@
     <string name="beauty_micro_pouch">去黑眼圈</string>
     <string name="beauty_micro_nasolabial">去法令纹</string>
     <string name="beauty_micro_smile">微笑嘴角</string>
+    <string name="beauty_brow_height">眉毛上下</string>
+    <string name="beauty_brow_space">眉间距</string>
     <string name="beauty_micro_canthus">开眼角</string>
     <string name="beauty_micro_philtrum">缩人中</string>
     <string name="beauty_micro_long_nose">长鼻</string>
@@ -78,8 +80,6 @@
     <string name="beautify_head_slim">小头</string>
     <string name="beautify_leg_thin_slim">瘦腿</string>
 
-
-
-
-
+    <string name="brow_height_tips">眉毛上下功能仅支持在高端机上使用</string>
+    <string name="brow_space_tips">眉毛间距功能仅支持在高端机上使用</string>
 </resources>

@@ -28,7 +28,6 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_navigation);
         mChannelName = findViewById(R.id.edt_channel);
         checkPermissions();
-        FUConfig.DEVICE_LEVEL = FuDeviceUtils.judgeDeviceLevel(this);
     }
 
     private void checkPermissions() {

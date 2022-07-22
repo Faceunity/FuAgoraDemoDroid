@@ -264,6 +264,20 @@ public class FaceBeautySource {
                         R.drawable.icon_beauty_shape_smile_close_selector, R.drawable.icon_beauty_shape_smile_open_selector
                 )
         );
+        params.add(
+                new FaceBeautyBean(
+                        FaceBeautyParam.BROW_HEIGHT_INTENSITY, R.string.beauty_brow_height,
+                        R.drawable.icon_beauty_shape_brow_height_close_selector, R.drawable.icon_beauty_shape_brow_height_open_selector,
+                        R.string.brow_height_tips,FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID
+                )
+        );
+        params.add(
+                new FaceBeautyBean(
+                        FaceBeautyParam.BROW_SPACE_INTENSITY, R.string.beauty_brow_space,
+                        R.drawable.icon_beauty_shape_brow_space_close_selector, R.drawable.icon_beauty_shape_brow_space_open_selector,
+                        R.string.brow_space_tips,FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID
+                )
+        );
         return params;
     }
 
@@ -306,6 +320,8 @@ public class FaceBeautySource {
         params.put(FaceBeautyParam.LONG_NOSE_INTENSITY, new ModelAttributeData(0.5, 0.5, 0.0, 1.0));
         params.put(FaceBeautyParam.PHILTRUM_INTENSITY, new ModelAttributeData(0.5, 0.5, 0.0, 1.0));
         params.put(FaceBeautyParam.SMILE_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
+        params.put(FaceBeautyParam.BROW_HEIGHT_INTENSITY, new ModelAttributeData(0.5, 0.5, 0.0, 1.0));
+        params.put(FaceBeautyParam.BROW_SPACE_INTENSITY, new ModelAttributeData(0.5, 0.5, 0.0, 1.0));
         return params;
     }
 
