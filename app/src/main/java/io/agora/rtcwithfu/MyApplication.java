@@ -5,7 +5,9 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.faceunity.FUConfig;
 import com.faceunity.nama.FURenderer;
+import com.faceunity.nama.utils.FuDeviceUtils;
 
 import io.agora.capture.video.camera.CameraVideoManager;
 import io.agora.framework.PreprocessorFaceUnity;
@@ -19,6 +21,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        FUConfig.DEVICE_LEVEL = FuDeviceUtils.judgeDeviceLevel(this);
         initRtcEngine();
         initVideoCaptureAsync();
     }

@@ -160,12 +160,24 @@ public class FaceBeautyControlView extends BaseControlView {
                 }
                 boolean isShinSelected = checkGroup.getCheckedCheckBoxId() == R.id.beauty_radio_skin_beauty;
                 helper.itemView.setSelected(isShinSelected ? mSkinIndex == position : mShapeIndex == position);
+
+                if (!data.isCanUseFunction()) {
+                    ImageView ivControl = helper.getView(R.id.iv_control);
+                    ivControl.setImageAlpha(154);
+                } else {
+                    ImageView ivControl = helper.getView(R.id.iv_control);
+                    ivControl.setImageAlpha(255);
+                }
             }
 
             @Override
             public void onItemClickListener(View view, FaceBeautyBean data, int position) {
                 boolean isShinSelected = checkGroup.getCheckedCheckBoxId() == R.id.beauty_radio_skin_beauty;
                 if ((isShinSelected && position == mSkinIndex) || (!isShinSelected && position == mShapeIndex)) {
+                    return;
+                }
+                if (!data.isCanUseFunction()) {
+                    ToastHelper.showNormalToast(mContext,data.getToastRes());
                     return;
                 }
                 if (isShinSelected) {
@@ -335,6 +347,7 @@ public class FaceBeautyControlView extends BaseControlView {
         } else {
             viewHolder.setImageResource(R.id.iv_control, bean.getOpenRes());
         }
+        mBeautyAdapter.notifyDataSetChanged();
     }
 
     /**

@@ -5,6 +5,7 @@ import android.hardware.Camera;
 import android.opengl.EGL14;
 import android.util.Log;
 
+import com.faceunity.FUConfig;
 import com.faceunity.core.callback.OperateCallback;
 import com.faceunity.core.entity.FURenderInputData;
 import com.faceunity.core.entity.FURenderOutputData;
@@ -19,6 +20,7 @@ import com.faceunity.core.faceunity.FURenderManager;
 import com.faceunity.core.utils.CameraUtils;
 import com.faceunity.core.utils.FULogger;
 import com.faceunity.nama.listener.FURendererListener;
+import com.faceunity.nama.utils.FuDeviceUtils;
 
 
 import java.io.File;
@@ -60,6 +62,7 @@ public class FURenderer extends IFURenderer {
     /* AI道具*/
     private String BUNDLE_AI_FACE = "model" + File.separator + "ai_face_processor.bundle";
     private String BUNDLE_AI_HUMAN = "model" + File.separator + "ai_human_processor.bundle";
+    private String BUNDLE_AI_HUMAN_GPU = "model" + File.separator + "ai_human_processor_gpu.bundle";
 
     /* 相机角度-朝向映射 */
     private HashMap<Integer, CameraFacingEnum> cameraOrientationMap = new HashMap<>();
@@ -91,7 +94,10 @@ public class FURenderer extends IFURenderer {
             public void onSuccess(int i, String s) {
                 if (i == FURenderConfig.OPERATE_SUCCESS_AUTH) {
                     mFUAIKit.loadAIProcessor(BUNDLE_AI_FACE, FUAITypeEnum.FUAITYPE_FACEPROCESSOR);
-                    mFUAIKit.loadAIProcessor(BUNDLE_AI_HUMAN, FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR);
+                    if (FUConfig.DEVICE_LEVEL  > FuDeviceUtils.DEVICE_LEVEL_MID)
+                        mFUAIKit.loadAIProcessor(BUNDLE_AI_HUMAN_GPU, FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR);
+                    else
+                        mFUAIKit.loadAIProcessor(BUNDLE_AI_HUMAN, FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR);
                     int cameraFrontOrientation = CameraUtils.INSTANCE.getCameraOrientation(Camera.CameraInfo.CAMERA_FACING_FRONT);
                     int cameraBackOrientation = CameraUtils.INSTANCE.getCameraOrientation(Camera.CameraInfo.CAMERA_FACING_BACK);
                     cameraOrientationMap.put(cameraFrontOrientation, CameraFacingEnum.CAMERA_FRONT);
