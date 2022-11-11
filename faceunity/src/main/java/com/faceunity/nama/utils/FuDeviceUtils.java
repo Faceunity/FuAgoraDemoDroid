@@ -3,9 +3,12 @@ package com.faceunity.nama.utils;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.opengl.GLES20;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.faceunity.core.faceunity.OffLineRenderHandler;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,10 +19,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class FuDeviceUtils {
 
     public static final String TAG = "FuDeviceUtils";
+    public static final String DEVICE_LEVEL = "device_level";
 
     public static final int DEVICE_LEVEL_HIGH = 2;
     public static final int DEVICE_LEVEL_MID = 1;
@@ -325,7 +331,6 @@ public class FuDeviceUtils {
         return Build.HARDWARE;
     }
 
-
     /**
      * Level judgement based on current memory and CPU.
      *
@@ -354,6 +359,98 @@ public class FuDeviceUtils {
     }
 
     /**
+     * Level judgement based on current GPU.
+     * 需要GL环境
+     * @return
+     */
+    public static int judgeDeviceLevelGPU() {
+        OffLineRenderHandler.getInstance().onResume();
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        //加一个sp读取 和 设置
+        final int[] level = {-1};
+        //有一些设备不符合下述的判断规则，则走一个机型判断模式
+        OffLineRenderHandler.getInstance().queueEvent(() -> {
+            try {
+                //高低端名单
+                int specialDevice = judgeDeviceLevelInDeviceName();
+                level[0] = specialDevice;
+                if (specialDevice >= 0) return;
+
+                String glRenderer = GLES20.glGetString(GLES20.GL_RENDERER);      //GPU 渲染器
+                String glVendor = GLES20.glGetString(GLES20.GL_VENDOR);          //GPU 供应商
+                int GPUVersion;
+                if ("Qualcomm".equals(glVendor)) {
+                    //高通
+                    if (glRenderer != null && glRenderer.startsWith("Adreno")) {
+                        //截取后面的数字
+                        String GPUVersionStr = glRenderer.substring(glRenderer.lastIndexOf(" ") + 1);
+                        try {
+                            GPUVersion = Integer.parseInt(GPUVersionStr);
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                            //可能是后面还包含了非数字的东西，那么截取三位
+                            String GPUVersionStrNew = GPUVersionStr.substring(0,3);
+                            GPUVersion = Integer.parseInt(GPUVersionStrNew);
+                        }
+
+                        if (GPUVersion >= 512) {
+                            level[0] = DEVICE_LEVEL_HIGH;
+                        } else {
+                            level[0] = DEVICE_LEVEL_MID;
+                        }
+                        countDownLatch.countDown();
+                    }
+                } else if ("ARM".equals(glVendor)) {
+                    //ARM
+                    if (glRenderer != null && glRenderer.startsWith("Mali")) {
+                        //截取-后面的东西
+                        String GPUVersionStr = glRenderer.substring(glRenderer.lastIndexOf("-") + 1);
+                        String strStart = GPUVersionStr.substring(0, 1);
+                        String strEnd = GPUVersionStr.substring(1);
+                        try {
+                            GPUVersion = Integer.parseInt(strEnd);
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                            //可能是后面还包含了非数字的东西，那么截取三位
+                            String strEndNew = strEnd.substring(0,2);
+                            GPUVersion = Integer.parseInt(strEndNew);
+                        }
+
+                        if ("G".equals(strStart)) {
+                            if (GPUVersion >= 51) {
+                                level[0] = DEVICE_LEVEL_HIGH;
+                            } else {
+                                level[0] = DEVICE_LEVEL_MID;
+                            }
+                        } else if ("T".equals(strStart)) {
+                            if (GPUVersion > 880) {
+                                level[0] = DEVICE_LEVEL_HIGH;
+                            } else {
+                                level[0] = DEVICE_LEVEL_MID;
+                            }
+                        }
+                        countDownLatch.countDown();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                level[0] = -1;
+                countDownLatch.countDown();
+            }
+        });
+
+        try {
+            countDownLatch.await(200,TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        OffLineRenderHandler.getInstance().onPause();
+
+        Log.d(TAG,"DeviceLevel: " + level[0]);
+        return level[0];
+    }
+
+    /**
      * -1 不是特定的高低端机型
      * @return
      */
@@ -379,9 +476,9 @@ public class FuDeviceUtils {
         return -1;
     }
 
-    public static final String[] upscaleDevice = {"vivo X6S A","MHA-AL00","VKY-AL00","V1838A"};
+    public static final String[] upscaleDevice = {"MHA-AL00","VKY-AL00","V1838A","EVA-AL00"};
     public static final String[] lowDevice = {};
-    public static final String[] middleDevice = {"OPPO R11s","PAR-AL00","MI 8 Lite","ONEPLUS A6000","PRO 6","PRO 7 Plus"};
+    public static final String[] middleDevice = {"PRO 6","PRO 7 Plus","V2002A","Pixel"};
 
     /**
      * 评定内存的等级.
@@ -577,7 +674,7 @@ public class FuDeviceUtils {
     public static String getDeviceName() {
         String deviceName = "";
         if (Build.MODEL != null) deviceName = Build.MODEL;
-        Log.e(TAG,"deviceName: " + deviceName);
+        Log.d(TAG,"deviceName: " + deviceName);
         return deviceName;
     }
 }

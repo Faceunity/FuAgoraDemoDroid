@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -161,11 +160,10 @@ public class FaceBeautyControlView extends BaseControlView {
                 boolean isShinSelected = checkGroup.getCheckedCheckBoxId() == R.id.beauty_radio_skin_beauty;
                 helper.itemView.setSelected(isShinSelected ? mSkinIndex == position : mShapeIndex == position);
 
+                ImageView ivControl = helper.getView(R.id.iv_control);
                 if (!data.isCanUseFunction()) {
-                    ImageView ivControl = helper.getView(R.id.iv_control);
                     ivControl.setImageAlpha(154);
                 } else {
-                    ImageView ivControl = helper.getView(R.id.iv_control);
                     ivControl.setImageAlpha(255);
                 }
             }
@@ -177,7 +175,7 @@ public class FaceBeautyControlView extends BaseControlView {
                     return;
                 }
                 if (!data.isCanUseFunction()) {
-                    ToastHelper.showNormalToast(mContext,data.getToastRes());
+                    ToastHelper.showNormalToast(mContext,mContext.getString(R.string.face_beauty_function_tips, mContext.getString(data.getDesRes())));
                     return;
                 }
                 if (isShinSelected) {
