@@ -116,6 +116,12 @@ public class FaceBeautySource {
                         R.drawable.icon_beauty_skin_sharpen_close_selector, R.drawable.icon_beauty_skin_sharpen_open_selector
                 )
         );
+        //五官立体
+        params.add(
+                new FaceBeautyBean(
+                        FaceBeautyParam.FACE_THREED, R.string.beauty_face_three,
+                        R.drawable.icon_beauty_skin_face_three_close_selector, R.drawable.icon_beauty_skin_face_three_open_selector)
+        );
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.EYE_BRIGHT_INTENSITY, R.string.beauty_box_eye_bright,
@@ -150,133 +156,206 @@ public class FaceBeautySource {
      */
     public static ArrayList<FaceBeautyBean> buildShapeParams() {
         ArrayList<FaceBeautyBean> params = new ArrayList<>();
+
+        //瘦脸
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.CHEEK_THINNING_INTENSITY, R.string.beauty_box_cheek_thinning,
                         R.drawable.icon_beauty_shape_face_cheekthin_close_selector, R.drawable.icon_beauty_shape_face_cheekthin_open_selector
                 )
         );
+
+        //V脸
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.CHEEK_V_INTENSITY, R.string.beauty_box_cheek_v,
                         R.drawable.icon_beauty_shape_face_v_close_selector, R.drawable.icon_beauty_shape_face_v_open_selector
                 )
         );
+
+        //窄脸
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.CHEEK_NARROW_INTENSITY, R.string.beauty_box_cheek_narrow,
                         R.drawable.icon_beauty_shape_face_narrow_close_selector, R.drawable.icon_beauty_shape_face_narrow_open_selector
                 )
         );
+
+        //小脸 -> 短脸  --使用的参数是以前小脸的
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.CHEEK_SHORT_INTENSITY, R.string.beauty_box_cheek_short,
                         R.drawable.icon_beauty_shape_face_short_close_selector, R.drawable.icon_beauty_shape_face_short_open_selector
                 )
         );
+
+        //小脸 -> 新增
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.CHEEK_SMALL_INTENSITY, R.string.beauty_box_cheek_small,
                         R.drawable.icon_beauty_shape_face_little_close_selector, R.drawable.icon_beauty_shape_face_little_open_selector
                 )
         );
+        //瘦颧骨
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.INTENSITY_CHEEKBONES_INTENSITY, R.string.beauty_box_cheekbones,
                         R.drawable.icon_beauty_shape_cheek_bones_close_selector, R.drawable.icon_beauty_shape_cheek_bones_open_selector
                 )
         );
+
+        //瘦下颌骨
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.INTENSITY_LOW_JAW_INTENSITY, R.string.beauty_box_lower_jaw,
                         R.drawable.icon_beauty_shape_lower_jaw_close_selector, R.drawable.icon_beauty_shape_lower_jaw_open_selector
                 )
         );
+
+        //大眼
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.EYE_ENLARGING_INTENSITY, R.string.beauty_box_eye_enlarge,
                         R.drawable.icon_beauty_shape_enlarge_eye_close_selector, R.drawable.icon_beauty_shape_enlarge_eye_open_selector
                 )
         );
+
+        //圆眼
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.EYE_CIRCLE_INTENSITY, R.string.beauty_box_eye_circle,
                         R.drawable.icon_beauty_shape_round_eye_close_selector, R.drawable.icon_beauty_shape_round_eye_open_selector
                 )
         );
+
+        //下巴
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.CHIN_INTENSITY, R.string.beauty_box_intensity_chin,
                         R.drawable.icon_beauty_shape_chin_close_selector, R.drawable.icon_beauty_shape_chin_open_selector
                 )
         );
+
+        //额头
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.FOREHEAD_INTENSITY, R.string.beauty_box_intensity_forehead,
                         R.drawable.icon_beauty_shape_forehead_close_selector, R.drawable.icon_beauty_shape_forehead_open_selector
                 )
         );
+
+        //瘦鼻
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.NOSE_INTENSITY, R.string.beauty_box_intensity_nose,
                         R.drawable.icon_beauty_shape_thin_nose_close_selector, R.drawable.icon_beauty_shape_thin_nose_open_selector
                 )
         );
+
+        //嘴型
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.MOUTH_INTENSITY, R.string.beauty_box_intensity_mouth,
                         R.drawable.icon_beauty_shape_mouth_close_selector, R.drawable.icon_beauty_shape_mouth_open_selector
                 )
         );
+
+        //嘴唇厚度
+        params.add(
+                new FaceBeautyBean(
+                        FaceBeautyParam.INTENSITY_LIP_THICK, R.string.beauty_lip_thick,
+                        R.drawable.icon_beauty_shape_lip_thick_close_selector, R.drawable.icon_beauty_shape_lip_thick_open_selector,
+                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID)
+        );
+
+        //眼睛位置
+        params.add(
+                new FaceBeautyBean(
+                        FaceBeautyParam.INTENSITY_EYE_HEIGHT, R.string.beauty_eye_height,
+                        R.drawable.icon_beauty_shape_eye_height_close_selector, R.drawable.icon_beauty_shape_eye_height_open_selector,
+                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID)
+        );
+
+        //开眼角
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.CANTHUS_INTENSITY, R.string.beauty_micro_canthus,
                         R.drawable.icon_beauty_shape_open_eyes_close_selector, R.drawable.icon_beauty_shape_open_eyes_open_selector
                 )
         );
+
+        //眼睑下至
+        params.add(
+                new FaceBeautyBean(
+                        FaceBeautyParam.INTENSITY_EYE_LID, R.string.beauty_eye_lid,
+                        R.drawable.icon_beauty_shape_eye_lid_close_selector, R.drawable.icon_beauty_shape_eye_lid_open_selector,
+                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID)
+        );
+
+        //眼距
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.EYE_SPACE_INTENSITY, R.string.beauty_micro_eye_space,
                         R.drawable.icon_beauty_shape_distance_close_selector, R.drawable.icon_beauty_shape_distance_open_selector
                 )
         );
+
+        //眼睛角度
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.EYE_ROTATE_INTENSITY, R.string.beauty_micro_eye_rotate,
                         R.drawable.icon_beauty_shape_angle_close_selector, R.drawable.icon_beauty_shape_angle_open_selector
                 )
         );
+
+        //长鼻
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.LONG_NOSE_INTENSITY, R.string.beauty_micro_long_nose,
                         R.drawable.icon_beauty_shape_proboscis_close_selector, R.drawable.icon_beauty_shape_proboscis_open_selector
                 )
         );
+
+        //缩人中
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.PHILTRUM_INTENSITY, R.string.beauty_micro_philtrum,
                         R.drawable.icon_beauty_shape_shrinking_close_selector, R.drawable.icon_beauty_shape_shrinking_open_selector
                 )
         );
+
+        //微笑嘴角
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.SMILE_INTENSITY, R.string.beauty_micro_smile,
                         R.drawable.icon_beauty_shape_smile_close_selector, R.drawable.icon_beauty_shape_smile_open_selector
                 )
         );
+
+        //眉毛上下
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.BROW_HEIGHT_INTENSITY, R.string.beauty_brow_height,
                         R.drawable.icon_beauty_shape_brow_height_close_selector, R.drawable.icon_beauty_shape_brow_height_open_selector,
-                        R.string.brow_height_tips,FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID
+                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID
                 )
         );
+
+        //眉间距
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.BROW_SPACE_INTENSITY, R.string.beauty_brow_space,
                         R.drawable.icon_beauty_shape_brow_space_close_selector, R.drawable.icon_beauty_shape_brow_space_open_selector,
-                        R.string.brow_space_tips,FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID
+                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID
                 )
+        );
+
+        //眉毛粗细
+        params.add(
+                new FaceBeautyBean(
+                        FaceBeautyParam.INTENSITY_BROW_THICK, R.string.beauty_brow_thick,
+                        R.drawable.icon_beauty_shape_brow_thick_close_selector, R.drawable.icon_beauty_shape_brow_thick_open_selector,
+                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID)
         );
         return params;
     }
@@ -297,6 +376,7 @@ public class FaceBeautySource {
         params.put(FaceBeautyParam.TOOTH_WHITEN_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
         params.put(FaceBeautyParam.REMOVE_POUCH_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
         params.put(FaceBeautyParam.REMOVE_NASOLABIAL_FOLDS_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
+        params.put(FaceBeautyParam.FACE_THREED, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
         /*美型*/
         params.put(FaceBeautyParam.FACE_SHAPE_INTENSITY, new ModelAttributeData(1.0, 0.0, 0.0, 1.0));
         params.put(FaceBeautyParam.CHEEK_THINNING_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
@@ -322,6 +402,10 @@ public class FaceBeautySource {
         params.put(FaceBeautyParam.SMILE_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
         params.put(FaceBeautyParam.BROW_HEIGHT_INTENSITY, new ModelAttributeData(0.5, 0.5, 0.0, 1.0));
         params.put(FaceBeautyParam.BROW_SPACE_INTENSITY, new ModelAttributeData(0.5, 0.5, 0.0, 1.0));
+        params.put(FaceBeautyParam.INTENSITY_EYE_LID, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
+        params.put(FaceBeautyParam.INTENSITY_EYE_HEIGHT, new ModelAttributeData(0.5, 0.5, 0.0, 1.0));
+        params.put(FaceBeautyParam.INTENSITY_BROW_THICK, new ModelAttributeData(0.5, 0.5, 0.0, 1.0));
+        params.put(FaceBeautyParam.INTENSITY_LIP_THICK, new ModelAttributeData(0.5, 0.5, 0.0, 1.0));
         return params;
     }
 

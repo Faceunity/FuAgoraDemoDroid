@@ -77,7 +77,6 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
         initUI();
         initRoom();
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mFURenderer.bindListener(mFURendererListener);
         String sdkVersion = RtcEngine.getSdkVersion();
         Log.i(TAG, "onCreate: agora sdk version " + sdkVersion);
         initCsvUtil(this);
@@ -147,6 +146,7 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
         preprocessor.setSurfaceListener(new PreprocessorFaceUnity.SurfaceViewListener() {
             @Override
             public void onSurfaceCreated() {
+                mFURenderer.bindListener(mFURendererListener);
                 mFaceUnityDataFactory.bindCurrentRenderer();
             }
 

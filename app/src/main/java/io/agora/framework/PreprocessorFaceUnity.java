@@ -118,10 +118,12 @@ public class PreprocessorFaceUnity implements IPreprocessor {
 
     public void releaseFURender() {
         renderSwitch = false;
-        mGLHandler.removeCallbacksAndMessages(0);
-        mGLHandler.post(() -> {
-            if (mSurfaceViewListener !=null ) mSurfaceViewListener.onSurfaceDestroyed();
-        });
+        if (mGLHandler != null) {
+            mGLHandler.removeCallbacksAndMessages(0);
+            mGLHandler.post(() -> {
+                if (mSurfaceViewListener !=null ) mSurfaceViewListener.onSurfaceDestroyed();
+            });
+        }
         mGLHandler = null;
     }
 
