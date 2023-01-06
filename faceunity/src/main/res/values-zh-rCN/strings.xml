@@ -73,9 +73,24 @@
     <string name="zhiganhui_1">质感灰 1</string>
 
     <string name="makeup_radio_remove">卸妆</string>
-    <string name="makeup_combination_naicha">奶茶</string>
-    <string name="makeup_combination_dousha">豆沙</string>
-    <string name="makeup_combination_chaoa">超A</string>
+    <string name="makeup_combination_sexy">性感</string>
+    <string name="makeup_combination_sweet">甜美</string>
+    <string name="makeup_combination_neighbor">邻家</string>
+    <string name="makeup_combination_occident">欧美</string>
+    <string name="makeup_combination_charming">妩媚</string>
+    <string name="makeup_combination_jianling">减龄</string>
+    <string name="makeup_combination_nuandong">暖冬</string>
+    <string name="makeup_combination_hongfeng">红枫</string>
+    <string name="makeup_combination_shaonv">少女</string>
+    <string name="makeup_combination_ziyun">紫韵</string>
+    <string name="makeup_combination_yanshimao">厌世猫</string>
+    <string name="makeup_combination_renyu">人鱼</string>
+    <string name="makeup_combination_chuqiu">初秋</string>
+    <string name="makeup_combination_qianzhihe">千纸鹤</string>
+    <string name="makeup_combination_chaomo">超模</string>
+    <string name="makeup_combination_chuju">雏菊</string>
+    <string name="makeup_combination_gangfeng">港风</string>
+    <string name="makeup_combination_rose">Rose</string>
 
     <string name="slimming">瘦身</string>
     <string name="long_legs">长腿</string>

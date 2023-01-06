@@ -3,12 +3,14 @@ package com.faceunity.nama.data;
 
 import android.support.annotation.NonNull;
 
+import com.faceunity.FUConfig;
 import com.faceunity.core.entity.FUBundleData;
 import com.faceunity.core.faceunity.FURenderKit;
 import com.faceunity.core.model.makeup.SimpleMakeup;
 import com.faceunity.nama.entity.MakeupCombinationBean;
 import com.faceunity.nama.infe.AbstractMakeupDataFactory;
 import com.faceunity.nama.repo.MakeupSource;
+import com.faceunity.nama.utils.FuDeviceUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -109,6 +111,7 @@ public class MakeupDataFactory extends AbstractMakeupDataFactory {
             SimpleMakeup makeup = new SimpleMakeup(new FUBundleData(MakeupSource.BUNDLE_FACE_MAKEUP));
             makeup.setCombinedConfig(new FUBundleData(bean.getBundlePath()));
             makeup.setMakeupIntensity(bean.getIntensity());
+            makeup.setMachineLevel(FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID);//更新设备等级去设置是否开启人脸遮挡
             makeupMap.put(bean.getKey(), makeup);
             return makeup;
         }

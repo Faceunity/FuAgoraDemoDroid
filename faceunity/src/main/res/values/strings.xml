@@ -73,10 +73,24 @@
 
 
     <string name="makeup_radio_remove">Remover</string>
-    <string name="makeup_combination_naicha">Milk tea</string>
-    <string name="makeup_combination_dousha">Bean paste</string>
-    <string name="makeup_combination_chaoa">Super a</string>
-
+    <string name="makeup_combination_sexy">Sexy</string>
+    <string name="makeup_combination_sweet">Sweet</string>
+    <string name="makeup_combination_neighbor">Next-door</string>
+    <string name="makeup_combination_occident">European</string>
+    <string name="makeup_combination_charming">Charming</string>
+    <string name="makeup_combination_jianling">Tender</string>
+    <string name="makeup_combination_nuandong">Warm</string>
+    <string name="makeup_combination_hongfeng">Maple</string>
+    <string name="makeup_combination_shaonv">Maiden</string>
+    <string name="makeup_combination_ziyun">Purple</string>
+    <string name="makeup_combination_yanshimao">Cat</string>
+    <string name="makeup_combination_renyu">Mermaid</string>
+    <string name="makeup_combination_chuqiu">Autumn</string>
+    <string name="makeup_combination_qianzhihe">Crane</string>
+    <string name="makeup_combination_chaomo">Model</string>
+    <string name="makeup_combination_chuju">Daisy</string>
+    <string name="makeup_combination_gangfeng">HK style</string>
+    <string name="makeup_combination_rose">Rose</string>
 
     <string name="slimming">Body</string>
     <string name="long_legs">Leg</string>
