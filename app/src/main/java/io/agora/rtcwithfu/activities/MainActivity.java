@@ -12,9 +12,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.faceunity.FUConfig;
-import com.faceunity.nama.utils.FuDeviceUtils;
-
 import io.agora.rtcwithfu.R;
 import io.agora.rtcwithfu.utils.Constants;
 

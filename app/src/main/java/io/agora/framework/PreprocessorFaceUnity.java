@@ -6,7 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.faceunity.FUConfig;
+import com.faceunity.nama.FUConfig;
 import com.faceunity.core.faceunity.FUAIKit;
 import com.faceunity.core.faceunity.FURenderKit;
 import com.faceunity.core.model.facebeauty.FaceBeautyBlurTypeEnum;

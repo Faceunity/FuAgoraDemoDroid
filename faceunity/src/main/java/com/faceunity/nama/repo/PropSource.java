@@ -20,7 +20,9 @@ public class PropSource {
      */
     public static ArrayList<PropBean> buildPropBeans() {
         ArrayList<PropBean> propBeans = new ArrayList<>();
-        propBeans.add(new PropBean(R.mipmap.icon_control_delete_all, null));
+        propBeans.add(new PropBean(R.mipmap.icon_control_none, null));
+        propBeans.add(new PropBean(R.mipmap.icon_sticker_cat_sparks, "sticker/cat_sparks.bundle"));
+        propBeans.add(new PropBean(R.mipmap.icon_sticker_sdlr, "sticker/sdlr.bundle"));
         propBeans.add(new PropBean(R.mipmap.icon_sticker_sdlu, "sticker/sdlu.bundle"));
         propBeans.add(new PropBean(R.mipmap.icon_sticker_fashi, "sticker/fashi.bundle"));
         return propBeans;

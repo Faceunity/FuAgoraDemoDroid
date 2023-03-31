@@ -1,6 +1,6 @@
 package com.faceunity.nama.repo;
 
-import com.faceunity.FUConfig;
+import com.faceunity.nama.FUConfig;
 import com.faceunity.core.controller.facebeauty.FaceBeautyParam;
 import com.faceunity.core.entity.FUBundleData;
 import com.faceunity.core.enumeration.FUFaceBeautyMultiModePropertyEnum;

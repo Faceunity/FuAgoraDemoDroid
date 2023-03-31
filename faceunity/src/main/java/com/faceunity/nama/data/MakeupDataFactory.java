@@ -3,7 +3,7 @@ package com.faceunity.nama.data;
 
 import android.support.annotation.NonNull;
 
-import com.faceunity.FUConfig;
+import com.faceunity.nama.FUConfig;
 import com.faceunity.core.entity.FUBundleData;
 import com.faceunity.core.faceunity.FURenderKit;
 import com.faceunity.core.model.makeup.SimpleMakeup;

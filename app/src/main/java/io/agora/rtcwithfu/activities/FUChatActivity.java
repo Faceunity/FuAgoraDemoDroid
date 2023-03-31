@@ -16,14 +16,11 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.faceunity.FUConfig;
 import com.faceunity.core.enumeration.FUAIProcessorEnum;
-import com.faceunity.core.faceunity.FUAIKit;
 import com.faceunity.nama.FURenderer;
 import com.faceunity.nama.data.FaceUnityDataFactory;
 import com.faceunity.nama.listener.FURendererListener;
 import com.faceunity.nama.ui.FaceUnityView;
-import com.faceunity.nama.utils.FuDeviceUtils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -132,7 +129,7 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
         preprocessor = (PreprocessorFaceUnity) mVideoManager.getPreprocessor();
         mTrackingText = findViewById(R.id.iv_face_detect);
         FaceUnityView faceUnityView = findViewById(R.id.fu_view);
-        mFaceUnityDataFactory = new FaceUnityDataFactory(0);
+        mFaceUnityDataFactory = new FaceUnityDataFactory(-1);
         faceUnityView.bindDataFactory(mFaceUnityDataFactory);
 
         mVideoManager.setPictureSize(CAPTURE_WIDTH, CAPTURE_HEIGHT);
