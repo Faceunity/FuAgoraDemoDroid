@@ -10,7 +10,7 @@ public class MakeupCombinationBean {
     private int imageRes;//图片
     private int desRes;//描述
     private String bundlePath;//资源句柄
-    private double intensity = 1.0;//强度
+    private double intensity = 0.7;//强度
 
     public MakeupCombinationBean(String key, int imageRes, int desRes, String bundlePath) {
         this.key = key;

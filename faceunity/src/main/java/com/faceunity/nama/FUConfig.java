@@ -1,4 +1,4 @@
-package com.faceunity;
+package com.faceunity.nama;
 
 import com.faceunity.nama.utils.FuDeviceUtils;
 

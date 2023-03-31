@@ -1,12 +1,9 @@
 package com.faceunity.nama.data;
 
 
-
 import android.support.annotation.NonNull;
 
-import com.faceunity.FUConfig;
 import com.faceunity.core.controller.facebeauty.FaceBeautyParam;
-import com.faceunity.core.faceunity.FUAIKit;
 import com.faceunity.core.faceunity.FURenderKit;
 import com.faceunity.core.model.facebeauty.FaceBeauty;
 import com.faceunity.nama.entity.FaceBeautyBean;
@@ -23,7 +20,7 @@ import java.util.HashMap;
  * DESC：美颜业务工厂
  * Created on 2021/3/1
  */
-public class FaceBeautyDataFactory extends AbstractFaceBeautyDataFactory {
+public class FaceBeautyAndFilterDataFactory extends AbstractFaceBeautyDataFactory {
 
 
     interface FaceBeautySetParamInterface {

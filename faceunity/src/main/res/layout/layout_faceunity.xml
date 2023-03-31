@@ -10,7 +10,26 @@
         android:layout_gravity="bottom"
         android:orientation="vertical">
 
+        <com.faceunity.nama.control.FaceBeautySkinControlView
+            android:id="@+id/control_beauty_skin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="bottom" />
 
+        <com.faceunity.nama.control.FaceBeautyShapeControlView
+            android:id="@+id/control_beauty_shape"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="bottom" />
+
+        <com.faceunity.nama.control.FilterControlView
+            android:id="@+id/control_filter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="bottom" />
 
         <com.faceunity.nama.control.BodyBeautyControlView
             android:id="@+id/control_body"
@@ -18,12 +37,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:visibility="gone" />
-
-        <com.faceunity.nama.control.FaceBeautyControlView
-            android:id="@+id/control_beauty"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom" />
 
         <com.faceunity.nama.control.MakeupControlView
             android:id="@+id/control_makeup"
@@ -56,14 +69,38 @@
         android:orientation="horizontal">
 
         <com.faceunity.nama.checkbox.CheckBoxCompat
-            android:id="@+id/radio_beauty"
+            android:id="@+id/radio_skin_beauty"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/transparent"
             android:button="@null"
             android:gravity="center"
-            android:text="@string/home_function_name_beauty"
+            android:text="@string/beauty_radio_skin_beauty"
+            android:textColor="@color/bottom_radio_color"
+            android:textSize="@dimen/text_size_26" />
+
+        <com.faceunity.nama.checkbox.CheckBoxCompat
+            android:id="@+id/radio_shape_beauty"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:button="@null"
+            android:gravity="center"
+            android:text="@string/beauty_radio_face_shape"
+            android:textColor="@color/bottom_radio_color"
+            android:textSize="@dimen/text_size_26" />
+
+        <com.faceunity.nama.checkbox.CheckBoxCompat
+            android:id="@+id/radio_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:button="@null"
+            android:gravity="center"
+            android:text="@string/beauty_radio_filter"
             android:textColor="@color/bottom_radio_color"
             android:textSize="@dimen/text_size_26" />
 
@@ -102,8 +139,5 @@
             android:text="@string/home_function_name_beauty_body"
             android:textColor="@color/bottom_radio_color"
             android:textSize="@dimen/text_size_26" />
-
     </com.faceunity.nama.checkbox.CheckGroup>
-
-
 </LinearLayout>
