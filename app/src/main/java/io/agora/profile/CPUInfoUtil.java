@@ -148,12 +148,14 @@ public class CPUInfoUtil {
                     // 读取到相应pkgName跳出循环（或者未找到）
                     if (line == null || line.endsWith(PackageName)) {
 //                        Log.e(TAG, "cpu line : " + line);
-                        String str[] = line.split(" ");
-                        int t = 0;
-                        for (int i = str.length - 1; i > 0; i--) {
-                            if (!str[i].isEmpty() && ++t == 4) {
+                        if (line != null && line.endsWith(PackageName)) {
+                            String str[] = line.split(" ");
+                            int t = 0;
+                            for (int i = str.length - 1; i > 0; i--) {
+                                if (!str[i].isEmpty() && ++t == 4) {
 //                                Log.e(TAG, "cpu : " + str[i] + " allCPU " + allCPU);
-                                cpuRate = 100 * Double.parseDouble(str[i]) / allCPU;
+                                    cpuRate = 100 * Double.parseDouble(str[i]) / allCPU;
+                                }
                             }
                         }
                         continue;

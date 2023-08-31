@@ -5,8 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
 
-import io.agora.capture.video.camera.CameraVideoManager;
-import io.agora.rtc.RtcEngine;
+import io.agora.rtc2.RtcEngine;
 import io.agora.rtcwithfu.MyApplication;
 import io.agora.rtcwithfu.RtcEngineEventHandler;
 
@@ -32,14 +31,6 @@ public abstract class RtcBasedActivity extends AppCompatActivity implements RtcE
 
     protected MyApplication application() {
         return (MyApplication) getApplication();
-    }
-
-    protected RtcEngine rtcEngine() {
-        return application().rtcEngine();
-    }
-
-    protected final CameraVideoManager videoManager() {
-        return application().videoManager();
     }
 
     private void addRtcHandler(RtcEngineEventHandler handler) {

@@ -1,31 +1,37 @@
 package io.agora.framework;
 
-import android.content.Context;
-import android.opengl.GLES20;
-import android.os.Handler;
-import android.os.Looper;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.util.Log;
 
-import com.faceunity.nama.FUConfig;
+import com.faceunity.core.callback.OnReadBitmapCallback;
 import com.faceunity.core.faceunity.FUAIKit;
 import com.faceunity.core.faceunity.FURenderKit;
 import com.faceunity.core.model.facebeauty.FaceBeautyBlurTypeEnum;
+import com.faceunity.core.utils.BitmapUtils;
+import com.faceunity.core.utils.GlUtil;
+import com.faceunity.nama.FUConfig;
 import com.faceunity.nama.FURenderer;
 import com.faceunity.nama.utils.FuDeviceUtils;
 
-import io.agora.capture.framework.modules.channels.VideoChannel;
-import io.agora.capture.framework.modules.processors.IPreprocessor;
-import io.agora.capture.video.camera.VideoCaptureFrame;
+import org.jetbrains.annotations.NotNull;
+
+import java.nio.ByteBuffer;
+
+import io.agora.base.TextureBufferHelper;
+import io.agora.base.VideoFrame;
+import io.agora.base.internal.video.YuvHelper;
 import io.agora.profile.CSVUtils;
+import io.agora.rtc2.gl.EglBaseProvider;
 
-public class PreprocessorFaceUnity implements IPreprocessor {
+public class PreprocessorFaceUnity {
     private final static String TAG = PreprocessorFaceUnity.class.getSimpleName();
-
     private FURenderer mFURenderer = FURenderer.getInstance();
-    private boolean renderSwitch;
-    private int skipFrame = 0;
-
-    private Handler mGLHandler;
+    private boolean renderSwitch = true;
+    private TextureBufferHelper mTextureBufferHelper;
+    private ByteBuffer nv21ByteBuffer;
+    private byte[] nv21ByteArray;
+    private int mFrameRotation;
 
     public void setCSVUtils(CSVUtils cSVUtils) {
         this.mCSVUtils = cSVUtils;
@@ -33,104 +39,137 @@ public class PreprocessorFaceUnity implements IPreprocessor {
 
     private CSVUtils mCSVUtils;
 
-    public PreprocessorFaceUnity(Context context) {
+    public PreprocessorFaceUnity() {
     }
 
-    @Override
-    public VideoCaptureFrame onPreProcessFrame(VideoCaptureFrame outFrame, VideoChannel.ChannelContext context) {
-        if (!renderSwitch) {
-            return outFrame;
-        }
-        if (mGLHandler == null) {
-            startGLThread();
-        }
-        if (skipFrame > 0) {
-            skipFrame--;
-            outFrame.textureId = 0;
-            return outFrame;
-        }
-        mFURenderer.setInputOrientation(outFrame.rotation);
+    private int originTexId;
 
-        if (FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID)//高性能设备
+    public boolean processBeauty(VideoFrame videoFrame) {
+        if (!renderSwitch) {
+            return true;
+        }
+
+        if (mTextureBufferHelper == null) {
+            mTextureBufferHelper = TextureBufferHelper.create("STRender", EglBaseProvider.instance().getRootEglBase().getEglBaseContext());
+            if (mTextureBufferHelper != null) {
+                mTextureBufferHelper.invoke(() -> {
+                    if (mSurfaceViewListener != null) mSurfaceViewListener.onSurfaceCreated();
+                    return null;
+                });
+            }
+        }
+
+
+        VideoFrame.Buffer buffer = videoFrame.getBuffer();
+        int width = buffer.getWidth();
+        int height = buffer.getHeight();
+        int rotation = videoFrame.getRotation();
+
+        boolean skipFrame = false;
+        Matrix transformMatrix = new Matrix();
+        int nv21Size = (int) (width * height * 3.0f / 2.0f + 0.5f);
+        if (nv21ByteBuffer == null || nv21ByteBuffer.capacity() != nv21Size) {
+            if (nv21ByteBuffer != null) {
+                nv21ByteBuffer.clear();
+            }
+            nv21ByteBuffer = ByteBuffer.allocateDirect(nv21Size);
+            nv21ByteArray = new byte[nv21Size];
+            skipFrame = true;
+        }
+
+        VideoFrame.I420Buffer i420Buffer = buffer.toI420();
+        YuvHelper.I420ToNV12(i420Buffer.getDataY(), i420Buffer.getStrideY(),
+                i420Buffer.getDataV(), i420Buffer.getStrideV(),
+                i420Buffer.getDataU(), i420Buffer.getStrideU(),
+                nv21ByteBuffer, width, height);
+        nv21ByteBuffer.position(0);
+        nv21ByteBuffer.get(nv21ByteArray);
+        i420Buffer.release();
+
+        if (mFrameRotation != rotation) {
+            mFrameRotation = rotation;
+            skipFrame = true;
+        }
+
+        if (skipFrame) {
+            return false;
+        }
+
+        mFURenderer.setInputOrientation(videoFrame.getRotation(), videoFrame.getSourceType() == VideoFrame.SourceType.kFrontCamera);
+        //高性能设备
+        if (FUConfig.DEVICE_LEVEL == FuDeviceUtils.DEVICE_LEVEL_HIGH) {
             cheekFaceNum();
+        }
+        int processTexId = -1;
+        originTexId = 0;
+
 
         long start = System.nanoTime();
-        int texId = mFURenderer.onDrawFrameDualInput(outFrame.image,
-                outFrame.textureId, outFrame.format.getWidth(),
-                outFrame.format.getHeight());
+        if (mTextureBufferHelper != null) {
+            if (videoFrame.getBuffer() instanceof VideoFrame.TextureBuffer) {
+                originTexId = ((VideoFrame.TextureBuffer) videoFrame.getBuffer()).getTextureId();
+                if (originTexId == 0) return false;
+                processTexId = mTextureBufferHelper.invoke(() ->
+                        mFURenderer.onDrawFrameDualInput(nv21ByteArray,
+                                originTexId, width,
+                                height));
+            }
+        }
 
         long renderTime = System.nanoTime() - start;
+
         if (mCSVUtils != null) {
             mCSVUtils.writeCsv(null, renderTime);
         }
 
-        // The texture is transformed to texture2D by beauty module.
-        if (skipFrame <= 0) {
-            outFrame.textureId = texId;
-            outFrame.format.setTexFormat(GLES20.GL_TEXTURE_2D);
-        } else {
-            outFrame.textureId = 0;
+        if (processTexId <= 0) {
+            return false;
         }
-        return outFrame;
-    }
 
-
-    @Override
-    public void initPreprocessor() {
-        // only call once when app launched
-        Log.e(TAG, "initPreprocessor: ");
-    }
-
-    @Override
-    public void enablePreProcess(boolean enabled) {
-        Log.e(TAG, "enablePreProcess: ");
-    }
-
-    @Override
-    public void releasePreprocessor(VideoChannel.ChannelContext context) {
-        // not called
-        Log.d(TAG, "releasePreprocessor: ");
-    }
-
-
-    /* 创建线程  */
-    private void startGLThread() {
-        if (mGLHandler == null) {
-            mGLHandler = new Handler(Looper.myLooper());
-            mGLHandler.post(() -> {if (mSurfaceViewListener !=null ) mSurfaceViewListener.onSurfaceCreated();});
+        if (mTextureBufferHelper != null) {
+            VideoFrame.TextureBuffer textureBuffer = mTextureBufferHelper.wrapTextureBuffer(
+                    width, height, VideoFrame.TextureBuffer.Type.RGB, processTexId, transformMatrix);
+            videoFrame.replaceBuffer(textureBuffer, mFrameRotation, videoFrame.getTimestampNs());
         }
+        return true;
     }
 
-    public void doGLAction(Runnable runnable) {
-        if (mGLHandler != null) {
-            mGLHandler.post(runnable);
-        }
-    }
 
     public void setRenderEnable(boolean enabled) {
         renderSwitch = enabled;
     }
 
-
-    public void skipFrame() {
-        skipFrame = 5;
-    }
-
     public void releaseFURender() {
         renderSwitch = false;
-        if (mGLHandler != null) {
-            mGLHandler.removeCallbacksAndMessages(0);
-            mGLHandler.post(() -> {
-                if (mSurfaceViewListener !=null ) mSurfaceViewListener.onSurfaceDestroyed();
+        if (mTextureBufferHelper != null) {
+            mTextureBufferHelper.invoke(() -> {
+                if (mSurfaceViewListener != null) mSurfaceViewListener.onSurfaceDestroyed();
+                return null;
             });
+
+            boolean disposeSuccess = false;
+            while (!disposeSuccess) {
+                try {
+                    mTextureBufferHelper.dispose();
+                    disposeSuccess = true;
+                    Log.e("TAG", "releaseFURender");
+                } catch (Exception e) {
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException ex) {
+                        // do nothing
+                    }
+                }
+            }
+            mTextureBufferHelper = null;
         }
-        mGLHandler = null;
     }
 
     private SurfaceViewListener mSurfaceViewListener;
 
-    public interface SurfaceViewListener{
+    public interface SurfaceViewListener {
         void onSurfaceCreated();
+
         void onSurfaceDestroyed();
     }
 
