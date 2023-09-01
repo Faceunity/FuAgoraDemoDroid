@@ -1,20 +1,14 @@
 package io.agora.framework;
 
-import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.util.Log;
 
-import com.faceunity.core.callback.OnReadBitmapCallback;
 import com.faceunity.core.faceunity.FUAIKit;
 import com.faceunity.core.faceunity.FURenderKit;
 import com.faceunity.core.model.facebeauty.FaceBeautyBlurTypeEnum;
-import com.faceunity.core.utils.BitmapUtils;
-import com.faceunity.core.utils.GlUtil;
 import com.faceunity.nama.FUConfig;
 import com.faceunity.nama.FURenderer;
 import com.faceunity.nama.utils.FuDeviceUtils;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
 
@@ -113,6 +107,7 @@ public class PreprocessorFaceUnity {
                         mFURenderer.onDrawFrameDualInput(nv21ByteArray,
                                 originTexId, width,
                                 height));
+                transformMatrix = ((VideoFrame.TextureBuffer) videoFrame.getBuffer()).getTransformMatrix();
             }
         }
 

@@ -73,8 +73,8 @@ public class FURenderer extends IFURenderer {
      */
     @Override
     public void setup(Context context) {
-        FURenderManager.setKitDebug(FULogger.LogLevel.TRACE);
-        FURenderManager.setCoreDebug(FULogger.LogLevel.DEBUG);
+        FURenderManager.setKitDebug(FULogger.LogLevel.ERROR);
+        FURenderManager.setCoreDebug(FULogger.LogLevel.OFF);
         FURenderManager.registerFURender(context, authpack.A(), new OperateCallback() {
             @Override
             public void onSuccess(int i, String s) {
@@ -176,7 +176,7 @@ public class FURenderer extends IFURenderer {
         } else {
             setInputBufferMatrix(FUTransformMatrixEnum.CCROT270);
             setInputTextureMatrix(FUTransformMatrixEnum.CCROT270);
-            setOutputMatrix(FUTransformMatrixEnum.CCROT90);
+            setOutputMatrix(FUTransformMatrixEnum.CCROT90_FLIPVERTICAL);
         }
     }
 

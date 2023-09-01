@@ -32,6 +32,7 @@ import io.agora.framework.PreprocessorFaceUnity;
 import io.agora.profile.CSVUtils;
 import io.agora.rtc2.ChannelMediaOptions;
 import io.agora.rtc2.RtcEngine;
+import io.agora.rtc2.video.CameraCapturerConfiguration;
 import io.agora.rtc2.video.IVideoFrameObserver;
 import io.agora.rtc2.video.VideoCanvas;
 import io.agora.rtc2.video.VideoEncoderConfiguration;
@@ -50,7 +51,7 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
 
     private static final int CAPTURE_WIDTH = 1280;
     private static final int CAPTURE_HEIGHT = 720;
-    private static final int CAPTURE_FRAME_RATE = 24;
+    private static final int CAPTURE_FRAME_RATE = 30;
 
     private FURenderer mFURenderer = FURenderer.getInstance();
     private FaceUnityDataFactory mFaceUnityDataFactory;
@@ -149,6 +150,9 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
                 return IVideoFrameObserver.POSITION_POST_CAPTURER;
             }
         });
+        rtcEngine.setCameraCapturerConfiguration(new CameraCapturerConfiguration(
+                new CameraCapturerConfiguration.CaptureFormat(CAPTURE_WIDTH, CAPTURE_HEIGHT, CAPTURE_FRAME_RATE)));
+
         rtcEngine.setVideoEncoderConfiguration(new VideoEncoderConfiguration(
                 VideoEncoderConfiguration.VD_640x360,
                 VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_24,
@@ -189,7 +193,7 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
 
         TextureView localVideo = findViewById(R.id.local_video_view);
         VideoCanvas local = new VideoCanvas(localVideo, io.agora.rtc2.Constants.RENDER_MODE_HIDDEN, 0);
-        local.mirrorMode = io.agora.rtc2.Constants.VIDEO_MIRROR_MODE_DISABLED;
+        local.mirrorMode = io.agora.rtc2.Constants.VIDEO_MIRROR_MODE_AUTO;
         rtcEngine.setupLocalVideo(local);
         rtcEngine.startPreview();
     }
@@ -304,10 +308,10 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
 
     }
 
-    private static final int ENCODE_FRAME_WIDTH = 960;
-    private static final int ENCODE_FRAME_HEIGHT = 540;
+    private static final int ENCODE_FRAME_WIDTH = 640;
+    private static final int ENCODE_FRAME_HEIGHT = 360;
     private static final int ENCODE_FRAME_BITRATE = 1000;
-    private static final int ENCODE_FRAME_FPS = 30;
+    private static final int ENCODE_FRAME_FPS = 24;
 
     private CSVUtils mCSVUtils;
 
