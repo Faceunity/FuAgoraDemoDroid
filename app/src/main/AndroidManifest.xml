@@ -38,6 +38,7 @@
 
         <activity
             android:name=".activities.FUChatActivity"
+            android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize"/>
     </application>
 

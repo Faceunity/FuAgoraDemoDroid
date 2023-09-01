@@ -2,7 +2,8 @@ package io.agora.rtcwithfu;
 
 import java.util.ArrayList;
 
-import io.agora.rtc.IRtcEngineEventHandler;
+import io.agora.rtc2.IRtcEngineEventHandler;
+
 
 public class RtcEngineEventHandlerProxy extends IRtcEngineEventHandler {
     private static final String TAG = "RtcEngineEventHandlerPr";

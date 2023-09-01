@@ -1,7 +1,6 @@
 package com.faceunity.nama;
 
 import android.content.Context;
-import android.hardware.Camera;
 
 import com.faceunity.core.callback.OperateCallback;
 import com.faceunity.core.entity.FURenderInputData;
@@ -14,12 +13,10 @@ import com.faceunity.core.faceunity.FUAIKit;
 import com.faceunity.core.faceunity.FURenderConfig;
 import com.faceunity.core.faceunity.FURenderKit;
 import com.faceunity.core.faceunity.FURenderManager;
-import com.faceunity.core.utils.CameraUtils;
 import com.faceunity.core.utils.FULogger;
 import com.faceunity.nama.listener.FURendererListener;
-import com.faceunity.nama.utils.FuDeviceUtils;
+
 import java.io.File;
-import java.util.HashMap;
 
 
 /**
@@ -57,16 +54,12 @@ public class FURenderer extends IFURenderer {
     private String BUNDLE_AI_FACE = "model" + File.separator + "ai_face_processor.bundle";
     private String BUNDLE_AI_HUMAN = "model" + File.separator + "ai_human_processor.bundle";
 
-    /* 相机角度-朝向映射 */
-    private HashMap<Integer, CameraFacingEnum> cameraOrientationMap = new HashMap<>();
-
     /*检测类型*/
     private FUAIProcessorEnum aIProcess = FUAIProcessorEnum.FACE_PROCESSOR;
     /*检测标识*/
     private int aIProcessTrackStatus = -1;
 
     /**
-     *
      * @return version
      */
     public String getVersion() {
@@ -80,18 +73,14 @@ public class FURenderer extends IFURenderer {
      */
     @Override
     public void setup(Context context) {
-        FURenderManager.setKitDebug(FULogger.LogLevel.TRACE);
-        FURenderManager.setCoreDebug(FULogger.LogLevel.ERROR);
+        FURenderManager.setKitDebug(FULogger.LogLevel.ERROR);
+        FURenderManager.setCoreDebug(FULogger.LogLevel.OFF);
         FURenderManager.registerFURender(context, authpack.A(), new OperateCallback() {
             @Override
             public void onSuccess(int i, String s) {
                 if (i == FURenderConfig.OPERATE_SUCCESS_AUTH) {
                     mFUAIKit.loadAIProcessor(BUNDLE_AI_FACE, FUAITypeEnum.FUAITYPE_FACEPROCESSOR);
                     mFUAIKit.loadAIProcessor(BUNDLE_AI_HUMAN, FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR);
-                    int cameraFrontOrientation = CameraUtils.INSTANCE.getCameraOrientation(Camera.CameraInfo.CAMERA_FACING_FRONT);
-                    int cameraBackOrientation = CameraUtils.INSTANCE.getCameraOrientation(Camera.CameraInfo.CAMERA_FACING_BACK);
-                    cameraOrientationMap.put(cameraFrontOrientation, CameraFacingEnum.CAMERA_FRONT);
-                    cameraOrientationMap.put(cameraBackOrientation, CameraFacingEnum.CAMERA_BACK);
                 }
             }
 
@@ -126,7 +115,7 @@ public class FURenderer extends IFURenderer {
         prepareDrawFrame();
         FURenderInputData inputData = new FURenderInputData(width, height);
         /*注释掉Buffer配置，启用单纹理模式，防止Buffer跟纹理存在不对齐造成，美妆偏移*/
-//        inputData.setImageBuffer(new FURenderInputData.FUImageBuffer(inputBufferType, img));//设置为单Buffer输入
+        //inputData.setImageBuffer(new FURenderInputData.FUImageBuffer(inputBufferType, img));
         inputData.setTexture(new FURenderInputData.FUTexture(inputTextureType, texId));
         FURenderInputData.FURenderConfig config = inputData.getRenderConfig();
         config.setExternalInputType(externalInputType);
@@ -134,8 +123,8 @@ public class FURenderer extends IFURenderer {
         config.setDeviceOrientation(deviceOrientation);
         config.setInputBufferMatrix(inputBufferMatrix);
         config.setInputTextureMatrix(inputTextureMatrix);
-        config.setOutputMatrix(outputMatrix);
         config.setCameraFacing(cameraFacing);
+        config.setOutputMatrix(outputMatrix);
         mCallStartTime = System.nanoTime();
         FURenderOutputData outputData = mFURenderKit.renderWithInput(inputData);
         mSumCallTime += System.nanoTime() - mCallStartTime;
@@ -175,23 +164,20 @@ public class FURenderer extends IFURenderer {
      * 设置输入数据朝向
      *
      * @param inputOrientation
+     * @param isFront
      */
-    @Override
-    public void setInputOrientation(int inputOrientation) {
-        if (cameraOrientationMap.containsKey(inputOrientation)) {
-            CameraFacingEnum cameraFacingEnum = cameraOrientationMap.get(inputOrientation);
-            setCameraFacing(cameraFacingEnum);
-            if (cameraFacingEnum == CameraFacingEnum.CAMERA_FRONT) {
-                setInputBufferMatrix(FUTransformMatrixEnum.CCROT90_FLIPHORIZONTAL);
-                setInputTextureMatrix(FUTransformMatrixEnum.CCROT90_FLIPHORIZONTAL);
-                setOutputMatrix(FUTransformMatrixEnum.CCROT270);
-            } else {
-                setInputBufferMatrix(FUTransformMatrixEnum.CCROT270);
-                setInputTextureMatrix(FUTransformMatrixEnum.CCROT270);
-                setOutputMatrix(FUTransformMatrixEnum.CCROT90_FLIPVERTICAL);
-            }
+    public void setInputOrientation(int inputOrientation, boolean isFront) {
+        setInputOrientation(inputOrientation);
+        setCameraFacing(isFront ? CameraFacingEnum.CAMERA_FRONT : CameraFacingEnum.CAMERA_BACK);
+        if (isFront) {
+            setInputBufferMatrix(FUTransformMatrixEnum.CCROT90_FLIPHORIZONTAL);
+            setInputTextureMatrix(FUTransformMatrixEnum.CCROT90_FLIPHORIZONTAL);
+            setOutputMatrix(FUTransformMatrixEnum.CCROT270);
+        } else {
+            setInputBufferMatrix(FUTransformMatrixEnum.CCROT270);
+            setInputTextureMatrix(FUTransformMatrixEnum.CCROT270);
+            setOutputMatrix(FUTransformMatrixEnum.CCROT90_FLIPVERTICAL);
         }
-        super.setInputOrientation(inputOrientation);
     }
 
 

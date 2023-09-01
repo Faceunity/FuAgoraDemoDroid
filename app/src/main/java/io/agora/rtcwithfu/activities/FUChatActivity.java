@@ -8,7 +8,6 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.view.WindowManager;
@@ -26,16 +25,17 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 
-import io.agora.capture.video.camera.CameraVideoManager;
-import io.agora.capture.video.camera.Constant;
-import io.agora.capture.video.camera.VideoCapture;
+import io.agora.base.VideoFrame;
 import io.agora.framework.PreprocessorFaceUnity;
-import io.agora.framework.RtcVideoConsumer;
 import io.agora.profile.CSVUtils;
-import io.agora.rtc.RtcEngine;
-import io.agora.rtc.video.VideoCanvas;
-import io.agora.rtc.video.VideoEncoderConfiguration;
+import io.agora.rtc2.ChannelMediaOptions;
+import io.agora.rtc2.RtcEngine;
+import io.agora.rtc2.video.CameraCapturerConfiguration;
+import io.agora.rtc2.video.IVideoFrameObserver;
+import io.agora.rtc2.video.VideoCanvas;
+import io.agora.rtc2.video.VideoEncoderConfiguration;
 import io.agora.rtcwithfu.MyApplication;
 import io.agora.rtcwithfu.R;
 import io.agora.rtcwithfu.RtcEngineEventHandler;
@@ -46,25 +46,23 @@ import io.agora.rtcwithfu.utils.Constants;
  * <p>
  * The FU activity which possesses remote video chatting ability.
  */
-@SuppressWarnings("deprecation")
 public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHandler, SensorEventListener {
     private final static String TAG = FUChatActivity.class.getSimpleName();
 
     private static final int CAPTURE_WIDTH = 1280;
     private static final int CAPTURE_HEIGHT = 720;
-    private static final int CAPTURE_FRAME_RATE = 24;
+    private static final int CAPTURE_FRAME_RATE = 30;
 
-    private CameraVideoManager mVideoManager;
     private FURenderer mFURenderer = FURenderer.getInstance();
     private FaceUnityDataFactory mFaceUnityDataFactory;
     private PreprocessorFaceUnity preprocessor;
 
     private FrameLayout mRemoteViewContainer;
     private TextView mTrackingText;
-
-
     private int mRemoteUid = -1;
     private SensorManager mSensorManager;
+
+    private RtcEngine rtcEngine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +75,7 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
         String sdkVersion = RtcEngine.getSdkVersion();
         Log.i(TAG, "onCreate: agora sdk version " + sdkVersion);
         initCsvUtil(this);
-        if (preprocessor !=null) {
+        if (preprocessor != null) {
             preprocessor.setCSVUtils(mCSVUtils);
         }
     }
@@ -98,48 +96,79 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
     }
 
     private void initRoom() {
-        initVideoModule();
-        rtcEngine().setVideoSource(new RtcVideoConsumer());
+        try {
+            rtcEngine = RtcEngine.create(getApplicationContext(), getString(R.string.agora_app_id), application().getRtcEventHandler());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if (rtcEngine == null) return;
+        initFUModule();
+        rtcEngine.enableExtension("agora_video_filters_clear_vision", "clear_vision", true);
+        rtcEngine.registerVideoFrameObserver(new IVideoFrameObserver() {
+            @Override
+            public boolean onCaptureVideoFrame(int sourceType, VideoFrame videoFrame) {
+                return preprocessor.processBeauty(videoFrame);
+            }
+
+            @Override
+            public boolean onPreEncodeVideoFrame(int sourceType, VideoFrame videoFrame) {
+                return false;
+            }
+
+            @Override
+            public boolean onMediaPlayerVideoFrame(VideoFrame videoFrame, int mediaPlayerId) {
+                return false;
+            }
+
+            @Override
+            public boolean onRenderVideoFrame(String channelId, int uid, VideoFrame videoFrame) {
+                return false;
+            }
+
+            @Override
+            public int getVideoFrameProcessMode() {
+                return IVideoFrameObserver.PROCESS_MODE_READ_WRITE;
+            }
+
+            @Override
+            public int getVideoFormatPreference() {
+                return IVideoFrameObserver.VIDEO_PIXEL_DEFAULT;
+            }
+
+            @Override
+            public boolean getRotationApplied() {
+                return false;
+            }
+
+            @Override
+            public boolean getMirrorApplied() {
+                return false;
+            }
+
+            @Override
+            public int getObservedFramePosition() {
+                return IVideoFrameObserver.POSITION_POST_CAPTURER;
+            }
+        });
+        rtcEngine.setCameraCapturerConfiguration(new CameraCapturerConfiguration(
+                new CameraCapturerConfiguration.CaptureFormat(CAPTURE_WIDTH, CAPTURE_HEIGHT, CAPTURE_FRAME_RATE)));
+
+        rtcEngine.setVideoEncoderConfiguration(new VideoEncoderConfiguration(
+                VideoEncoderConfiguration.VD_640x360,
+                VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_24,
+                VideoEncoderConfiguration.STANDARD_BITRATE,
+                VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT));
+        rtcEngine.enableVideo();
+        rtcEngine.disableAudio();
         joinChannel();
     }
 
-    private void initVideoModule() {
-        mVideoManager = videoManager();
-        mVideoManager.setCameraStateListener(new VideoCapture.VideoCaptureStateListener() {
-            @Override
-            public void onFirstCapturedFrame(int width, int height) {
-                Log.i(TAG, "onFirstCapturedFrame: " + width + "x" + height);
-            }
-
-            @Override
-            public void onCameraCaptureError(int error, String msg) {
-                Log.i(TAG, "onCameraCaptureError: error:" + error + " " + msg);
-                if (mVideoManager != null) {
-                    // When there is a camera error, the capture should
-                    // be stopped to reset the internal states.
-                    mVideoManager.stopCapture();
-                }
-            }
-
-            @Override
-            public void onCameraClosed() {
-
-            }
-        });
-        preprocessor = (PreprocessorFaceUnity) mVideoManager.getPreprocessor();
+    private void initFUModule() {
+        preprocessor = new PreprocessorFaceUnity();
         mTrackingText = findViewById(R.id.iv_face_detect);
         FaceUnityView faceUnityView = findViewById(R.id.fu_view);
         mFaceUnityDataFactory = new FaceUnityDataFactory(-1);
         faceUnityView.bindDataFactory(mFaceUnityDataFactory);
-
-        mVideoManager.setPictureSize(CAPTURE_WIDTH, CAPTURE_HEIGHT);
-        mVideoManager.setFrameRate(CAPTURE_FRAME_RATE);
-        mVideoManager.setFacing(Constant.CAMERA_FACING_FRONT);
-        mVideoManager.setLocalPreviewMirror(Constant.MIRROR_MODE_AUTO);
-
-        TextureView localVideo = findViewById(R.id.local_video_view);
-        mVideoManager.setLocalPreview(localVideo);
-
         preprocessor.setSurfaceListener(new PreprocessorFaceUnity.SurfaceViewListener() {
             @Override
             public void onSurfaceCreated() {
@@ -155,30 +184,26 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
     }
 
     private void joinChannel() {
-        rtcEngine().setVideoEncoderConfiguration(new VideoEncoderConfiguration(
-                VideoEncoderConfiguration.VD_640x360,
-                VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_24,
-                VideoEncoderConfiguration.STANDARD_BITRATE,
-                VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT));
-        rtcEngine().setClientRole(io.agora.rtc.Constants.CLIENT_ROLE_BROADCASTER);
-        rtcEngine().enableLocalAudio(false);
+        int uid = new Random(System.currentTimeMillis()).nextInt(1000) + 10000;
+        ChannelMediaOptions options = new ChannelMediaOptions();
+        options.channelProfile = io.agora.rtc2.Constants.CHANNEL_PROFILE_LIVE_BROADCASTING;
+        options.clientRoleType = io.agora.rtc2.Constants.CLIENT_ROLE_BROADCASTER;
         String roomName = getIntent().getStringExtra(Constants.ACTION_KEY_ROOM_NAME);
-        rtcEngine().joinChannel(null, roomName, null, 0);
+        rtcEngine.joinChannel(null, roomName, uid, options);
+
+        TextureView localVideo = findViewById(R.id.local_video_view);
+        VideoCanvas local = new VideoCanvas(localVideo, io.agora.rtc2.Constants.RENDER_MODE_HIDDEN, 0);
+        local.mirrorMode = io.agora.rtc2.Constants.VIDEO_MIRROR_MODE_AUTO;
+        rtcEngine.setupLocalVideo(local);
+        rtcEngine.startPreview();
     }
 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_switch_camera:
-                preprocessor.skipFrame();
-                onCameraChangeRequested();
+                rtcEngine.switchCamera();
                 break;
         }
-    }
-
-    private void onCameraChangeRequested() {
-        preprocessor.doGLAction(() -> Log.e("ECRP", "test doGLAction thread id:" + Thread.currentThread().getId()));
-
-        mVideoManager.switchCamera();
     }
 
     /**
@@ -207,21 +232,16 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
         super.onResume();
         Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-        preprocessor.setRenderEnable(true);
-        mVideoManager.startCapture();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        preprocessor.releaseFURender();
-        mVideoManager.stopCapture();
-        mSensorManager.unregisterListener(this);
     }
 
     @Override
     protected void onDestroy() {
-        rtcEngine().leaveChannel();
+        preprocessor.setRenderEnable(false);
+        rtcEngine.leaveChannel();
+        rtcEngine.stopPreview();
+        preprocessor.releaseFURender();
+        mSensorManager.unregisterListener(this);
+        RtcEngine.destroy();
         super.onDestroy();
     }
 
@@ -238,7 +258,7 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
     @Override
     public void onRemoteVideoStateChanged(int uid, int state, int reason, int elapsed) {
         Log.i(TAG, "onRemoteVideoStateChanged " + (uid & 0xFFFFFFFFL) + " " + state + " " + reason);
-        if (mRemoteUid == -1 && state == io.agora.rtc.Constants.REMOTE_VIDEO_STATE_DECODING) {
+        if (mRemoteUid == -1 && state == io.agora.rtc2.Constants.REMOTE_VIDEO_STATE_STARTING) {
             runOnUiThread(() -> {
                 mRemoteUid = uid;
                 setRemoteVideoView(uid);
@@ -247,10 +267,10 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
     }
 
     private void setRemoteVideoView(int uid) {
-        SurfaceView surfaceView = RtcEngine.CreateRendererView(this);
-        rtcEngine().setupRemoteVideo(new VideoCanvas(
-                surfaceView, VideoCanvas.RENDER_MODE_HIDDEN, uid));
-        mRemoteViewContainer.addView(surfaceView);
+        TextureView videoView = new TextureView(application());
+        rtcEngine.setupRemoteVideo(new VideoCanvas(
+                videoView, VideoCanvas.RENDER_MODE_HIDDEN, uid));
+        mRemoteViewContainer.addView(videoView);
     }
 
     @Override
@@ -288,12 +308,13 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
 
     }
 
-    private static final int ENCODE_FRAME_WIDTH = 960;
-    private static final int ENCODE_FRAME_HEIGHT = 540;
+    private static final int ENCODE_FRAME_WIDTH = 640;
+    private static final int ENCODE_FRAME_HEIGHT = 360;
     private static final int ENCODE_FRAME_BITRATE = 1000;
-    private static final int ENCODE_FRAME_FPS = 30;
+    private static final int ENCODE_FRAME_FPS = 24;
 
     private CSVUtils mCSVUtils;
+
     private void initCsvUtil(Context context) {
         mCSVUtils = new CSVUtils(context);
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault());
