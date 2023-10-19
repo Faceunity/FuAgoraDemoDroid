@@ -47,6 +47,7 @@ public class FaceBeautySkinControlView extends BaseControlView {
     private TextView recoverTextView;
     private SwitchCompat switchCompat;
 
+
     public FaceBeautySkinControlView(@NonNull Context context) {
         super(context);
         init();
@@ -164,6 +165,7 @@ public class FaceBeautySkinControlView extends BaseControlView {
         /*渲染开关*/
         switchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> mDataFactory.enableFaceBeauty(isChecked));
     }
+
 
     /**
      * 滚动条绑定事件

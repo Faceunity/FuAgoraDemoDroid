@@ -28,6 +28,7 @@
     <string name="beauty_box_heavy_blur_fine">Fine smooth</string>
     <string name="beauty_box_color_level">Whiten</string>
     <string name="beauty_box_red_level">Ruddy</string>
+    <string name="beauty_box_clarity">Clarity</string>
     <string name="beauty_box_sharpen">Sharpen</string>
     <string name="beauty_box_eye_bright">Eye brighten</string>
     <string name="beauty_box_tooth_whiten">Tooth whiten</string>
@@ -92,6 +93,7 @@
     <string name="makeup_combination_gangfeng">HK style</string>
     <string name="makeup_combination_rose">Rose</string>
 
+
     <string name="slimming">Body</string>
     <string name="long_legs">Leg</string>
     <string name="thin_waist">Waist</string>
@@ -101,4 +103,8 @@
     <string name="beautify_leg_thin_slim">Thin leg</string>
 
     <string name="face_beauty_function_tips">%s is only supported for high-end computers</string>
+
+    <string name="beauty_skin_seg_type_overall">Overall</string>
+    <string name="beauty_skin_seg_type_skin">Skin</string>
+    <string name="beauty_skin_seg_type_tips">Skin Tone</string>
 </resources>

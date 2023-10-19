@@ -99,4 +99,5 @@ public abstract class AbstractFaceBeautyDataFactory {
     public abstract void updateParamIntensity(String key, double value);
 
 
+
 }
