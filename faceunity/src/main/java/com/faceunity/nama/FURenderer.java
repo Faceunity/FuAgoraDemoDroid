@@ -15,6 +15,7 @@ import com.faceunity.core.faceunity.FURenderKit;
 import com.faceunity.core.faceunity.FURenderManager;
 import com.faceunity.core.utils.FULogger;
 import com.faceunity.nama.listener.FURendererListener;
+import com.faceunity.nama.utils.FuDeviceUtils;
 
 import java.io.File;
 
@@ -81,6 +82,9 @@ public class FURenderer extends IFURenderer {
                 if (i == FURenderConfig.OPERATE_SUCCESS_AUTH) {
                     mFUAIKit.loadAIProcessor(BUNDLE_AI_FACE, FUAITypeEnum.FUAITYPE_FACEPROCESSOR);
                     mFUAIKit.loadAIProcessor(BUNDLE_AI_HUMAN, FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR);
+                    if (FUConfig.DEVICE_LEVEL == FuDeviceUtils.DEVICE_LEVEL_LOW) {
+                        mFURenderKit.setUseTexAsync(true);
+                    }
                 }
             }
 

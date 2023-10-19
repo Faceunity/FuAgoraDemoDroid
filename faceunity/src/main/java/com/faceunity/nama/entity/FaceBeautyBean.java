@@ -12,6 +12,7 @@ public class FaceBeautyBean {
     private int openRes;//图片
     private boolean canUseFunction = true;
 
+
     public FaceBeautyBean(String key, int desRes, int closeRes, int openRes) {
         this.key = key;
         this.desRes = desRes;
@@ -20,13 +21,14 @@ public class FaceBeautyBean {
         this.canUseFunction = true;
     }
 
-    public FaceBeautyBean(String key, int desRes, int closeRes, int openRes,boolean canUseFunction) {
+    public FaceBeautyBean(String key, int desRes, int closeRes, int openRes, boolean canUseFunction) {
         this.key = key;
         this.desRes = desRes;
         this.closeRes = closeRes;
         this.openRes = openRes;
         this.canUseFunction = canUseFunction;
     }
+
 
     public String getKey() {
         return key;
@@ -67,4 +69,5 @@ public class FaceBeautyBean {
     public void setCanUseFunction(boolean canUseFunction) {
         this.canUseFunction = canUseFunction;
     }
+
 }
