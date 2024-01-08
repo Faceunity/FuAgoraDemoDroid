@@ -12,6 +12,12 @@ public class FaceBeautyBean {
     private int openRes;//图片
     private boolean canUseFunction = true;
 
+    private String relevanceKey;//关联的名称标识
+    private boolean showRadioButton = false;
+    private boolean enableRadioButton;
+    private int leftRadioButtonDesRes;
+    private int rightRadioButtonDesRes;
+    private int enableRadioButtonDesRes;
 
     public FaceBeautyBean(String key, int desRes, int closeRes, int openRes) {
         this.key = key;
@@ -29,6 +35,19 @@ public class FaceBeautyBean {
         this.canUseFunction = canUseFunction;
     }
 
+    public FaceBeautyBean(String key, int desRes, int closeRes, int openRes, boolean canUseFunction, String relevanceKey, boolean showRadioButton, boolean enableRadioButton, int leftRadioButtonDesRes, int rightRadioButtonDesRes, int enableRadioButtonDesRes) {
+        this.key = key;
+        this.desRes = desRes;
+        this.closeRes = closeRes;
+        this.openRes = openRes;
+        this.canUseFunction = canUseFunction;
+        this.relevanceKey = relevanceKey;
+        this.showRadioButton = showRadioButton;
+        this.enableRadioButton = enableRadioButton;
+        this.leftRadioButtonDesRes = leftRadioButtonDesRes;
+        this.rightRadioButtonDesRes = rightRadioButtonDesRes;
+        this.enableRadioButtonDesRes = enableRadioButtonDesRes;
+    }
 
     public String getKey() {
         return key;
@@ -70,4 +89,51 @@ public class FaceBeautyBean {
         this.canUseFunction = canUseFunction;
     }
 
+    public boolean isShowRadioButton() {
+        return showRadioButton;
+    }
+
+    public void setShowRadioButton(boolean showRadioButton) {
+        this.showRadioButton = showRadioButton;
+    }
+
+    public boolean isEnableRadioButton() {
+        return enableRadioButton;
+    }
+
+    public void setEnableRadioButton(boolean enableRadioButton) {
+        this.enableRadioButton = enableRadioButton;
+    }
+
+    public int getLeftRadioButtonDesRes() {
+        return leftRadioButtonDesRes;
+    }
+
+    public void setLeftRadioButtonDesRes(int leftRadioButtonDesRes) {
+        this.leftRadioButtonDesRes = leftRadioButtonDesRes;
+    }
+
+    public int getRightRadioButtonDesRes() {
+        return rightRadioButtonDesRes;
+    }
+
+    public void setRightRadioButtonDesRes(int rightRadioButtonDesRes) {
+        this.rightRadioButtonDesRes = rightRadioButtonDesRes;
+    }
+
+    public int getEnableRadioButtonDesRes() {
+        return enableRadioButtonDesRes;
+    }
+
+    public void setEnableRadioButtonDesRes(int enableRadioButtonDesRes) {
+        this.enableRadioButtonDesRes = enableRadioButtonDesRes;
+    }
+
+    public String getRelevanceKey() {
+        return relevanceKey;
+    }
+
+    public void setRelevanceKey(String relevanceKey) {
+        this.relevanceKey = relevanceKey;
+    }
 }

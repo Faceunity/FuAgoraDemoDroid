@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +48,9 @@ public class FaceBeautySkinControlView extends BaseControlView {
     private TextView recoverTextView;
     private SwitchCompat switchCompat;
 
+    private LinearLayout linBeautyRelevance;
+
+    private TextView rbLeftBeautyRelevance, rbRightBeautyRelevance;
 
     public FaceBeautySkinControlView(@NonNull Context context) {
         super(context);
@@ -103,6 +107,9 @@ public class FaceBeautySkinControlView extends BaseControlView {
         recoverImageView = findViewById(R.id.iv_beauty_recover);
         recoverTextView = findViewById(R.id.tv_beauty_recover);
         switchCompat = findViewById(R.id.switch_compat);
+        linBeautyRelevance = findViewById(R.id.lin_beauty_relevance);
+        rbLeftBeautyRelevance = findViewById(R.id.rb_left_beauty_relevance);
+        rbRightBeautyRelevance = findViewById(R.id.rb_right_beauty_relevance);
         initHorizontalRecycleView(recyclerView);
     }
 
@@ -140,6 +147,7 @@ public class FaceBeautySkinControlView extends BaseControlView {
                     ToastHelper.showNormalToast(mContext, mContext.getString(R.string.face_beauty_function_tips, mContext.getString(data.getDesRes())));
                     return;
                 }
+                checkRelevanceRadioGroup(data);
                 changeAdapterSelected(mBeautyAdapter, mSkinIndex, position);
                 mSkinIndex = position;
                 double value = mDataFactory.getParamIntensity(data.getKey());
@@ -148,6 +156,62 @@ public class FaceBeautySkinControlView extends BaseControlView {
                 seekToSeekBar(value, stand, maxRange);
             }
         }, R.layout.list_item_control_title_image_circle);
+    }
+
+
+    private void checkRelevanceRadioGroup(FaceBeautyBean data) {
+        linBeautyRelevance.setVisibility(data.isShowRadioButton() ? View.VISIBLE : View.GONE);
+        if (data.isShowRadioButton()) {
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) discreteSeekBar.getLayoutParams();
+            params.weight = 1.0f;
+            discreteSeekBar.requestLayout();
+            rbLeftBeautyRelevance.setText(data.getLeftRadioButtonDesRes());
+            rbRightBeautyRelevance.setText(data.getRightRadioButtonDesRes());
+            if (mDataFactory.getParamRelevanceSelectedType(data.getRelevanceKey()) == 0) {
+                rbLeftBeautyRelevance.setSelected(true);
+                rbRightBeautyRelevance.setSelected(false);
+            } else {
+                rbLeftBeautyRelevance.setSelected(false);
+                rbRightBeautyRelevance.setSelected(true);
+            }
+            if (!data.isEnableRadioButton()) {
+                if (rbLeftBeautyRelevance.isSelected()) {
+                    rbRightBeautyRelevance.setOnClickListener(v -> ToastHelper.showNormalToast(
+                            mContext, mContext.getString(
+                                    R.string.face_beauty_function_tips,
+                                    mContext.getString(data.getEnableRadioButtonDesRes())
+                            )
+                    ));
+                }
+                if (rbRightBeautyRelevance.isSelected()) {
+                    rbLeftBeautyRelevance.setOnClickListener(v -> ToastHelper.showNormalToast(
+                            mContext, mContext.getString(
+                                    R.string.face_beauty_function_tips,
+                                    mContext.getString(data.getEnableRadioButtonDesRes())
+                            )
+                    ));
+                }
+            } else {
+                rbLeftBeautyRelevance.setOnClickListener(v -> {
+                    mDataFactory.updateParamRelevanceType(data.getRelevanceKey(), 0);
+                    setRecoverEnable(checkFaceSkinChanged());
+                    rbLeftBeautyRelevance.setSelected(true);
+                    rbRightBeautyRelevance.setSelected(false);
+                });
+                rbRightBeautyRelevance.setOnClickListener(v -> {
+                    mDataFactory.updateParamRelevanceType(data.getRelevanceKey(), 1);
+                    setRecoverEnable(checkFaceSkinChanged());
+                    rbLeftBeautyRelevance.setSelected(false);
+                    rbRightBeautyRelevance.setSelected(true);
+                });
+            }
+        } else {
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) discreteSeekBar.getLayoutParams();
+            params.weight = 0f;
+            params.width = (int) getResources().getDimension(R.dimen.x528);
+            discreteSeekBar.requestLayout();
+        }
+
     }
 
 
@@ -258,11 +322,25 @@ public class FaceBeautySkinControlView extends BaseControlView {
             if (!DecimalUtils.doubleEquals(value, defaultV)) {
                 return true;
             }
+            if (!TextUtils.isEmpty(bean.getRelevanceKey())) {
+                double relevanceValue = mDataFactory.getParamRelevanceSelectedType(bean.getRelevanceKey());
+                double relevanceDefault = mModelAttributeRange.get(bean.getRelevanceKey()).getDefaultV();
+                if (!DecimalUtils.doubleEquals(relevanceValue, relevanceDefault)) {
+                    return true;
+                }
+            }
             for (FaceBeautyBean beautyBean : mSkinBeauty) {
                 value = mDataFactory.getParamIntensity(beautyBean.getKey());
                 defaultV = mModelAttributeRange.get(beautyBean.getKey()).getDefaultV();
                 if (!DecimalUtils.doubleEquals(value, defaultV)) {
                     return true;
+                }
+                if (!TextUtils.isEmpty(bean.getRelevanceKey())) {
+                    double relevanceValue = mDataFactory.getParamRelevanceSelectedType(bean.getRelevanceKey());
+                    double relevanceDefault = mModelAttributeRange.get(bean.getRelevanceKey()).getDefaultV();
+                    if (!DecimalUtils.doubleEquals(relevanceValue, relevanceDefault)) {
+                        return true;
+                    }
                 }
             }
         }
@@ -286,11 +364,16 @@ public class FaceBeautySkinControlView extends BaseControlView {
         for (FaceBeautyBean bean : beautyBeans) {
             double intensity = mModelAttributeRange.get(bean.getKey()).getDefaultV();
             mDataFactory.updateParamIntensity(bean.getKey(), intensity);
+            if (!TextUtils.isEmpty(bean.getRelevanceKey())) {
+                double relevanceDefault = mModelAttributeRange.get(bean.getRelevanceKey()).getDefaultV();
+                mDataFactory.updateParamRelevanceType(bean.getRelevanceKey(), (int) relevanceDefault);
+            }
         }
         FaceBeautyBean data = beautyBeans.get(currentIndex);
         double value = mDataFactory.getParamIntensity(data.getKey());
         double stand = mModelAttributeRange.get(data.getKey()).getStandV();
         double maxRange = mModelAttributeRange.get(data.getKey()).getMaxRange();
+        checkRelevanceRadioGroup(data);
         seekToSeekBar(value, stand, maxRange);
         mBeautyAdapter.notifyDataSetChanged();
         setRecoverEnable(false);

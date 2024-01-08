@@ -51,7 +51,7 @@ public class FaceBeautySource {
         recommendFaceBeauty.setMouthIntensity(0.4);
         recommendFaceBeauty.setChinIntensity(0.3);
         //性能最优策略
-        if (FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID) {
+        if (FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_ONE) {
             setFaceBeautyPropertyMode(recommendFaceBeauty);
         }
         return recommendFaceBeauty;
@@ -97,10 +97,16 @@ public class FaceBeautySource {
                         R.drawable.icon_beauty_skin_buffing_close_selector, R.drawable.icon_beauty_skin_buffing_open_selector
                 )
         );
+        params.add(new FaceBeautyBean(
+                        FaceBeautyParam.DELSPOT, R.string.beauty_box_delspot,
+                        R.drawable.icon_beauty_skin_delspot_close_selector, R.drawable.icon_beauty_skin_delspot_open_selector, FUConfig.DEVICE_LEVEL >= FuDeviceUtils.DEVICE_LEVEL_THREE && !FuDeviceUtils.judgeFunctionInBlackList(FaceBeautyParam.DELSPOT)
+                )
+        );
         params.add(
                 new FaceBeautyBean(
                         FaceBeautyParam.COLOR_INTENSITY, R.string.beauty_box_color_level,
-                        R.drawable.icon_beauty_skin_color_close_selector, R.drawable.icon_beauty_skin_color_open_selector
+                        R.drawable.icon_beauty_skin_color_close_selector, R.drawable.icon_beauty_skin_color_open_selector, true, FaceBeautyParam.ENABLE_SKIN_SEG, true, FUConfig.DEVICE_LEVEL >= FuDeviceUtils.DEVICE_LEVEL_FOUR,
+                        R.string.beauty_skin_seg_type_overall, R.string.beauty_skin_seg_type_skin, R.string.beauty_skin_seg_type_tips
                 )
         );
         params.add(
@@ -269,7 +275,7 @@ public class FaceBeautySource {
                 new FaceBeautyBean(
                         FaceBeautyParam.INTENSITY_LIP_THICK, R.string.beauty_lip_thick,
                         R.drawable.icon_beauty_shape_lip_thick_close_selector, R.drawable.icon_beauty_shape_lip_thick_open_selector,
-                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID)
+                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_ONE)
         );
 
         //眼睛位置
@@ -277,7 +283,7 @@ public class FaceBeautySource {
                 new FaceBeautyBean(
                         FaceBeautyParam.INTENSITY_EYE_HEIGHT, R.string.beauty_eye_height,
                         R.drawable.icon_beauty_shape_eye_height_close_selector, R.drawable.icon_beauty_shape_eye_height_open_selector,
-                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID)
+                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_ONE)
         );
 
         //开眼角
@@ -293,7 +299,7 @@ public class FaceBeautySource {
                 new FaceBeautyBean(
                         FaceBeautyParam.INTENSITY_EYE_LID, R.string.beauty_eye_lid,
                         R.drawable.icon_beauty_shape_eye_lid_close_selector, R.drawable.icon_beauty_shape_eye_lid_open_selector,
-                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID)
+                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_ONE)
         );
 
         //眼距
@@ -341,7 +347,7 @@ public class FaceBeautySource {
                 new FaceBeautyBean(
                         FaceBeautyParam.BROW_HEIGHT_INTENSITY, R.string.beauty_brow_height,
                         R.drawable.icon_beauty_shape_brow_height_close_selector, R.drawable.icon_beauty_shape_brow_height_open_selector,
-                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID
+                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_ONE
                 )
         );
 
@@ -350,7 +356,7 @@ public class FaceBeautySource {
                 new FaceBeautyBean(
                         FaceBeautyParam.BROW_SPACE_INTENSITY, R.string.beauty_brow_space,
                         R.drawable.icon_beauty_shape_brow_space_close_selector, R.drawable.icon_beauty_shape_brow_space_open_selector,
-                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID
+                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_ONE
                 )
         );
 
@@ -359,7 +365,7 @@ public class FaceBeautySource {
                 new FaceBeautyBean(
                         FaceBeautyParam.INTENSITY_BROW_THICK, R.string.beauty_brow_thick,
                         R.drawable.icon_beauty_shape_brow_thick_close_selector, R.drawable.icon_beauty_shape_brow_thick_open_selector,
-                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID)
+                        FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_ONE)
         );
         return params;
     }
@@ -373,6 +379,7 @@ public class FaceBeautySource {
         HashMap<String, ModelAttributeData> params = new HashMap<>();
         /*美肤*/
         params.put(FaceBeautyParam.COLOR_INTENSITY, new ModelAttributeData(0.3, 0.0, 0.0, 1.0));
+        params.put(FaceBeautyParam.ENABLE_SKIN_SEG, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
         params.put(FaceBeautyParam.BLUR_INTENSITY, new ModelAttributeData(4.2, 0.0, 0.0, 6.0));
         params.put(FaceBeautyParam.RED_INTENSITY, new ModelAttributeData(0.3, 0.0, 0.0, 1.0));
         params.put(FaceBeautyParam.SHARPEN_INTENSITY, new ModelAttributeData(0.2, 0.0, 0.0, 1.0));
@@ -382,6 +389,7 @@ public class FaceBeautySource {
         params.put(FaceBeautyParam.REMOVE_NASOLABIAL_FOLDS_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
         params.put(FaceBeautyParam.FACE_THREED, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
         params.put(FaceBeautyParam.CLARITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
+        params.put(FaceBeautyParam.DELSPOT, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
         /*美型*/
         params.put(FaceBeautyParam.FACE_SHAPE_INTENSITY, new ModelAttributeData(1.0, 0.0, 0.0, 1.0));
         params.put(FaceBeautyParam.CHEEK_THINNING_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));

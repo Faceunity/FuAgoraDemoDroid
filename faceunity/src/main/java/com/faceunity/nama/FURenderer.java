@@ -82,7 +82,7 @@ public class FURenderer extends IFURenderer {
                 if (i == FURenderConfig.OPERATE_SUCCESS_AUTH) {
                     mFUAIKit.loadAIProcessor(BUNDLE_AI_FACE, FUAITypeEnum.FUAITYPE_FACEPROCESSOR);
                     mFUAIKit.loadAIProcessor(BUNDLE_AI_HUMAN, FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR);
-                    if (FUConfig.DEVICE_LEVEL == FuDeviceUtils.DEVICE_LEVEL_LOW) {
+                    if (FUConfig.DEVICE_LEVEL <= FuDeviceUtils.DEVICE_LEVEL_ONE) {
                         mFURenderKit.setUseTexAsync(true);
                     }
                 }

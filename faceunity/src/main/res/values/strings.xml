@@ -26,6 +26,7 @@
 
     <string name="recover">Recover</string>
     <string name="beauty_box_heavy_blur_fine">Fine smooth</string>
+    <string name="beauty_box_delspot">Acne Removal</string>
     <string name="beauty_box_color_level">Whiten</string>
     <string name="beauty_box_red_level">Ruddy</string>
     <string name="beauty_box_clarity">Clarity</string>
