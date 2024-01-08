@@ -111,7 +111,7 @@ public class MakeupDataFactory extends AbstractMakeupDataFactory {
             SimpleMakeup makeup = new SimpleMakeup(new FUBundleData(MakeupSource.BUNDLE_FACE_MAKEUP));
             makeup.setCombinedConfig(new FUBundleData(bean.getBundlePath()));
             makeup.setMakeupIntensity(bean.getIntensity());
-            makeup.setMachineLevel(FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID);//更新设备等级去设置是否开启人脸遮挡
+            makeup.setMachineLevel(FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_ONE);//更新设备等级去设置是否开启人脸遮挡
             makeupMap.put(bean.getKey(), makeup);
             return makeup;
         }

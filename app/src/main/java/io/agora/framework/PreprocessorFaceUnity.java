@@ -91,7 +91,7 @@ public class PreprocessorFaceUnity {
 
         mFURenderer.setInputOrientation(videoFrame.getRotation(), videoFrame.getSourceType() == VideoFrame.SourceType.kFrontCamera);
         //高性能设备
-        if (FUConfig.DEVICE_LEVEL == FuDeviceUtils.DEVICE_LEVEL_HIGH) {
+        if (FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_ONE) {
             cheekFaceNum();
         }
         int processTexId = -1;

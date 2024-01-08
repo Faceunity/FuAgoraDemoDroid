@@ -57,7 +57,7 @@ public class FaceUnityDataFactory {
         hasFaceBeautyOrFilterLoaded = needBindFaceBeauty;
         //高端机开启小脸检测
         FUAIKit.getInstance().faceProcessorSetFaceLandmarkQuality(FUConfig.DEVICE_LEVEL);
-        if (FUConfig.DEVICE_LEVEL  > FuDeviceUtils.DEVICE_LEVEL_MID)
+        if (FUConfig.DEVICE_LEVEL  > FuDeviceUtils.DEVICE_LEVEL_ONE)
             FUAIKit.getInstance().fuFaceProcessorSetDetectSmallFace(true);
         //选中哪一项加载哪一项道具
         switch (currentFunctionIndex) {
