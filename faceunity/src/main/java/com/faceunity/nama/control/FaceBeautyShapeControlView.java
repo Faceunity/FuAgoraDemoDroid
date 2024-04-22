@@ -101,10 +101,6 @@ public class FaceBeautyShapeControlView extends BaseControlView {
         recoverImageView = findViewById(R.id.iv_beauty_recover);
         recoverTextView = findViewById(R.id.tv_beauty_recover);
         switchCompat = findViewById(R.id.switch_compat);
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) discreteSeekBar.getLayoutParams();
-        params.weight = 0f;
-        params.width = (int) getResources().getDimension(R.dimen.x528);
-        discreteSeekBar.requestLayout();
         initHorizontalRecycleView(recyclerView);
     }
 

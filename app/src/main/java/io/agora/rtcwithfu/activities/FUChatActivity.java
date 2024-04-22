@@ -150,8 +150,7 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
                 return IVideoFrameObserver.POSITION_POST_CAPTURER;
             }
         });
-        rtcEngine.setCameraCapturerConfiguration(new CameraCapturerConfiguration(
-                new CameraCapturerConfiguration.CaptureFormat(CAPTURE_WIDTH, CAPTURE_HEIGHT, CAPTURE_FRAME_RATE)));
+
 
         rtcEngine.setVideoEncoderConfiguration(new VideoEncoderConfiguration(
                 VideoEncoderConfiguration.VD_640x360,
