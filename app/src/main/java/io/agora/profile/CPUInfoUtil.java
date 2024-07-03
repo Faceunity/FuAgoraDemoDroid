@@ -2,6 +2,7 @@ package io.agora.profile;
 
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -30,7 +31,8 @@ public class CPUInfoUtil {
             if (pn.length() <= 16) {
                 PackageName = pn;
             } else {
-                PackageName = pn.substring(0, 15) + "+";
+//                PackageName = pn.substring(0, 15) + "+";
+                PackageName = pn.substring(0, 14);// 不同手机截取方法不一样，直接判断前几位就行
             }
 //            Log.e(TAG, "CSVUtils PackageName " + PackageName);
             isRunningCPU = true;
@@ -133,8 +135,10 @@ public class CPUInfoUtil {
                 BufferedReader buf = new BufferedReader(new InputStreamReader(is));
                 do {
                     line = buf.readLine();
+
                     if (allCPU == 0 && line.contains("user") && line.contains("nice") && line.contains("sys") && line.contains("idle") && line.contains("iow") && line.contains("irq") && line.contains("sirq") && line.contains("host")) {
-                        if (line.indexOf("%cpu ") > 0)
+
+                        if (line.contains("%cpu "))
                             allCPU = Double.parseDouble(line.split("%cpu ")[0]);
                         if (allCPU == 0) {
                             String[] s = line.split("%,");
@@ -146,9 +150,8 @@ public class CPUInfoUtil {
                         }
                     }
                     // 读取到相应pkgName跳出循环（或者未找到）
-                    if (line == null || line.endsWith(PackageName)) {
-//                        Log.e(TAG, "cpu line : " + line);
-                        if (line != null && line.endsWith(PackageName)) {
+                    if (line == null || line.contains(PackageName)) {
+                        if (line != null && line.contains(PackageName)) {
                             String str[] = line.split(" ");
                             int t = 0;
                             for (int i = str.length - 1; i > 0; i--) {
