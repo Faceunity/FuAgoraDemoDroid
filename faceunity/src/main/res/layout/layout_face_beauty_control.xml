@@ -82,10 +82,8 @@
 
                 <com.faceunity.nama.seekbar.DiscreteSeekBar
                     android:id="@+id/seek_bar"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/x528"
                     android:layout_height="@dimen/x48"
-                    android:layout_weight="1"
-                    android:maxWidth="@dimen/x528"
                     app:dsb_indicatorColor="@color/main_color"
                     app:dsb_indicatorElevation="0dp"
                     app:dsb_indicatorPopupEnabled="true"

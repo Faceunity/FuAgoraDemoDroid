@@ -1,7 +1,10 @@
 package com.faceunity.nama.repo;
 
+import com.faceunity.core.context.FUApplication;
+import com.faceunity.nama.FUConfig;
 import com.faceunity.nama.R;
 import com.faceunity.nama.entity.MakeupCombinationBean;
+import com.faceunity.nama.utils.FuDeviceUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,6 +45,14 @@ public class MakeupSource {
         combinations.add(new MakeupCombinationBean("oumei", R.mipmap.icon_makeup_combination_occident, R.string.makeup_combination_occident, "makeup/oumei.bundle"));
         combinations.add(new MakeupCombinationBean("wumei", R.mipmap.icon_makeup_combination_charming, R.string.makeup_combination_charming, "makeup/wumei.bundle"));
         return combinations;
+    }
+
+    public static boolean isEnableMakeup() {
+        return FUConfig.DEVICE_LEVEL >= FuDeviceUtils.DEVICE_LEVEL_ONE;
+    }
+
+    public static String disableMessage() {
+        return FUApplication.getApplication().getString(R.string.device_level_function_tip);
     }
 
     //endregion 

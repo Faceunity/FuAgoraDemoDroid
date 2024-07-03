@@ -1,9 +1,9 @@
 package com.faceunity.nama.data;
 
-import com.faceunity.nama.FUConfig;
 import com.faceunity.core.enumeration.FUAIProcessorEnum;
 import com.faceunity.core.faceunity.FUAIKit;
 import com.faceunity.core.faceunity.FURenderKit;
+import com.faceunity.nama.FUConfig;
 import com.faceunity.nama.FURenderer;
 import com.faceunity.nama.utils.FuDeviceUtils;
 
@@ -56,7 +56,8 @@ public class FaceUnityDataFactory {
     public void bindCurrentRenderer(boolean needBindFaceBeauty) {
         hasFaceBeautyOrFilterLoaded = needBindFaceBeauty;
         //高端机开启小脸检测
-        FUAIKit.getInstance().faceProcessorSetFaceLandmarkQuality(FUConfig.DEVICE_LEVEL);
+        FUAIKit.getInstance().faceProcessorSetFaceLandmarkQuality(FUConfig.DEVICE_LEVEL >= 2 ? 2 : 1);
+        FURenderKit.getInstance().setDynamicQualityControl(FUConfig.DEVICE_LEVEL <= FuDeviceUtils.DEVICE_LEVEL_ONE);
         if (FUConfig.DEVICE_LEVEL  > FuDeviceUtils.DEVICE_LEVEL_ONE)
             FUAIKit.getInstance().fuFaceProcessorSetDetectSmallFace(true);
         //选中哪一项加载哪一项道具
@@ -145,5 +146,9 @@ public class FaceUnityDataFactory {
                 mFURenderer.setAIProcessTrackType(FUAIProcessorEnum.HUMAN_PROCESSOR);
                 break;
         }
+    }
+
+    public boolean isEnableMakeup() {
+        return mMakeupDataFactory.isEnableMakeup();
     }
 }
