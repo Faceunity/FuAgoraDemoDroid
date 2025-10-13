@@ -6,6 +6,7 @@ import com.faceunity.core.faceunity.FURenderKit;
 import com.faceunity.nama.FUConfig;
 import com.faceunity.nama.FURenderer;
 import com.faceunity.nama.utils.FuDeviceUtils;
+import com.faceunity.nama.repo.FaceBeautySource;
 
 /**
  * DESC：
@@ -105,6 +106,7 @@ public class FaceUnityDataFactory {
             mFURenderKit.getFUAIController().setMaxFaces(4);
             mFURenderer.setAIProcessTrackType(FUAIProcessorEnum.FACE_PROCESSOR);
         }
+        mFURenderKit.enableWarpAntiAlias(FaceBeautySource.BUNDLE_FACE_BEAUTIFICATION, FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_ONE);
     }
 
     /**
@@ -148,6 +150,7 @@ public class FaceUnityDataFactory {
                 mFURenderer.setAIProcessTrackType(FUAIProcessorEnum.HUMAN_PROCESSOR);
                 break;
         }
+        mFURenderKit.enableWarpAntiAlias(FaceBeautySource.BUNDLE_FACE_BEAUTIFICATION, FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_ONE);
     }
 
     public boolean isEnableMakeup() {
