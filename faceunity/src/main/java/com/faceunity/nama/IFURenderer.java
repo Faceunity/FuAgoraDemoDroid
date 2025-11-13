@@ -21,7 +21,7 @@ abstract class IFURenderer {
      * 渲染属性
      */
     protected FUExternalInputEnum externalInputType = FUExternalInputEnum.EXTERNAL_INPUT_TYPE_CAMERA;//数据源类型
-    protected FUInputTextureEnum inputTextureType = FUInputTextureEnum.FU_ADM_FLAG_EXTERNAL_OES_TEXTURE;//纹理类型
+    protected FUInputTextureEnum inputTextureType = FUInputTextureEnum.FU_ADM_FLAG_COMMON_TEXTURE;//纹理类型
     protected FUInputBufferEnum inputBufferType = FUInputBufferEnum.FU_FORMAT_NV21_BUFFER;//数据类型
     protected int inputOrientation = 0;//数据源朝向
     protected int deviceOrientation = 90;//手机设备朝向
