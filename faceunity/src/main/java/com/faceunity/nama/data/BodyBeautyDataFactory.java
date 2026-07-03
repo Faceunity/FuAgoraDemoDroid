@@ -120,6 +120,7 @@ public class BodyBeautyDataFactory extends AbstractBodyBeautyDataFactory {
             put(BodyBeautyParam.HIP_SLIM_INTENSITY, value -> getCurrentBodyBeautyModel().setHipSlimIntensity(value));
             put(BodyBeautyParam.HEAD_SLIM_INTENSITY, value -> getCurrentBodyBeautyModel().setHeadSlimIntensity(value));
             put(BodyBeautyParam.LEG_SLIM_INTENSITY, value -> getCurrentBodyBeautyModel().setLegSlimIntensity(value));
+            put(BodyBeautyParam.BREAST_INTENSITY, value -> getCurrentBodyBeautyModel().setBreastIntensity(value));
         }
     };
 
@@ -133,7 +134,7 @@ public class BodyBeautyDataFactory extends AbstractBodyBeautyDataFactory {
             put(BodyBeautyParam.HIP_SLIM_INTENSITY, () -> getCurrentBodyBeautyModel().getHipSlimIntensity());
             put(BodyBeautyParam.HEAD_SLIM_INTENSITY, () -> getCurrentBodyBeautyModel().getHeadSlimIntensity());
             put(BodyBeautyParam.LEG_SLIM_INTENSITY, () -> getCurrentBodyBeautyModel().getLegSlimIntensity());
-
+            put(BodyBeautyParam.BREAST_INTENSITY, ()->getCurrentBodyBeautyModel().getBreastIntensity());
         }
     };
 

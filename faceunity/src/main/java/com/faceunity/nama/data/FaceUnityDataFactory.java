@@ -5,8 +5,8 @@ import com.faceunity.core.faceunity.FUAIKit;
 import com.faceunity.core.faceunity.FURenderKit;
 import com.faceunity.nama.FUConfig;
 import com.faceunity.nama.FURenderer;
-import com.faceunity.nama.utils.FuDeviceUtils;
 import com.faceunity.nama.repo.FaceBeautySource;
+import com.faceunity.nama.utils.FuDeviceUtils;
 
 /**
  * DESC：

@@ -20,6 +20,7 @@ import com.faceunity.nama.FURenderer;
 import com.faceunity.nama.data.FaceUnityDataFactory;
 import com.faceunity.nama.listener.FURendererListener;
 import com.faceunity.nama.ui.FaceUnityView;
+import com.faceunity.nama.utils.FuDeviceUtils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -64,11 +65,14 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
 
     private RtcEngine rtcEngine;
 
+    int level = 2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_base);
+        level = FuDeviceUtils.judgeDeviceLevel();
         initUI();
         initRoom();
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -151,10 +155,12 @@ public class FUChatActivity extends RtcBasedActivity implements RtcEngineEventHa
             }
         });
 
+        rtcEngine.setCameraCapturerConfiguration(new CameraCapturerConfiguration(
+                new CameraCapturerConfiguration.CaptureFormat(CAPTURE_WIDTH, CAPTURE_HEIGHT, CAPTURE_FRAME_RATE)));
 
         rtcEngine.setVideoEncoderConfiguration(new VideoEncoderConfiguration(
                 VideoEncoderConfiguration.VD_640x360,
-                VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_24,
+                VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_30,
                 VideoEncoderConfiguration.STANDARD_BITRATE,
                 VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT));
         rtcEngine.enableVideo();
