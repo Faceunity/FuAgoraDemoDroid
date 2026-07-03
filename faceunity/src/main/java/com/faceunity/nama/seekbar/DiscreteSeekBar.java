@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewParent;
 
-
 import com.faceunity.nama.R;
 import com.faceunity.nama.seekbar.internal.PopupIndicator;
 import com.faceunity.nama.seekbar.internal.compat.AnimatorCompat;

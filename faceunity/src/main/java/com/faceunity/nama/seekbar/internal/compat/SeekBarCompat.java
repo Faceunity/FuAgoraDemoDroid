@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewParent;
 import android.widget.TextView;
 
-
 import com.faceunity.nama.seekbar.internal.drawable.AlmostRippleDrawable;
 import com.faceunity.nama.seekbar.internal.drawable.MarkerDrawable;
 
